@@ -1,0 +1,91 @@
+
+<div class="container mt-5 pb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark">Product Catalog</h2>
+    <span class="badge bg-dark rounded-pill px-3 py-2">Items: {{ filterlist.length }}</span>
+  </div>
+  <div class="container py-5 text-center">
+</div>
+
+  <div class="row g-4">
+    @for (p of filterlist; track p.id) {
+      <div class="col-md-4 col-lg-3">
+        <div class="card product-card border-0 shadow-lg rounded-4 h-100 transition-up">
+          
+          <div appZoom class="img-box position-relative overflow-hidden" style="height: 200px;">
+            <img class="card-img-top h-100 w-100 object-fit-cover" [src]="p.thumbnail" [alt]="p.title">
+            <span class="badge bg-secondary position-absolute top-0 end-0 m-3 rounded-pill shadow-sm">
+              {{ p.categoryid }}
+            </span>
+          </div>
+
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title fw-bold text-dark mb-1 text-truncate">
+              {{ p.title }}
+            </h5>
+
+            <p class="card-text text-muted small mb-3">
+              {{ p.description | shortdesc }}
+            </p>
+
+            <ul class="list-group list-group-flush mb-3">
+              <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                <span class="text-muted">Price:</span>
+                <span class="fw-bold">{{ p.price | currency:'USD' }}</span>
+              </li>
+
+              <li class="list-group-item border-0 px-0 py-1 d-flex justify-content-between">
+                <span class="text-muted">Stock:</span>
+                @switch (p.stock) {
+                  @case(0){ <span class="text-danger fw-bold">Out of stock</span> }
+                  @case(1){ <span class="text-warning fw-bold">Last item!</span> }
+                  @default{ <span class="text-success">{{p.stock}}</span> }
+                }
+              </li>
+              <li class="list-group-item border-0 px-0 py-2 border-top mt-2 d-flex justify-content-between align-items-center">
+                <strong class="text-primary">Item Total:</strong> 
+                <span class="fw-bold text-primary fs-5">{{ (p.price * (+qty.value || 0)) | currency:'USD' }}</span>
+              </li>
+            </ul>
+
+            <div class="mt-auto d-flex justify-content-center align-items-end gap-2 pt-2">
+              <div style="max-width: 90px;">
+                <label class="form-label small text-muted mb-1 ms-1">Qty</label>
+                <input [disabled]="p.stock===0" #qty type="number" class="form-control form-control-sm rounded-pill border-primary px-3 shadow-sm" 
+                       value="1" min="1" [max]="p.stock" (input)="0">
+              </div>
+              
+              <app-dynamibutton
+                [title]="p.stock === 0 ? 'Out of Stock' : 'Buy Now'"
+                [bgColor]="p.stock === 0 ? '#6c757d' : '#0d6efd'"
+                color="#ffffff"
+                width="110px"
+                height="38px"
+                [disabled]="p.stock === 0"
+                (click)="p.stock !== 0 && buyproducts(qty, p)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="col-12 text-center py-5">
+        <div class="display-1 text-muted opacity-25 mb-3">Empty</div>
+        <h3 class="text-muted">No products found in this list.</h3>
+      </div>
+    }
+  </div>
+</div>
+
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="liveToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Sorry, the requested quantity is not available! Only {{currentStock}} is available.      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>

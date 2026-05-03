@@ -1,0 +1,40 @@
+.footer {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border-top: 3px solid #0d6efd; 
+}
+
+.footer-links a {
+  color: #adb5bd;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.footer-links a:hover {
+  color: #0d6efd;
+  padding-left: 8px; 
+}
+
+.social-links a {
+  width: 35px;
+  height: 35px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.social-links a:hover {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  transform: translateY(-3px);
+}
+
+.input-group .form-control {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.input-group .form-control::placeholder {
+  color: #6c757d;
+}

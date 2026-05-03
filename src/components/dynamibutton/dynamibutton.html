@@ -1,0 +1,12 @@
+<button
+  class="app-btn"
+  [style.color]="color"
+  [style.background-color]="bgColor"
+  [style.width]="width"
+  [style.height]="height"
+  [disabled]="disabled"
+  [style.opacity]="disabled ? '0.55' : '1'"
+  [style.cursor]="disabled ? 'not-allowed' : 'pointer'"
+>
+  {{ title }}
+</button>
