@@ -1,14 +1,16 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../services/user';
 import { Subscription } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { UpperCasePipe } from '@angular/common';
+import { AsyncPipe, UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-users',
-  imports: [UpperCasePipe],
+  imports: [UpperCasePipe,AsyncPipe],
   templateUrl: './users.html',
   styleUrl: './users.css',
+  changeDetection:ChangeDetectionStrategy.OnPush
+
 })
 export class Users implements OnInit, OnDestroy {
   data: any[] = [];

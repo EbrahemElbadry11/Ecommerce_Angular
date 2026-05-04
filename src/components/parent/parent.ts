@@ -1,8 +1,8 @@
 import { Component ,ViewChild, ElementRef } from '@angular/core';
-import { Products } from '../products/products';
 import { FormsModule } from '@angular/forms';
 import { Icategory } from '../../models/icategory';
 import { CurrencyPipe } from '@angular/common';
+import { Products } from '../products/products';
 
 @Component({
   selector: 'app-parent',
@@ -14,7 +14,7 @@ export class Parent {
   selectedid:number=0
   catlist:Icategory[]
   total:number=0
-
+ 
   constructor(){
     this.catlist= [
     { id: 1, name: 'Beauty' },

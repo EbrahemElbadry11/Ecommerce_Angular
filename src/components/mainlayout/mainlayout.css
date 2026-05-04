@@ -1,0 +1,27 @@
+.custom-toast {
+  min-width: 260px;
+  max-width: 320px;
+  backdrop-filter: blur(6px);
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+.custom-toast:hover {
+  transform: translateY(-3px) scale(1.02);
+  opacity: 1;
+}
+
+.animate {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

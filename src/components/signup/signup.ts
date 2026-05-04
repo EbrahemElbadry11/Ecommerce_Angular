@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { User } from '../../services/user';
 import { Router, RouterLink } from '@angular/router';
+import { ToastService } from '../../services/toast';
 declare var bootstrap: any;
 
 @Component({
@@ -13,7 +14,7 @@ declare var bootstrap: any;
 export class Signup {
   userRegister: FormGroup;
 
-  constructor(private fb: FormBuilder, private userr: User, private router: Router) {
+  constructor(private fb: FormBuilder, private userr: User, private router: Router,private t:ToastService) {
     this.userRegister = fb.group({
       name: ['', [Validators.required, Validators.pattern('[A-Za-z]+')]],
       age: ['', [Validators.required]],
@@ -38,9 +39,7 @@ export class Signup {
   this.userr.addUser(userData).subscribe({
     next: () => {
       this.userRegister.reset();
-      const toastEl = document.getElementById('liveToast');
-      const toast = new bootstrap.Toast(toastEl);
-      toast.show();
+      this.t.show('User registered successfully!', 'success');
       setTimeout(() => this.router.navigate(['/login']), 2000);
     },
     error: (err) => console.error('Error adding user:', err)

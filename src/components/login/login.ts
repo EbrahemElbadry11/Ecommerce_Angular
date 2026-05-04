@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { User } from '../../services/user';
 import { ChangeDetectorRef } from '@angular/core';
+import { ToastService } from '../../services/toast';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +17,7 @@ export class Login {
   errorMessage: string = '';
   isLoading: boolean = false;
 
-  constructor(private fb: FormBuilder,private cd: ChangeDetectorRef, private userService: User, private router: Router) {
+  constructor(private fb: FormBuilder, private auth: Auth,private cd: ChangeDetectorRef,private t:ToastService ,private userService: User, private router: Router) {
     this.loginForm = this.fb.group({ 
       email: ['', [Validators.required, Validators.email]], 
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -34,15 +36,15 @@ Login() {
       this.isLoading = false;
       if (users.length > 0) {
         if (String(users[0].password) === String(this.loginForm.value.password)) {
-          this.router.navigate(['/parent']);
+           this.auth.setUser(users[0]);
+          this.router.navigate(['/home']);
+          this.t.show('Login successful!', 'success');
         } else {
-          this.errorMessage = 'Incorrect password.';
+          this.errorMessage = 'Incorrect password or email.';
         }
-      } else {
-        this.errorMessage = 'Email not found.';
-      }
+      }else {
         this.cd.detectChanges();
-
+      }
     },
     error: (err) => {
       this.isLoading = false;

@@ -1,4 +1,22 @@
 <app-header></app-header>
+<div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1200">
+  @for (toast of toastService.toasts(); track toast) {
+    <div 
+      class="custom-toast mb-3 d-flex align-items-center justify-content-between text-white px-3 py-2 rounded-4 shadow-lg bg-{{toast.type}} animate"
+      role="alert">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold">
+          {{ toast.message }}
+        </span>
+      </div>
+      <button 
+        type="button" 
+        class="btn-close btn-close-white ms-3"
+        (click)="toastService.remove(toast)">
+      </button>
+    </div>
+  }
+</div>
 <div class="container">
   <router-outlet></router-outlet>
 </div>

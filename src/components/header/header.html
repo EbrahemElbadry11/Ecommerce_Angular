@@ -1,30 +1,112 @@
-<nav class="navbar navbar-expand-lg bg-body-tertiary">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+<nav class="navbar navbar-expand-lg" style="
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0.75rem 0;
+">
+  <div class="container">
+
+    <a class="navbar-brand fw-bold d-flex align-items-center gap-2" routerLink="/home" style="
+      color: #fff;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    ">
+      <span style="
+        width: 32px; height: 32px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      ">✦</span>
+      MyApp
+    </a>
+
+    <button class="navbar-toggler border-0" type="button"
+      data-bs-toggle="collapse" data-bs-target="#mainNav"
+      style="color: rgba(255,255,255,0.6);">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="/users">Users</a>
-        </li>
 
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/parent">Products</a>
-        </li>
+    <div class="collapse navbar-collapse" id="mainNav">
 
+      <ul class="navbar-nav mx-auto gap-1">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/signup">Signup</a>
+          <a class="nav-link px-3 py-2 rounded-3" routerLink="/home"
+            routerLinkActive="active-link"
+            style="color: rgba(255,255,255,0.65); font-size: 0.9rem; transition: all 0.2s;">
+            Home
+          </a>
         </li>
-
+        <li class="nav-item">
+          <a class="nav-link px-3 py-2 rounded-3" routerLink="/parent"
+            routerLinkActive="active-link"
+            style="color: rgba(255,255,255,0.65); font-size: 0.9rem; transition: all 0.2s;">
+            Products
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link px-3 py-2 rounded-3" routerLink="/dashboard"
+            routerLinkActive="active-link"
+            style="color: rgba(255,255,255,0.65); font-size: 0.9rem; transition: all 0.2s;">
+            Dashboard
+          </a>
+        </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-       <button type="button" appDarkmode class="btn btn-dark rounded-pill px-4">
-        🌙 Dark Mode
-      </button>
-      </form>
+
+      <div class="d-flex align-items-center gap-2">
+
+        <button class="btn btn-sm px-3 py-2 rounded-3"
+          (click)="userLogIn()" [hidden]="Logged"
+          routerLink="/login"
+          style="
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+          ">
+          Login
+        </button>
+
+        <button class="btn btn-sm px-3 py-2 rounded-3"
+          (click)="userLogOut()" [hidden]="!Logged"
+          routerLink="/home"
+          style="
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(255,255,255,0.12);
+            font-size: 0.85rem;
+            font-weight: 500;
+          ">
+          Logout
+        </button>
+
+        <button appDarkmode
+          class="btn btn-sm px-3 py-2 rounded-3"
+          style="
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.85rem;
+          ">
+          🌙
+        </button>
+
+      </div>
     </div>
   </div>
 </nav>
+
+<style>
+  .active-link {
+    color: #fff !important;
+    background: rgba(99, 102, 241, 0.15) !important;
+  }
+  .nav-link:hover {
+    color: #fff !important;
+    background: rgba(255,255,255,0.06) !important;
+  }
+</style>
