@@ -1,0 +1,34 @@
+<section class="seller-page">
+  <div class="page-hero">
+    <p class="eyebrow">Seller onboarding</p>
+    <h1>Register your store</h1>
+    <p>
+      Create your seller profile so you can start managing products from your own storefront.
+    </p>
+
+    <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="created-card" *ngIf="createdSeller">
+      <div class="logo" *ngIf="createdSeller.logoBase64; else noLogo">
+        <img [src]="getLogoUrl(createdSeller.logoBase64)" alt="Store logo" />
+      </div>
+      <ng-template #noLogo>
+        <div class="logo placeholder">{{ createdSeller.storeName.charAt(0) }}</div>
+      </ng-template>
+
+      <div class="summary">
+        <h2>{{ createdSeller.storeName }}</h2>
+        <p>{{ createdSeller.description }}</p>
+        <a routerLink="/sellers/profile">Go to profile</a>
+      </div>
+    </div>
+  </div>
+
+  <app-seller-form
+    mode="register"
+    (onSaved)="onSaved($event)"
+    (onSuccess)="onSuccess($event)"
+    (onError)="onError($event)"
+  ></app-seller-form>
+</section>

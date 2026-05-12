@@ -1,0 +1,54 @@
+<section class="seller-form-shell">
+  <div class="form-card">
+    <div class="form-header">
+      <p class="eyebrow">Seller profile</p>
+      <h2>{{ mode === 'edit' ? 'Update your store' : 'Register your store' }}</h2>
+      <p class="subtitle">
+        {{ mode === 'edit'
+          ? 'Adjust your store details, branding, and description in one place.'
+          : 'Create your store profile so customers can discover your products.' }}
+      </p>
+    </div>
+
+    <form class="seller-form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="field">
+        <span>Store name</span>
+        <input type="text" formControlName="storeName" placeholder="Enter your store name" />
+        <small class="error" *ngIf="hasError('storeName')">{{ getErrorMessage('storeName') }}</small>
+      </label>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          rows="5"
+          formControlName="description"
+          placeholder="Tell customers what makes your store unique"
+        ></textarea>
+        <small class="meta">{{ form.value.description?.length || 0 }} / 500 characters</small>
+        <small class="error" *ngIf="hasError('description')">{{ getErrorMessage('description') }}</small>
+      </label>
+
+      <div class="field">
+        <span>Store logo</span>
+        <div class="upload-row">
+          <label class="upload-button">
+            <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+            Choose image
+          </label>
+          <button type="button" class="ghost-button" (click)="clearLogo()">Clear</button>
+        </div>
+        <small class="meta" *ngIf="selectedLogoName">Selected: {{ selectedLogoName }}</small>
+
+        <div class="preview" *ngIf="logoPreviewUrl">
+          <img [src]="logoPreviewUrl" alt="Store logo preview" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="primary-button" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Saving...' : (mode === 'edit' ? 'Update profile' : 'Register store') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

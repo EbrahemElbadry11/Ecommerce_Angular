@@ -13,6 +13,8 @@ import { ProductListComponent } from './modules/products/components/product-list
 import { ProductDetailComponent } from './modules/products/components/product-detail/product-detail.component';
 import { CategoryListComponent } from './modules/categories/components/category-list/category-list.component';
 import { CategoryDetailComponent } from './modules/categories/components/category-detail/category-detail.component';
+import { SellerRegisterPageComponent } from './modules/sellers/components/seller-register-page/seller-register-page.component';
+import { SellerProfilePageComponent } from './modules/sellers/components/seller-profile-page/seller-profile-page.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' }, 
@@ -29,6 +31,16 @@ export const routes: Routes = [
       { path: 'products/:id', component: ProductDetailComponent },
       { path: 'categories', component: CategoryListComponent },
       { path: 'categories/:id', component: CategoryDetailComponent },
+      {
+        path: 'sellers/register',
+        component: SellerRegisterPageComponent,
+        canActivate: [multiauthGuard],
+      },
+      {
+        path: 'sellers/profile',
+        component: SellerProfilePageComponent,
+        canActivate: [multiauthGuard],
+      },
       { path: 'parent', component: Parent , canActivate: [multiauthGuard]},
       { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },    ],
   },

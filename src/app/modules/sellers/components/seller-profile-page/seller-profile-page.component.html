@@ -1,0 +1,78 @@
+<section class="seller-page">
+  <div class="profile-hero">
+    <p class="eyebrow">Seller profile</p>
+    <h1>Manage your store</h1>
+    <p>
+      Review your storefront details, update the branding, or remove the seller profile when needed.
+    </p>
+
+    <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+    <div class="loading-card" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading seller profile...</p>
+    </div>
+
+    <div class="empty-card" *ngIf="!isLoading && !seller && !errorMessage">
+      <p>You do not have a seller profile yet.</p>
+      <a routerLink="/sellers/register">Register your store</a>
+    </div>
+
+    <div class="summary-card" *ngIf="seller">
+      <div class="logo" *ngIf="seller.logoBase64; else fallbackLogo">
+        <img [src]="getLogoUrl(seller.logoBase64)" alt="Store logo" />
+      </div>
+      <ng-template #fallbackLogo>
+        <div class="logo placeholder">{{ seller.storeName.charAt(0) }}</div>
+      </ng-template>
+
+      <div class="summary-content">
+        <div class="status-row">
+          <span class="status" [class.approved]="seller.isApproved">
+            {{ seller.isApproved ? 'Approved' : 'Pending approval' }}
+          </span>
+          <button class="danger-button" type="button" (click)="deleteProfile()" [disabled]="isDeleting">
+            {{ isDeleting ? 'Deleting...' : 'Delete profile' }}
+          </button>
+        </div>
+
+        <h2>{{ seller.storeName }}</h2>
+        <p>{{ seller.description }}</p>
+
+        <div class="stats">
+          <div>
+            <span>Owner</span>
+            <strong>{{ seller.fullName }}</strong>
+          </div>
+          <div>
+            <span>Email</span>
+            <strong>{{ seller.email }}</strong>
+          </div>
+          <div>
+            <span>Total products</span>
+            <strong>{{ seller.totalProducts }}</strong>
+          </div>
+          <div>
+            <span>Total earnings</span>
+            <strong>{{ formatCurrency(seller.totalEarnings) }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-seller-form
+    *ngIf="seller"
+    mode="edit"
+    [seller]="seller"
+    (onSaved)="onSaved($event)"
+    (onSuccess)="onSuccess($event)"
+    (onError)="onError($event)"
+  ></app-seller-form>
+
+  <div class="retry-card" *ngIf="!isLoading && !seller && errorMessage">
+    <button type="button" class="primary-link" (click)="retry()">Retry</button>
+    <a routerLink="/sellers/register">Register store</a>
+  </div>
+</section>
