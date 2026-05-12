@@ -1,0 +1,273 @@
+.dashboard-page {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.dashboard-hero,
+.products-panel,
+.loading-card,
+.empty-card,
+.retry-card {
+  width: min(100%, 1160px);
+  margin: 0 auto;
+}
+
+.dashboard-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.9fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.hero-copy,
+.quick-stats,
+.products-panel,
+.loading-card,
+.empty-card,
+.retry-card {
+  border-radius: 26px;
+  padding: 1.4rem;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.eyebrow {
+  margin: 0 0 0.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.74rem;
+  color: #6f86a8;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  color: #111827;
+}
+
+.hero-copy > p {
+  margin: 0.8rem 0 0;
+  color: #4b5563;
+  max-width: 66ch;
+}
+
+.message {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  font-weight: 600;
+}
+
+.message.success {
+  background: #e6f7ed;
+  color: #146c3d;
+}
+
+.message.error {
+  background: #fdecec;
+  color: #b42318;
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.stat-card {
+  padding: 1rem;
+  border-radius: 18px;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-card.accent {
+  background: linear-gradient(135deg, #0f766e, #2563eb);
+  color: #fff;
+  border-color: transparent;
+}
+
+.stat-card span {
+  display: block;
+  font-size: 0.84rem;
+  opacity: 0.8;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.1rem;
+}
+
+.loading-card,
+.empty-card,
+.retry-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  color: #4b5563;
+}
+
+.products-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+}
+
+.panel-header h2 {
+  margin: 0;
+  color: #111827;
+}
+
+.panel-header p {
+  margin: 0.25rem 0 0;
+  color: #6b7280;
+}
+
+.primary-link {
+  color: #1d4ed8;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+}
+
+.image-wrap {
+  height: 220px;
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+}
+
+.image-wrap img,
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+}
+
+.image-placeholder {
+  color: #0f172a;
+  font-size: 3rem;
+  font-weight: 800;
+}
+
+.product-body {
+  padding: 1rem;
+}
+
+.product-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: #6b7280;
+}
+
+.category {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.product-body h3 {
+  margin: 0.6rem 0 0;
+  color: #111827;
+}
+
+.product-body p {
+  margin: 0.5rem 0 0;
+  color: #4b5563;
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.product-meta strong {
+  color: #111827;
+  font-size: 1.05rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.secondary-button,
+.danger-button {
+  flex: 1;
+  border: 0;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.danger-button {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.danger-button:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.empty-products {
+  padding: 1rem;
+  border-radius: 18px;
+  background: #f8fafc;
+  color: #4b5563;
+}
+
+@media (max-width: 900px) {
+  .dashboard-hero,
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .panel-header,
+  .product-topline,
+  .product-meta,
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quick-stats {
+    grid-template-columns: 1fr;
+  }
+}

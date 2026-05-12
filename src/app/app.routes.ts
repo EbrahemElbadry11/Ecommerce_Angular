@@ -15,6 +15,7 @@ import { CategoryListComponent } from './modules/categories/components/category-
 import { CategoryDetailComponent } from './modules/categories/components/category-detail/category-detail.component';
 import { SellerRegisterPageComponent } from './modules/sellers/components/seller-register-page/seller-register-page.component';
 import { SellerProfilePageComponent } from './modules/sellers/components/seller-profile-page/seller-profile-page.component';
+import { SellerDashboardComponent } from './modules/sellers/components/seller-dashboard/seller-dashboard.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' }, 
@@ -39,6 +40,11 @@ export const routes: Routes = [
       {
         path: 'sellers/profile',
         component: SellerProfilePageComponent,
+        canActivate: [multiauthGuard],
+      },
+      {
+        path: 'sellers/dashboard',
+        component: SellerDashboardComponent,
         canActivate: [multiauthGuard],
       },
       { path: 'parent', component: Parent , canActivate: [multiauthGuard]},
