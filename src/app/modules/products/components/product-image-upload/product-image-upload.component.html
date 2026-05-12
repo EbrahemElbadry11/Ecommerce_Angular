@@ -1,0 +1,36 @@
+<section class="image-upload-card">
+  <div class="upload-header">
+    <div>
+      <p class="eyebrow">Product image</p>
+      <h4>{{ productName || 'Upload product image' }}</h4>
+    </div>
+    <span class="badge" *ngIf="currentImageUrl || previewUrl">Preview ready</span>
+  </div>
+
+  <div class="preview" *ngIf="hasCurrentPreview">
+    <img [src]="previewUrl || currentImageUrl" [alt]="productName || 'Product image preview'" />
+  </div>
+
+  <div class="upload-row">
+    <label class="upload-button">
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" />
+      Choose image
+    </label>
+
+    <button type="button" class="ghost-button" (click)="clearSelection()">Clear</button>
+  </div>
+
+  <p class="meta" *ngIf="selectedFileName">Selected: {{ selectedFileName }}</p>
+  <p class="meta success" *ngIf="statusMessage">{{ statusMessage }}</p>
+
+  <div class="actions">
+    <button
+      type="button"
+      class="primary-button"
+      (click)="upload()"
+      [disabled]="isUploading || !selectedFile"
+    >
+      {{ isUploading ? 'Uploading...' : 'Upload image' }}
+    </button>
+  </div>
+</section>

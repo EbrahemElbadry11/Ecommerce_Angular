@@ -83,6 +83,14 @@
               {{ isDeleting(product.productId) ? 'Deleting...' : 'Delete' }}
             </button>
           </div>
+
+          <app-product-image-upload
+            [productId]="product.productId"
+            [productName]="product.name"
+            [currentImageUrl]="getCurrentImageUrl(product)"
+            (uploaded)="onImageUploaded($event)"
+            (error)="onImageError($event)"
+          ></app-product-image-upload>
         </div>
       </article>
     </div>

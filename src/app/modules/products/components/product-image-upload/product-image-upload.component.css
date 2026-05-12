@@ -1,0 +1,128 @@
+.image-upload-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #eff6ff;
+}
+
+.upload-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.7rem;
+  color: #93c5fd;
+}
+
+.upload-header h4 {
+  margin: 0.35rem 0 0;
+  font-size: 1rem;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.preview {
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  min-height: 150px;
+}
+
+.preview img {
+  width: 100%;
+  height: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.upload-button,
+.ghost-button,
+.primary-button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.78rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.upload-button {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  overflow: hidden;
+}
+
+.upload-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.ghost-button {
+  background: transparent;
+  color: #dbeafe;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.primary-button {
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  color: #fff;
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.86rem;
+  color: #cbd5e1;
+}
+
+.meta.success {
+  color: #86efac;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .upload-header,
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primary-button,
+  .ghost-button,
+  .upload-button {
+    width: 100%;
+  }
+}

@@ -6,11 +6,12 @@ import { ProductDto } from '../../../products/models/product.model';
 import { ProductService } from '../../../products/services/product.service';
 import { SellerResponseDto } from '../../models/seller.model';
 import { SellerService } from '../../services/seller.service';
+import { ProductImageUploadComponent } from '../../../products/components/product-image-upload/product-image-upload.component';
 
 @Component({
   selector: 'app-seller-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ProductImageUploadComponent],
   templateUrl: './seller-dashboard.component.html',
   styleUrls: ['./seller-dashboard.component.css'],
 })
@@ -134,6 +135,23 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  onImageUploaded(productId: number): void {
+    if (!this.seller) {
+      return;
+    }
+
+    this.successMessage = 'Product image uploaded successfully.';
+    this.errorMessage = '';
+    this.loadProducts(this.seller.id);
+  }
+
+  onImageError(message: string): void {
+    this.errorMessage = message;
+    if (message) {
+      this.successMessage = '';
+    }
+  }
+
   isDeleting(productId: number): boolean {
     return this.isDeletingProductId === productId;
   }
@@ -145,6 +163,10 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
     }
 
     return `https://localhost:7125/Images/Products/${imageName}`;
+  }
+
+  getCurrentImageUrl(product: ProductDto): string {
+    return this.getImageUrl(product);
   }
 
   formatCurrency(value: number): string {
