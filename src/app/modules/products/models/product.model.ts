@@ -23,7 +23,8 @@ export interface AddProductDto {
   price: number;
   stockQuantity: number;
   categoryId: number;
-  sellerId: number;
+  // sellerId is determined by the authenticated user on the server-side
+  sellerId?: number;
 }
 
 // DTO for updating an existing product

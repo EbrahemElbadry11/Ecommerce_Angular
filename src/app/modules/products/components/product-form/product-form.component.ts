@@ -139,7 +139,7 @@ export class ProductFormComponent implements OnChanges, OnDestroy {
         price,
         stockQuantity,
         categoryId,
-        sellerId: this.sellerId,
+        // do not send sellerId; backend will associate using the authenticated user
       };
 
       this.productService
