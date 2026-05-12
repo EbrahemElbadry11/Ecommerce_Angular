@@ -99,6 +99,10 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/products', productId]);
   }
 
+  editProduct(productId: number): void {
+    this.router.navigate(['/products', productId, 'edit']);
+  }
+
   deleteProduct(product: ProductDto): void {
     const confirmed = window.confirm(
       `Delete ${product.name}? This cannot be undone.`

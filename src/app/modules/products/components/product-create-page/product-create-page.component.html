@@ -1,0 +1,32 @@
+<section class="page-shell">
+  <div class="hero">
+    <p class="eyebrow">Product creation</p>
+    <h1>Add a new product</h1>
+    <p>
+      Create a new product for your store. Select a category, set the price, and publish it to the catalog.
+    </p>
+
+    <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
+    <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+  </div>
+
+  <div class="loading-card" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading product form...</p>
+  </div>
+
+  <div class="empty-card" *ngIf="!isLoading && !seller && errorMessage">
+    <p>{{ errorMessage }}</p>
+    <button type="button" class="primary-link" (click)="retry()">Retry</button>
+  </div>
+
+  <app-product-form
+    *ngIf="!isLoading && seller"
+    mode="create"
+    [sellerId]="seller.id"
+    [categories]="categories"
+    (saved)="onSaved()"
+    (success)="onSuccess($event)"
+    (error)="onError($event)"
+  ></app-product-form>
+</section>

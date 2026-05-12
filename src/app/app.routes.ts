@@ -11,6 +11,8 @@ import { multiauthGuard } from '../guards/multiauth-guard';
 import { Dashboard } from '../components/dashboard/dashboard';
 import { ProductListComponent } from './modules/products/components/product-list/product-list.component';
 import { ProductDetailComponent } from './modules/products/components/product-detail/product-detail.component';
+import { ProductCreatePageComponent } from './modules/products/components/product-create-page/product-create-page.component';
+import { ProductEditPageComponent } from './modules/products/components/product-edit-page/product-edit-page.component';
 import { CategoryListComponent } from './modules/categories/components/category-list/category-list.component';
 import { CategoryDetailComponent } from './modules/categories/components/category-detail/category-detail.component';
 import { SellerRegisterPageComponent } from './modules/sellers/components/seller-register-page/seller-register-page.component';
@@ -28,6 +30,16 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
+      {
+        path: 'products/create',
+        component: ProductCreatePageComponent,
+        canActivate: [multiauthGuard],
+      },
+      {
+        path: 'products/:id/edit',
+        component: ProductEditPageComponent,
+        canActivate: [multiauthGuard],
+      },
       { path: 'products', component: ProductListComponent },
       { path: 'products/:id', component: ProductDetailComponent },
       { path: 'categories', component: CategoryListComponent },

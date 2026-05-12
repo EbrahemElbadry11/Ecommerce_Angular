@@ -1,0 +1,66 @@
+<section class="product-form-shell">
+  <div class="form-card">
+    <div class="form-header">
+      <p class="eyebrow">Product management</p>
+      <h2>{{ isEditMode ? 'Edit product' : 'Create product' }}</h2>
+      <p class="subtitle">
+        {{ isEditMode
+          ? 'Update the product details your customers see in the catalog.'
+          : 'Add a new product to your store and publish it to the catalog.' }}
+      </p>
+    </div>
+
+    <form class="product-form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="field">
+        <span>Product name</span>
+        <input type="text" formControlName="name" placeholder="Enter product name" />
+        <small class="error" *ngIf="hasError('name')">{{ getErrorMessage('name') }}</small>
+      </label>
+
+      <label class="field">
+        <span>Description</span>
+        <textarea
+          rows="5"
+          formControlName="description"
+          placeholder="Write a short description for your product"
+        ></textarea>
+        <small class="error" *ngIf="hasError('description')">{{ getErrorMessage('description') }}</small>
+      </label>
+
+      <div class="grid">
+        <label class="field">
+          <span>Price</span>
+          <input type="number" step="0.01" min="0" formControlName="price" placeholder="0.00" />
+          <small class="error" *ngIf="hasError('price')">{{ getErrorMessage('price') }}</small>
+        </label>
+
+        <label class="field">
+          <span>Stock quantity</span>
+          <input type="number" min="0" formControlName="stockQuantity" placeholder="0" />
+          <small class="error" *ngIf="hasError('stockQuantity')">{{ getErrorMessage('stockQuantity') }}</small>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Category</span>
+        <select
+          [value]="form.value.categoryId ?? ''"
+          (change)="onCategoryChange($any($event.target).value)"
+        >
+          <option value="">Select a category</option>
+          <option *ngFor="let category of categories" [value]="category.categoryId">
+            {{ category.name }}
+          </option>
+        </select>
+        <small class="meta" *ngIf="selectedCategoryName">Selected category: {{ selectedCategoryName }}</small>
+        <small class="error" *ngIf="hasError('categoryId')">{{ getErrorMessage('categoryId') }}</small>
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="primary-button" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Update product' : 'Create product') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

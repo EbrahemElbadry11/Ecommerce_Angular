@@ -47,7 +47,10 @@
         <h2>Your products</h2>
         <p>{{ products.length }} items listed in your store</p>
       </div>
-      <a class="primary-link" routerLink="/sellers/profile">Edit seller profile</a>
+      <div class="panel-actions">
+        <a class="primary-link" routerLink="/products/create">Add product</a>
+        <a class="primary-link" routerLink="/sellers/profile">Edit seller profile</a>
+      </div>
     </div>
 
     <div class="empty-products" *ngIf="!isLoadingProducts && products.length === 0">
@@ -79,6 +82,7 @@
 
           <div class="actions">
             <button type="button" class="secondary-button" (click)="viewProduct(product.productId)">View</button>
+            <button type="button" class="secondary-button" (click)="editProduct(product.productId)">Edit</button>
             <button type="button" class="danger-button" (click)="deleteProduct(product)" [disabled]="isDeleting(product.productId)">
               {{ isDeleting(product.productId) ? 'Deleting...' : 'Delete' }}
             </button>
