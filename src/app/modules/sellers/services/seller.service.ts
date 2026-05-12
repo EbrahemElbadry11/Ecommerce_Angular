@@ -6,7 +6,7 @@ import {
   RegisterSellerDto,
   UpdateSellerDto,
 } from '../models/seller.model';
-import { GeneralResponse } from '../../shared/models/api-response.model';
+import { GeneralResponse } from '../../../shared/models/api-response.model';
 
 /**
  * Seller Service

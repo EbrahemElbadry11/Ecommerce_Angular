@@ -8,7 +8,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { CategoryDto } from '../../../categories/models/category.model';
 import { CategoryService } from '../../../categories/services/category.service';
@@ -34,13 +34,7 @@ export class ProductFormComponent implements OnChanges, OnDestroy {
   @Output() success = new EventEmitter<string>();
   @Output() error = new EventEmitter<string>();
 
-  form = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(1000)]],
-    price: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    stockQuantity: [0, [Validators.required, Validators.min(0)]],
-    categoryId: [null as number | null, [Validators.required]],
-  });
+  form!: FormGroup;
 
   isSubmitting: boolean = false;
   selectedCategoryName: string = '';
@@ -51,7 +45,20 @@ export class ProductFormComponent implements OnChanges, OnDestroy {
     private fb: FormBuilder,
     private productService: ProductService,
     private categoryService: CategoryService
-  ) {}
+  ) {
+    this.constructorInit();
+  }
+
+  // Initialize form after FormBuilder is available
+  constructorInit() {
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.maxLength(100)]],
+      description: ['', [Validators.maxLength(1000)]],
+      price: [null as number | null, [Validators.required, Validators.min(0.01)]],
+      stockQuantity: [0, [Validators.required, Validators.min(0)]],
+      categoryId: [null as number | null, [Validators.required]],
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['product'] || changes['categories'] || changes['mode']) {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CategoryDto } from '../models/category.model';
-import { GeneralResponse } from '../../shared/models/api-response.model';
+import { GeneralResponse } from '../../../shared/models/api-response.model';
 
 /**
  * Category Service

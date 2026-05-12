@@ -86,7 +86,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       .getProductById(productId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.product = response.data;
           } else {
@@ -95,7 +95,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
           }
           this.isLoadingProduct = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load product:', err);
           this.errorMessage = 'Failed to load product details. Please try again.';
           this.isLoadingProduct = false;
@@ -124,14 +124,14 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       .deleteReview(event.productId, event.reviewId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess) {
             this.reviews.splice(event.index, 1);
             this.successMessage = 'Review deleted successfully!';
             setTimeout(() => (this.successMessage = ''), 3000);
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to delete review:', err);
           this.errorMessage = 'Failed to delete review. Please try again.';
         },
@@ -188,6 +188,15 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       );
     }
     return '';
+  }
+
+  // Debug handlers (delegates console usage to component methods)
+  onDebugAddToCart(): void {
+    console.log('Add to cart - Feature from Dev1');
+  }
+
+  onDebugSave(): void {
+    console.log('Add to wishlist - Feature from Dev1');
   }
 
   /**

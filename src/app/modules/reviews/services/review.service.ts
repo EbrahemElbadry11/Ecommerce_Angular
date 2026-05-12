@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ReviewDto, AddReviewDto } from '../models/review.model';
-import { GeneralResponse } from '../../shared/models/api-response.model';
+import { GeneralResponse } from '../../../shared/models/api-response.model';
 
 /**
  * Review Service

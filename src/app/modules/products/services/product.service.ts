@@ -7,7 +7,7 @@ import {
   UpdateProductDto,
   ProductFilterDto,
 } from '../models/product.model';
-import { GeneralResponse } from '../../shared/models/api-response.model';
+import { GeneralResponse } from '../../../shared/models/api-response.model';
 
 /**
  * Product Service

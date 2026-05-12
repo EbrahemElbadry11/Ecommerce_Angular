@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ProductService } from '../services/product.service';
-import { CategoryService } from '../../categories/services/category.service';
-import { ProductDto, ProductFilterDto } from '../models/product.model';
-import { CategoryDto } from '../../categories/models/category.model';
+import { ProductService } from '../../services/product.service';
+import { CategoryService } from '../../../categories/services/category.service';
+import { ProductDto, ProductFilterDto } from '../../models/product.model';
+import { CategoryDto } from '../../../categories/models/category.model';
 
 @Component({
   selector: 'app-product-list',
@@ -81,12 +81,12 @@ export class ProductListComponent implements OnInit, OnDestroy {
       .getAllCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.categories = response.data;
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load categories:', err);
         },
       });
@@ -95,7 +95,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   /**
    * Load products with current filters and pagination
    */
-  private loadProducts(): void {
+  loadProducts(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
@@ -114,7 +114,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       .getAllProducts(filter)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.products = response.data;
             // Assuming total count is in response or use products.length
@@ -122,7 +122,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
           }
           this.isLoading = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load products:', err);
           this.errorMessage =
             'Failed to load products. Please try again later.';

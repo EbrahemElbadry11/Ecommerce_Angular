@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
-import { ProductService } from '../../products/services/product.service';
-import { CategoryService } from '../services/category.service';
-import { ProductDto, ProductFilterDto } from '../../products/models/product.model';
-import { CategoryDto } from '../models/category.model';
+import { ProductService } from '../../../products/services/product.service';
+import { CategoryService } from '../../services/category.service';
+import { ProductDto, ProductFilterDto } from '../../../products/models/product.model';
+import { CategoryDto } from '../../models/category.model';
 
 @Component({
   selector: 'app-category-detail',
@@ -92,12 +92,12 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .getAllCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.allCategories = response.data;
           }
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load categories:', err);
         },
       });
@@ -113,13 +113,13 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .getCategoryById(id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.category = response.data;
           }
           this.isLoadingCategory = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load category:', err);
           this.isLoadingCategory = false;
         },
@@ -148,13 +148,13 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .getAllProducts(filter)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.products = response.data;
           }
           this.isLoadingProducts = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Failed to load products:', err);
           this.errorMessage = 'Failed to load products. Please try again.';
           this.products = [];

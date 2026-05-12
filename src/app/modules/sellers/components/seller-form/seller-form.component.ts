@@ -8,7 +8,7 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { SellerResponseDto } from '../../models/seller.model';
 import { SellerService } from '../../services/seller.service';
@@ -30,11 +30,7 @@ export class SellerFormComponent implements OnChanges, OnDestroy {
   @Output() onSuccess = new EventEmitter<string>();
   @Output() onError = new EventEmitter<string>();
 
-  form = this.fb.group({
-    storeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-    description: ['', [Validators.maxLength(500)]],
-    logo: [null as File | null],
-  });
+  form!: FormGroup;
 
   isSubmitting: boolean = false;
   logoPreviewUrl: string = '';
@@ -42,7 +38,17 @@ export class SellerFormComponent implements OnChanges, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder, private sellerService: SellerService) {}
+  constructor(private fb: FormBuilder, private sellerService: SellerService) {
+    this.constructorInit();
+  }
+
+  private constructorInit(): void {
+    this.form = this.fb.group({
+      storeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      description: ['', [Validators.maxLength(500)]],
+      logo: [null as File | null],
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['seller']) {

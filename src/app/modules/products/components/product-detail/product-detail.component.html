@@ -96,13 +96,13 @@
           <button
             class="btn btn-primary"
             [disabled]="product.stockQuantity === 0"
-            (click)="console.log('Add to cart - Feature from Dev1')"
+            (click)="onDebugAddToCart()"
           >
             {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
           </button>
           <button
             class="btn btn-secondary"
-            (click)="console.log('Add to wishlist - Feature from Dev1')"
+            (click)="onDebugSave()"
           >
             ♥ Save
           </button>
