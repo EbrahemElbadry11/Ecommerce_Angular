@@ -10,6 +10,7 @@ import { authGuard } from '../guards/auth-guard';
 import { multiauthGuard } from '../guards/multiauth-guard';
 import { Dashboard } from '../components/dashboard/dashboard';
 import { ProductListComponent } from './modules/products/components/product-list/product-list.component';
+import { ProductDetailComponent } from './modules/products/components/product-detail/product-detail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' }, 
@@ -23,7 +24,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
       { path: 'products', component: ProductListComponent },
-      { path: 'products/:id', component: ProductListComponent }, // Placeholder for Feature 3: Product Detail
+      { path: 'products/:id', component: ProductDetailComponent },
       { path: 'parent', component: Parent , canActivate: [multiauthGuard]},
       { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },    ],
   },
