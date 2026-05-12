@@ -1,0 +1,45 @@
+<div class="reviews-list-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- No Reviews Message -->
+  <div *ngIf="!isLoading && reviews.length === 0" class="no-reviews">
+    <p>No reviews yet. Be the first to review this product!</p>
+  </div>
+
+  <!-- Reviews List -->
+  <div *ngIf="!isLoading && reviews.length > 0" class="reviews-list">
+    <div *ngFor="let review of reviews; let i = index" class="review-card">
+      <!-- Review Header -->
+      <div class="review-header">
+        <div class="reviewer-info">
+          <span class="reviewer-name">{{ review.userName }}</span>
+          <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+        </div>
+        
+        <!-- Delete Button (Owner Only) -->
+        <button
+          *ngIf="isUserReview(review.userName)"
+          class="delete-review-btn"
+          (click)="deleteReview(review.reviewId, i)"
+          title="Delete this review"
+          aria-label="Delete review"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Rating -->
+      <div class="review-rating">
+        <span class="stars">{{ getStarDisplay(review.rating) }}</span>
+        <span class="rating-number">({{ review.rating }}/5)</span>
+      </div>
+
+      <!-- Comment -->
+      <p class="review-comment">{{ review.comment }}</p>
+    </div>
+  </div>
+</div>

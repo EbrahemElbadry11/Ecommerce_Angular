@@ -119,88 +119,39 @@
         {{ successMessage }}
       </div>
 
-      <!-- Add Review Form (Only if logged in) -->
-      <div *ngIf="isLoggedIn" class="add-review-form">
-        <h3>Leave a Review</h3>
-
-        <div class="form-group">
-          <label>Rating (1-5 stars)</label>
-          <div class="star-rating">
-            <div class="stars-display">
-              <button
-                *ngFor="let star of [1, 2, 3, 4, 5]"
-                class="star-btn"
-                [class.filled]="star <= newReview.rating"
-                (click)="newReview.rating = star"
-              >
-                ★
-              </button>
-            </div>
-            <span class="rating-value">{{ newReview.rating }} / 5</span>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="comment">Your Comment</label>
-          <textarea
-            id="comment"
-            [(ngModel)]="newReview.comment"
-            placeholder="Share your experience with this product..."
-            rows="4"
-            class="comment-input"
-          ></textarea>
-          <small>{{ newReview.comment.length }} / 500 characters</small>
-        </div>
-
-        <button
-          class="btn btn-primary"
-          (click)="submitReview()"
-          [disabled]="isSubmittingReview"
-        >
-          {{ isSubmittingReview ? 'Submitting...' : 'Submit Review' }}
-        </button>
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-banner">
+        {{ errorMessage }}
       </div>
+
+      <!-- Review Form Component (Only if logged in) -->
+      <app-review-form
+        *ngIf="product && isLoggedIn"
+        [productId]="product.productId"
+        [isLoggedIn]="isLoggedIn"
+        (onReviewAdded)="onReviewAdded($event)"
+        (onError)="onReviewError($event)"
+        (onSuccess)="successMessage = $event"
+      ></app-review-form>
 
       <!-- Not logged in message -->
-      <div *ngIf="!isLoggedIn" class="login-prompt">
-        <p>Please <a href="/login">log in</a> to leave a review</p>
-      </div>
+      <app-review-form
+        *ngIf="product && !isLoggedIn"
+        [productId]="product.productId"
+        [isLoggedIn]="isLoggedIn"
+      ></app-review-form>
 
-      <!-- Reviews List -->
-      <div *ngIf="isLoadingReviews" class="loading-reviews">
-        <div class="spinner"></div>
-        <p>Loading reviews...</p>
-      </div>
-
-      <div *ngIf="!isLoadingReviews && reviews.length === 0" class="no-reviews">
-        <p>No reviews yet. Be the first to review this product!</p>
-      </div>
-
-      <div *ngIf="!isLoadingReviews && reviews.length > 0" class="reviews-list">
-        <div *ngFor="let review of reviews; let i = index" class="review-card">
-          <div class="review-header">
-            <div class="reviewer-info">
-              <span class="reviewer-name">{{ review.userName }}</span>
-              <span class="review-date">{{ formatDate(review.createdAt) }}</span>
-            </div>
-            <button
-              *ngIf="isLoggedIn && currentUserName === review.userName"
-              class="delete-review-btn"
-              (click)="deleteReview(review.reviewId, i)"
-              title="Delete this review"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div class="review-rating">
-            <span class="stars">{{ getStarDisplay(review.rating) }}</span>
-            <span class="rating-number">({{ review.rating }}/5)</span>
-          </div>
-
-          <p class="review-comment">{{ review.comment }}</p>
-        </div>
-      </div>
+      <!-- Review List Component -->
+      <app-review-list
+        *ngIf="product"
+        [productId]="product.productId"
+        [reviews]="reviews"
+        [isLoggedIn]="isLoggedIn"
+        [currentUserName]="currentUserName"
+        [isLoading]="isLoadingReviews"
+        (onDeleteReview)="onDeleteReview($event)"
+        (reviewsLoadingChange)="isLoadingReviews = $event"
+      ></app-review-list>
     </div>
   </div>
 </div>

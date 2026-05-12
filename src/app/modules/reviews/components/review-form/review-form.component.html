@@ -1,0 +1,52 @@
+<div class="review-form-container">
+  <!-- Not Logged In Message -->
+  <div *ngIf="!isLoggedIn" class="login-prompt">
+    <p>Please <a href="/login">log in</a> to leave a review</p>
+  </div>
+
+  <!-- Review Form (Only if Logged In) -->
+  <form *ngIf="isLoggedIn" class="review-form" (ngSubmit)="submitReview()">
+    <h3>Leave a Review</h3>
+
+    <!-- Star Rating -->
+    <div class="form-group">
+      <label>Rating (1-5 stars)</label>
+      <div class="star-rating">
+        <div class="stars-display">
+          <button
+            type="button"
+            *ngFor="let star of [1, 2, 3, 4, 5]"
+            class="star-btn"
+            [class.filled]="isStarFilled(star)"
+            (click)="setRating(star)"
+            title="Rate {{ star }} stars"
+            aria-label="Rate {{ star }} stars"
+          >
+            {{ getStarDisplay(star) }}
+          </button>
+        </div>
+        <span class="rating-value">{{ rating }} / 5</span>
+      </div>
+    </div>
+
+    <!-- Comment Textarea -->
+    <div class="form-group">
+      <label for="comment">Your Comment</label>
+      <textarea
+        id="comment"
+        [(ngModel)]="comment"
+        name="comment"
+        placeholder="Share your experience with this product..."
+        rows="4"
+        class="comment-input"
+        maxlength="500"
+      ></textarea>
+      <small class="char-count">{{ comment.length }} / 500 characters</small>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="submit-btn" [disabled]="isSubmitting || !comment.trim()">
+      {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+    </button>
+  </form>
+</div>
