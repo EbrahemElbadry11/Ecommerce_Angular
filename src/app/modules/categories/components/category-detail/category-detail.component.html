@@ -1,0 +1,198 @@
+<div class="category-detail-container">
+  <!-- Back Button -->
+  <div class="header">
+    <button class="back-btn" (click)="goBack()">← Back to Categories</button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoadingCategory" class="loading">
+    <div class="spinner"></div>
+    <p>Loading category...</p>
+  </div>
+
+  <!-- Category Header -->
+  <div *ngIf="category && !isLoadingCategory" class="category-header">
+    <div class="category-icon" *ngIf="getCategoryImageUrl(category.icon)">
+      <img [src]="getCategoryImageUrl(category.icon)" [alt]="category.name" />
+    </div>
+    <div class="category-icon" *ngIf="!getCategoryImageUrl(category.icon)">
+      📦
+    </div>
+    <div class="category-info">
+      <h1>{{ category.name }}</h1>
+      <p class="product-count">{{ products.length }} product<span *ngIf="products.length !== 1">s</span> available</p>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Categories Sidebar -->
+    <aside class="categories-sidebar">
+      <h3>Categories</h3>
+      <div class="categories-list">
+        <button
+          *ngFor="let cat of allCategories"
+          class="category-item"
+          [class.active]="cat.categoryId === categoryId"
+          (click)="changeCategory(cat.categoryId)"
+        >
+          {{ cat.name }}
+        </button>
+      </div>
+    </aside>
+
+    <!-- Products Section -->
+    <div class="products-section">
+      <!-- Filters Header -->
+      <div class="filters-header">
+        <div class="search-bar">
+          <input
+            type="text"
+            placeholder="Search in category..."
+            [(ngModel)]="searchText"
+            (ngModelChange)="onSearchChange($event)"
+            class="search-input"
+          />
+          <button class="clear-btn" *ngIf="searchText" (click)="searchText = ''; onSearchChange('')">
+            ✕
+          </button>
+        </div>
+        <button class="filter-toggle-btn" (click)="toggleFilters()" [class.active]="showFilters">
+          Filters
+        </button>
+      </div>
+
+      <!-- Filters Panel -->
+      <div class="filters-panel" [class.open]="showFilters">
+        <div class="filter-header">
+          <h2>Filters</h2>
+          <button class="close-filters" (click)="showFilters = false">✕</button>
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-group">
+          <label>Price Range</label>
+          <div class="price-inputs">
+            <input
+              type="number"
+              placeholder="Min"
+              [(ngModel)]="minPrice"
+              (ngModelChange)="onFilterChange()"
+              min="0"
+              class="price-input"
+            />
+            <span>-</span>
+            <input
+              type="number"
+              placeholder="Max"
+              [(ngModel)]="maxPrice"
+              (ngModelChange)="onFilterChange()"
+              min="0"
+              class="price-input"
+            />
+          </div>
+          <div class="price-display">
+            {{ formatPrice(minPrice) }} - {{ formatPrice(maxPrice) }}
+          </div>
+        </div>
+
+        <!-- Sort By -->
+        <div class="filter-group">
+          <label>Sort By</label>
+          <select [(ngModel)]="sortBy" (change)="onFilterChange()" class="filter-select">
+            <option value="createdAt">Newest</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+          </select>
+        </div>
+
+        <!-- Sort Order -->
+        <div class="filter-group">
+          <label>Order</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="sortOrder" value="asc" (change)="onFilterChange()" />
+              Ascending
+            </label>
+            <label class="radio-label">
+              <input type="radio" [(ngModel)]="sortOrder" value="desc" (change)="onFilterChange()" />
+              Descending
+            </label>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="reset-btn" (click)="resetFilters()">Reset Filters</button>
+      </div>
+
+      <!-- Loading Products -->
+      <div *ngIf="isLoadingProducts" class="loading">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage && !isLoadingProducts" class="error-message">
+        <p>{{ errorMessage }}</p>
+        <button (click)="onFilterChange()">Retry</button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="!isLoadingProducts && !errorMessage">
+        <div *ngIf="products.length === 0" class="no-products">
+          <p>No products found in this category</p>
+        </div>
+
+        <div *ngFor="let product of products" class="product-card">
+          <div class="product-image-container">
+            <img
+              *ngIf="product.imagesNames && product.imagesNames.length > 0"
+              [src]="'https://localhost:7125/Images/Products/' + product.imagesNames[0]"
+              [alt]="product.name"
+              class="product-image"
+            />
+            <div *ngIf="!product.imagesNames || product.imagesNames.length === 0" class="no-image">
+              No Image
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">
+              {{ truncateDescription(product.description) }}
+            </p>
+
+            <div class="product-meta">
+              <span class="store">{{ product.storeName }}</span>
+            </div>
+
+            <div class="product-footer">
+              <div class="price-stock">
+                <span class="price">{{ formatPrice(product.price) }}</span>
+                <span class="stock" [class.low]="product.stockQuantity < 10">
+                  {{ product.stockQuantity }} in stock
+                </span>
+              </div>
+              <button class="view-btn" (click)="viewProduct(product.productId)">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="products.length > 0 && !isLoadingProducts">
+        <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagination-btn">
+          ← Previous
+        </button>
+
+        <span class="page-info">Page {{ currentPage }}</span>
+
+        <button (click)="nextPage()" [disabled]="!hasNextPage()" class="pagination-btn">
+          Next →
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

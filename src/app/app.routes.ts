@@ -11,6 +11,8 @@ import { multiauthGuard } from '../guards/multiauth-guard';
 import { Dashboard } from '../components/dashboard/dashboard';
 import { ProductListComponent } from './modules/products/components/product-list/product-list.component';
 import { ProductDetailComponent } from './modules/products/components/product-detail/product-detail.component';
+import { CategoryListComponent } from './modules/categories/components/category-list/category-list.component';
+import { CategoryDetailComponent } from './modules/categories/components/category-detail/category-detail.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' }, 
@@ -25,6 +27,8 @@ export const routes: Routes = [
       { path: 'home', component: Home },
       { path: 'products', component: ProductListComponent },
       { path: 'products/:id', component: ProductDetailComponent },
+      { path: 'categories', component: CategoryListComponent },
+      { path: 'categories/:id', component: CategoryDetailComponent },
       { path: 'parent', component: Parent , canActivate: [multiauthGuard]},
       { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },    ],
   },

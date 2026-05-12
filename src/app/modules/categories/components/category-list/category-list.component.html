@@ -1,0 +1,46 @@
+<div class="category-list-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Shop by Category</h1>
+    <p class="subtitle">Browse our carefully selected product categories</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading categories...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-banner">
+    <p>{{ errorMessage }}</p>
+    <button (click)="retry()">Retry</button>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="categories-grid" *ngIf="!isLoading && !errorMessage">
+    <div *ngIf="categories.length === 0" class="no-categories">
+      <p>No categories available</p>
+    </div>
+
+    <button
+      *ngFor="let category of categories"
+      class="category-card"
+      (click)="viewCategory(category.categoryId)"
+    >
+      <div class="card-icon">
+        <img
+          *ngIf="getImageUrl(category.icon)"
+          [src]="getImageUrl(category.icon)"
+          [alt]="category.name"
+          class="icon-image"
+        />
+        <div *ngIf="!getImageUrl(category.icon)" class="icon-placeholder">
+          📦
+        </div>
+      </div>
+      <h3 class="category-name">{{ category.name }}</h3>
+      <span class="view-link">View Products →</span>
+    </button>
+  </div>
+</div>
