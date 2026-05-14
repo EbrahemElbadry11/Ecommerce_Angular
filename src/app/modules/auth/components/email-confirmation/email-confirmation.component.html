@@ -1,0 +1,55 @@
+<section class="auth-shell">
+  <div class="auth-panel">
+
+    <span class="eyebrow">Almost there</span>
+    <h1>Verify Email</h1>
+
+    <p style="text-align:center;color:#94a3b8;margin:-1rem 0 1.5rem;font-size:.95rem;">
+      Enter the 6-digit code sent to your inbox
+    </p>
+
+    @if (message()) {
+      <div class="alert" [class.alert-success]="success()" [class.alert-danger]="!success()">
+        {{ success() ? '✅' : '⚠' }} {{ message() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+
+      <label>
+        Email address
+        <input type="email" formControlName="email" placeholder="you@example.com"/>
+        @if (f.email.touched && f.email.hasError('required')) {
+          <span class="field-error">⚡ Email is required</span>
+        } @else if (f.email.touched && f.email.hasError('email')) {
+          <span class="field-error">⚡ Enter a valid email</span>
+        }
+      </label>
+
+      <label>
+        Verification code
+        <input type="text" formControlName="verificationCode"
+               placeholder="123456" maxlength="6"
+               style="letter-spacing:.5rem;font-size:1.4rem;text-align:center;font-weight:700;"/>
+        @if (f.verificationCode.touched && f.verificationCode.hasError('required')) {
+          <span class="field-error">⚡ Code is required</span>
+        } @else if (f.verificationCode.touched &&
+                   (f.verificationCode.hasError('minlength') || f.verificationCode.hasError('maxlength'))) {
+          <span class="field-error">⚡ Code must be exactly 6 digits</span>
+        }
+      </label>
+
+      <button class="btn-primary" type="submit" [disabled]="loading()">
+        @if (loading()) { <span class="spinner"></span> Confirming... }
+        @else { Confirm Email }
+      </button>
+
+    </form>
+
+    <div class="auth-links">
+      <button type="button" class="link-btn" (click)="resend()">Resend code</button>
+      <a routerLink="/auth/login">Back to login</a>
+    </div>
+
+  </div>
+</section>

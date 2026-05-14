@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   ProductDto,
@@ -61,7 +61,8 @@ export class ProductService {
    * Requires: Authorization header with Bearer token
    */
   addProduct(dto: AddProductDto): Observable<GeneralResponse<ProductDto>> {
-    return this.http.post<GeneralResponse<ProductDto>>(this.endpoint, dto);
+    const headers = new HttpHeaders({ 'X-Success-Message': 'Product added successfully!' });
+    return this.http.post<GeneralResponse<ProductDto>>(this.endpoint, dto, { headers });
   }
 
   /**
@@ -71,7 +72,8 @@ export class ProductService {
    * Note: You can only update products you own
    */
   updateProduct(dto: UpdateProductDto): Observable<GeneralResponse<string>> {
-    return this.http.put<GeneralResponse<string>>(this.endpoint, dto);
+    const headers = new HttpHeaders({ 'X-Success-Message': 'Product updated successfully!' });
+    return this.http.put<GeneralResponse<string>>(this.endpoint, dto, { headers });
   }
 
   /**
@@ -81,8 +83,10 @@ export class ProductService {
    * Note: You can only delete products you own
    */
   deleteProduct(id: number): Observable<GeneralResponse<string>> {
+    const headers = new HttpHeaders({ 'X-Success-Message': 'Product deleted successfully!' });
     return this.http.delete<GeneralResponse<string>>(
-      `${this.endpoint}/${id}`
+      `${this.endpoint}/${id}`,
+      { headers }
     );
   }
 
@@ -98,10 +102,11 @@ export class ProductService {
   ): Observable<GeneralResponse<string>> {
     const formData = new FormData();
     formData.append('image', file);
-
+    const headers = new HttpHeaders({ 'X-Success-Message': 'Product image uploaded successfully!' });
     return this.http.post<GeneralResponse<string>>(
       `${this.endpoint}/${productId}/image`,
-      formData
+      formData,
+      { headers }
     );
   }
 
