@@ -9,15 +9,15 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
 
   // Auth pages (no layout)
-  { path: 'auth/login',           loadComponent: () => import('./modules/auth/components/login/login.component').then(m => m.LoginComponent) },
-  { path: 'auth/register',        loadComponent: () => import('./modules/auth/components/register/register.component').then(m => m.RegisterComponent) },
-  { path: 'auth/confirm-email',   loadComponent: () => import('./modules/auth/components/email-confirmation/email-confirmation.component').then(m => m.EmailConfirmationComponent) },
+  { path: 'auth/login', loadComponent: () => import('./modules/auth/components/login/login.component').then(m => m.LoginComponent) },
+  { path: 'auth/register', loadComponent: () => import('./modules/auth/components/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'auth/confirm-email', loadComponent: () => import('./modules/auth/components/email-confirmation/email-confirmation.component').then(m => m.EmailConfirmationComponent) },
   { path: 'auth/forgot-password', loadComponent: () => import('./modules/auth/components/forget-password/forget-password.component').then(m => m.ForgetPasswordComponent) },
-  { path: 'auth/reset-password',  loadComponent: () => import('./modules/auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
+  { path: 'auth/reset-password', loadComponent: () => import('./modules/auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
 
   // Redirects
-  { path: 'login',     redirectTo: 'auth/login',    pathMatch: 'full' },
-  { path: 'signup',    redirectTo: 'auth/register',  pathMatch: 'full' },
+  { path: 'login', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: 'signup', redirectTo: 'auth/register', pathMatch: 'full' },
   { path: 'dashboard', redirectTo: 'admin/dashboard', pathMatch: 'full' },
 
   // Main layout
@@ -29,8 +29,8 @@ export const routes: Routes = [
       { path: 'home', component: Home },
 
       // Products (public)
-      { path: 'products',           loadComponent: () => import('./modules/products/components/product-list/product-list.component').then(m => m.ProductListComponent) },
-      { path: 'products/:id',       loadComponent: () => import('./modules/products/components/product-detail/product-detail.component').then(m => m.ProductDetailComponent) },
+      { path: 'products', loadComponent: () => import('./modules/products/components/product-list/product-list.component').then(m => m.ProductListComponent) },
+      { path: 'products/:id', loadComponent: () => import('./modules/products/components/product-detail/product-detail.component').then(m => m.ProductDetailComponent) },
 
       // Products CRUD (Seller / Admin only)
       {
@@ -47,7 +47,7 @@ export const routes: Routes = [
       },
 
       // Categories (public)
-      { path: 'categories',     loadComponent: () => import('./modules/categories/components/category-list/category-list.component').then(m => m.CategoryListComponent) },
+      { path: 'categories', loadComponent: () => import('./modules/categories/components/category-list/category-list.component').then(m => m.CategoryListComponent) },
       { path: 'categories/:id', loadComponent: () => import('./modules/categories/components/category-detail/category-detail.component').then(m => m.CategoryDetailComponent) },
 
       // Seller pages (logged-in users)
@@ -89,6 +89,13 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/user/components/user-profile/user-profile.component').then(m => m.UserProfileComponent),
         canActivate: [authGuard],
       },
+      {
+        path: 'cart',
+        loadComponent: () =>
+          import('./modules/cart/components/cart.component/cart.component')
+            .then(m => m.CartComponent)
+      },
+
     ],
   },
 
