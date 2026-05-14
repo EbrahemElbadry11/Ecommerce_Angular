@@ -1,0 +1,94 @@
+<section class="auth-shell">
+  <div class="auth-panel auth-panel-wide">
+
+    <span class="eyebrow">New here?</span>
+    <h1>Create Account</h1>
+
+    @if (message()) {
+      <div class="alert" [class.alert-success]="success()" [class.alert-danger]="!success()">
+        {{ success() ? '✅' : '⚠' }} {{ message() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form grid" novalidate>
+
+      <!-- Full Name -->
+      <label>
+        Full name
+        <input type="text" formControlName="fullName" placeholder="John Doe"/>
+        @if (f.fullName.touched && f.fullName.hasError('required')) {
+          <span class="field-error">⚡ Full name is required</span>
+        } @else if (f.fullName.touched && f.fullName.hasError('minlength')) {
+          <span class="field-error">⚡ At least 3 characters</span>
+        }
+      </label>
+
+      <!-- Phone -->
+      <label>
+        Phone number
+        <input type="tel" formControlName="phoneNumber" placeholder="+20 10XXXXXXXX"/>
+        @if (f.phoneNumber.touched && f.phoneNumber.hasError('pattern')) {
+          <span class="field-error">⚡ Enter a valid phone number</span>
+        }
+      </label>
+
+      <!-- Email -->
+      <label class="span-2">
+        Email address
+        <input type="email" formControlName="email" placeholder="you@example.com"/>
+        @if (f.email.touched && f.email.hasError('required')) {
+          <span class="field-error">⚡ Email is required</span>
+        } @else if (f.email.touched && f.email.hasError('email')) {
+          <span class="field-error">⚡ Enter a valid email</span>
+        }
+      </label>
+
+      <!-- Password -->
+      <label>
+        Password
+        <div style="position:relative">
+          <input [type]="showPass() ? 'text' : 'password'"
+                 formControlName="password"
+                 placeholder="Min 8 chars, 1 upper, 1 number, 1 symbol"
+                 style="padding-right:3rem"/>
+          <button type="button"
+                  (click)="showPass.set(!showPass())"
+                  style="position:absolute;right:.875rem;top:50%;transform:translateY(-50%);
+                         background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;">
+            {{ showPass() ? '🙈' : '👁' }}
+          </button>
+        </div>
+        @if (f.password.touched && f.password.hasError('required')) {
+          <span class="field-error">⚡ Password is required</span>
+        } @else if (f.password.touched && f.password.hasError('minlength')) {
+          <span class="field-error">⚡ At least 8 characters</span>
+        } @else if (f.password.touched && f.password.hasError('pattern')) {
+          <span class="field-error">⚡ Must include uppercase, number & symbol</span>
+        }
+      </label>
+
+      <!-- Confirm Password -->
+      <label>
+        Confirm password
+        <input type="password" formControlName="confirmPassword" placeholder="••••••••"/>
+        @if (f.confirmPassword.touched && f.confirmPassword.hasError('required')) {
+          <span class="field-error">⚡ Please confirm your password</span>
+        } @else if (form.touched && form.hasError('mismatch')) {
+          <span class="field-error">⚡ Passwords do not match</span>
+        }
+      </label>
+
+      <button class="btn-primary span-2" type="submit" [disabled]="loading()">
+        @if (loading()) { <span class="spinner"></span> Creating account... }
+        @else { Create Account }
+      </button>
+
+    </form>
+
+    <div class="auth-links">
+      <a routerLink="/auth/login">Already have an account?</a>
+      <a routerLink="/auth/confirm-email">Confirm email</a>
+    </div>
+
+  </div>
+</section>

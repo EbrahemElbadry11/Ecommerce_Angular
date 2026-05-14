@@ -1,0 +1,59 @@
+<section class="auth-shell">
+  <div class="auth-panel">
+
+    <span class="eyebrow">Welcome back</span>
+    <h1>Sign In</h1>
+
+    @if (message()) {
+      <div class="alert alert-danger">⚠ {{ message() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+
+      <!-- Email -->
+      <label>
+        Email address
+        <input type="email" formControlName="email"
+               autocomplete="email" placeholder="you@example.com"/>
+        @if (email.touched && email.hasError('required')) {
+          <span class="field-error">⚡ Email is required</span>
+        } @else if (email.touched && email.hasError('email')) {
+          <span class="field-error">⚡ Enter a valid email</span>
+        }
+      </label>
+
+      <!-- Password -->
+      <label>
+        Password
+        <div style="position:relative">
+          <input [type]="showPass() ? 'text' : 'password'"
+                 formControlName="password"
+                 autocomplete="current-password"
+                 placeholder="••••••••"
+                 style="padding-right:3rem"/>
+          <button type="button"
+                  (click)="showPass.set(!showPass())"
+                  style="position:absolute;right:.875rem;top:50%;transform:translateY(-50%);
+                         background:none;border:none;color:#94a3b8;cursor:pointer;font-size:1.1rem;">
+            {{ showPass() ? '🙈' : '👁' }}
+          </button>
+        </div>
+        @if (password.touched && password.hasError('required')) {
+          <span class="field-error">⚡ Password is required</span>
+        }
+      </label>
+
+      <button class="btn-primary" type="submit" [disabled]="loading()">
+        @if (loading()) { <span class="spinner"></span> Signing in... }
+        @else { Sign In }
+      </button>
+
+    </form>
+
+    <div class="auth-links">
+      <a routerLink="/auth/forgot-password">Forgot password?</a>
+      <a routerLink="/auth/register">Create account</a>
+    </div>
+
+  </div>
+</section>

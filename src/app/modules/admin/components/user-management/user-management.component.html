@@ -1,0 +1,141 @@
+<section class="admin-page">
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div>
+      <span class="eyebrow">Admin Panel</span>
+      <h1>User Management</h1>
+    </div>
+    <div class="header-actions">
+      <span class="badge badge-neutral" style="font-size:.9rem;padding:.5rem 1rem;">
+        {{ filtered().length }} / {{ users().length }} Users
+      </span>
+      <a routerLink="/admin/dashboard" class="btn btn-outline-primary">← Dashboard</a>
+    </div>
+  </header>
+
+  <!-- Alert -->
+  @if (message()) {
+    <div class="alert" [class.alert-success]="success()" [class.alert-danger]="!success()">
+      {{ success() ? '✅' : '⚠' }} {{ message() }}
+    </div>
+  }
+
+  <!-- Search & Filter -->
+  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+    <input
+      type="text"
+      placeholder="🔍  Search by name or email..."
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+      style="flex:1;min-width:220px;padding:.75rem 1rem;border:1.5px solid #e2e8f0;
+             border-radius:12px;font-size:.9rem;font-family:inherit;
+             background:#fff;color:#334155;"/>
+    <select
+      class="admin-select"
+      [value]="filterRole()"
+      (change)="filterRole.set($any($event.target).value)"
+      style="padding:.75rem 1rem;">
+      <option>All</option>
+      <option>Admin</option>
+      <option>Seller</option>
+      <option>Customer</option>
+    </select>
+  </div>
+
+  <!-- Table -->
+  <div class="table-panel">
+    @if (loading()) {
+      <div style="display:flex;justify-content:center;padding:3rem">
+        <div class="spinner" style="width:36px;height:36px;border-width:3px;border-color:#e2e8f0;border-top-color:#6366f1;"></div>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Contact</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filtered(); track user.id) {
+              <tr>
+
+                <!-- User -->
+                <td>
+                  <div style="display:flex;align-items:center;gap:.875rem;">
+                    <div class="avatar">{{ user.fullName.charAt(0).toUpperCase() }}</div>
+                    <div>
+                      <strong style="color:#0f172a;display:block;">{{ user.fullName }}</strong>
+                      <span style="font-size:.8rem;color:#94a3b8;">{{ user.id.slice(0,8) }}...</span>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Contact -->
+                <td>
+                  <div style="display:flex;flex-direction:column;gap:.2rem;">
+                    <span>{{ user.email }}</span>
+                    <span style="color:#94a3b8;font-size:.82rem;">{{ user.phoneNumber || '—' }}</span>
+                  </div>
+                </td>
+
+                <!-- Role -->
+                <td>
+                  <select class="admin-select"
+                          [ngModel]="user.role || 'Customer'"
+                          (ngModelChange)="changeRole(user, $event)">
+                    <option>Customer</option>
+                    <option>Seller</option>
+                    <option>Admin</option>
+                  </select>
+                </td>
+
+                <!-- Status -->
+                <td>
+                  <span class="badge" [class.badge-danger]="user.isDeleted" [class.badge-success]="!user.isDeleted">
+                    {{ user.isDeleted ? '🚫 Blocked' : '✅ Active' }}
+                  </span>
+                </td>
+
+                <!-- Joined -->
+                <td style="color:#64748b;font-size:.875rem;">{{ user.createdAt | date:'mediumDate' }}</td>
+
+                <!-- Actions -->
+                <td>
+                  <div style="display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap;">
+                    @if (user.isDeleted) {
+                      <button class="btn btn-success" style="padding:.45rem .9rem;font-size:.82rem;"
+                              (click)="unblock(user)">Unblock</button>
+                    } @else {
+                      <button class="btn btn-warning" style="padding:.45rem .9rem;font-size:.82rem;"
+                              (click)="block(user)">Block</button>
+                    }
+                    <button class="btn btn-danger" style="padding:.45rem .9rem;font-size:.82rem;"
+                            (click)="remove(user)">Delete</button>
+                  </div>
+                </td>
+
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <span class="empty-icon">🔍</span>
+                    No users match your search.
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</section>

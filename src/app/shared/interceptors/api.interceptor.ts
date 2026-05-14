@@ -1,23 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpResponse,
+  HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError, catchError, tap } from 'rxjs';
+import { ToastService } from '../../../services/toast';
 
 /**
  * API Interceptor
  * Adds authentication token and API base URL to all requests
  * Also handles CORS and content-type headers
+ * Displays toast notifications for successes and failures
  */
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
   // Update this to match your API server URL
-  private readonly API_BASE_URL = 'https://localhost:7125/api';
-
-  constructor() {}
+  private readonly API_BASE_URL = 'https://localhost:7017/api';
+  private readonly toastService = inject(ToastService);
 
   intercept(
     request: HttpRequest<unknown>,
@@ -62,6 +65,26 @@ export class ApiInterceptor implements HttpInterceptor {
       });
     }
 
-    return next.handle(request);
+    return next.handle(request).pipe(
+      tap((event) => {
+        if (
+          event instanceof HttpResponse &&
+          ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+        ) {
+          const customMessage = request.headers.get('X-Success-Message');
+          const message = customMessage || 'Action completed successfully.';
+          this.toastService.show(message, 'success');
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        const message =
+          error.error?.message ||
+          error.error?.data   ||
+          error.statusText    ||
+          'Something went wrong. Please try again.';
+        this.toastService.show(message, 'danger');
+        return throwError(() => error);
+      })
+    );
   }
 }

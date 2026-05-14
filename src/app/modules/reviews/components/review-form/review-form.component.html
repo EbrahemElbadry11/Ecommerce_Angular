@@ -1,7 +1,7 @@
 <div class="review-form-container">
   <!-- Not Logged In Message -->
   <div *ngIf="!isLoggedIn" class="login-prompt">
-    <p>Please <a href="/login">log in</a> to leave a review</p>
+    <p>Please <a routerLink="/auth/login">log in</a> to leave a review</p>
   </div>
 
   <!-- Review Form (Only if Logged In) -->

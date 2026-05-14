@@ -1,66 +1,96 @@
 import { Routes } from '@angular/router';
-import { Parent } from '../components/parent/parent';
 import { Home } from '../components/home/home';
 import { Error } from '../components/error/error';
-import { Signup } from '../components/signup/signup';
-import { Login } from '../components/login/login';
 import { Mainlayout } from '../components/mainlayout/mainlayout';
-import { Users } from '../components/users/users';
-import { authGuard } from '../guards/auth-guard';
-import { multiauthGuard } from '../guards/multiauth-guard';
-import { Dashboard } from '../components/dashboard/dashboard';
-import { ProductListComponent } from './modules/products/components/product-list/product-list.component';
-import { ProductDetailComponent } from './modules/products/components/product-detail/product-detail.component';
-import { ProductCreatePageComponent } from './modules/products/components/product-create-page/product-create-page.component';
-import { ProductEditPageComponent } from './modules/products/components/product-edit-page/product-edit-page.component';
-import { CategoryListComponent } from './modules/categories/components/category-list/category-list.component';
-import { CategoryDetailComponent } from './modules/categories/components/category-detail/category-detail.component';
-import { SellerRegisterPageComponent } from './modules/sellers/components/seller-register-page/seller-register-page.component';
-import { SellerProfilePageComponent } from './modules/sellers/components/seller-profile-page/seller-profile-page.component';
-import { SellerDashboardComponent } from './modules/sellers/components/seller-dashboard/seller-dashboard.component';
+import { authGuard } from './core/guards/auth-guard-guard';
+import { roleGuard } from './core/guards/roleguard-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' }, 
-  { path: 'login', component: Login },                 
-  { path: 'signup', component: Signup },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+  // Auth pages (no layout)
+  { path: 'auth/login',           loadComponent: () => import('./modules/auth/components/login/login.component').then(m => m.LoginComponent) },
+  { path: 'auth/register',        loadComponent: () => import('./modules/auth/components/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'auth/confirm-email',   loadComponent: () => import('./modules/auth/components/email-confirmation/email-confirmation.component').then(m => m.EmailConfirmationComponent) },
+  { path: 'auth/forgot-password', loadComponent: () => import('./modules/auth/components/forget-password/forget-password.component').then(m => m.ForgetPasswordComponent) },
+  { path: 'auth/reset-password',  loadComponent: () => import('./modules/auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
+
+  // Redirects
+  { path: 'login',     redirectTo: 'auth/login',    pathMatch: 'full' },
+  { path: 'signup',    redirectTo: 'auth/register',  pathMatch: 'full' },
+  { path: 'dashboard', redirectTo: 'admin/dashboard', pathMatch: 'full' },
+
+  // Main layout
   {
     path: '',
     component: Mainlayout,
-   
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
+
+      // Products (public)
+      { path: 'products',           loadComponent: () => import('./modules/products/components/product-list/product-list.component').then(m => m.ProductListComponent) },
+      { path: 'products/:id',       loadComponent: () => import('./modules/products/components/product-detail/product-detail.component').then(m => m.ProductDetailComponent) },
+
+      // Products CRUD (Seller / Admin only)
       {
         path: 'products/create',
-        component: ProductCreatePageComponent,
-        canActivate: [multiauthGuard],
+        loadComponent: () => import('./modules/products/components/product-create-page/product-create-page.component').then(m => m.ProductCreatePageComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Seller', 'Admin'] },
       },
       {
         path: 'products/:id/edit',
-        component: ProductEditPageComponent,
-        canActivate: [multiauthGuard],
+        loadComponent: () => import('./modules/products/components/product-edit-page/product-edit-page.component').then(m => m.ProductEditPageComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Seller', 'Admin'] },
       },
-      { path: 'products', component: ProductListComponent },
-      { path: 'products/:id', component: ProductDetailComponent },
-      { path: 'categories', component: CategoryListComponent },
-      { path: 'categories/:id', component: CategoryDetailComponent },
+
+      // Categories (public)
+      { path: 'categories',     loadComponent: () => import('./modules/categories/components/category-list/category-list.component').then(m => m.CategoryListComponent) },
+      { path: 'categories/:id', loadComponent: () => import('./modules/categories/components/category-detail/category-detail.component').then(m => m.CategoryDetailComponent) },
+
+      // Seller pages (logged-in users)
       {
         path: 'sellers/register',
-        component: SellerRegisterPageComponent,
-        canActivate: [multiauthGuard],
+        loadComponent: () => import('./modules/sellers/components/seller-register-page/seller-register-page.component').then(m => m.SellerRegisterPageComponent),
+        canActivate: [authGuard],
       },
       {
         path: 'sellers/profile',
-        component: SellerProfilePageComponent,
-        canActivate: [multiauthGuard],
+        loadComponent: () => import('./modules/sellers/components/seller-profile-page/seller-profile-page.component').then(m => m.SellerProfilePageComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Seller', 'Admin'] },
       },
       {
         path: 'sellers/dashboard',
-        component: SellerDashboardComponent,
-        canActivate: [multiauthGuard],
+        loadComponent: () => import('./modules/sellers/components/seller-dashboard/seller-dashboard.component').then(m => m.SellerDashboardComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Seller', 'Admin'] },
       },
-      { path: 'parent', component: Parent , canActivate: [multiauthGuard]},
-      { path: 'dashboard', component: Dashboard, canActivate: [authGuard] },    ],
+
+      // Admin pages (Admin only)
+      {
+        path: 'admin/dashboard',
+        loadComponent: () => import('./modules/admin/components/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+      },
+      {
+        path: 'admin/users',
+        loadComponent: () => import('./modules/admin/components/user-management/user-management.component').then(m => m.UserManagementComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+      },
+
+      // User profile (any logged-in user)
+      {
+        path: 'user/profile',
+        loadComponent: () => import('./modules/user/components/user-profile/user-profile.component').then(m => m.UserProfileComponent),
+        canActivate: [authGuard],
+      },
+    ],
   },
+
   { path: '**', component: Error },
 ];

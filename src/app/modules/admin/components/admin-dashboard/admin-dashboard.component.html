@@ -1,0 +1,88 @@
+<section class="admin-page">
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div>
+      <span class="eyebrow">Admin Panel</span>
+      <h1>Dashboard Overview</h1>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/admin/users" class="btn btn-outline-primary">👥 Manage Users</a>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div style="display:flex;justify-content:center;padding:4rem">
+      <div class="spinner" style="width:40px;height:40px;border-width:3px;border-color:#e2e8f0;border-top-color:#6366f1;"></div>
+    </div>
+  } @else {
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <article>
+        <span>Total Users</span>
+        <strong>{{ stats()?.totalUsers ?? 0 | number }}</strong>
+        <span class="stat-icon">👥</span>
+      </article>
+      <article>
+        <span>Total Orders</span>
+        <strong>{{ stats()?.totalOrders ?? 0 | number }}</strong>
+        <span class="stat-icon">📦</span>
+      </article>
+      <article>
+        <span>Total Products</span>
+        <strong>{{ stats()?.totalProducts ?? 0 | number }}</strong>
+        <span class="stat-icon">🛍️</span>
+      </article>
+      <article>
+        <span>Total Revenue</span>
+        <strong>{{ stats()?.totalRevenue ?? 0 | currency:'USD':'symbol':'1.0-0' }}</strong>
+        <span class="stat-icon">💰</span>
+      </article>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="table-panel">
+      <h2>📋 Recent Orders</h2>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of stats()?.recentOrders ?? []; track order.id) {
+              <tr>
+                <td><span style="color:#6366f1;font-weight:700;">#{{ order.id }}</span></td>
+                <td>{{ order.customerName }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatusClass(order.status)">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td><strong>{{ order.totalAmount | currency:'USD':'symbol':'1.0-0' }}</strong></td>
+                <td style="color:#64748b;">{{ order.date | date:'mediumDate' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5">
+                  <div class="empty-state">
+                    <span class="empty-icon">📭</span>
+                    No recent orders found.
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  }
+
+</section>
