@@ -7,11 +7,12 @@ import { ProductService } from '../../../products/services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { ProductDto, ProductFilterDto } from '../../../products/models/product.model';
 import { CategoryDto } from '../../models/category.model';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-category-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,...SHARED_IMPORTS],
   templateUrl: './category-detail.component.html',
   styleUrls: ['./category-detail.component.css'],
 })

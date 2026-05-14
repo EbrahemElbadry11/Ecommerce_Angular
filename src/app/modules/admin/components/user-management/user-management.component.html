@@ -22,24 +22,23 @@
   }
 
   <!-- Search & Filter -->
-  <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+  <div class="filters-section">
     <input
       type="text"
       placeholder="🔍  Search by name or email..."
       [value]="searchTerm()"
       (input)="searchTerm.set($any($event.target).value)"
-      style="flex:1;min-width:220px;padding:.75rem 1rem;border:1.5px solid #e2e8f0;
+      style="flex:1;min-width:220px;padding:.75rem 1rem;border:1.5px solid var(--border-color,#e2e8f0);
              border-radius:12px;font-size:.9rem;font-family:inherit;
-             background:#fff;color:#334155;"/>
+             background:var(--bg-card,#fff);color:var(--text-primary,#334155);"/>
     <select
       class="admin-select"
-      [value]="filterRole()"
-      (change)="filterRole.set($any($event.target).value)"
-      style="padding:.75rem 1rem;">
-      <option>All</option>
-      <option>Admin</option>
-      <option>Seller</option>
-      <option>Customer</option>
+      style="padding:.75rem 1rem;"
+      (change)="filterRole.set($any($event.target).value)">
+      <option value="All"      [selected]="filterRole()==='All'">All Roles</option>
+      <option value="Admin"    [selected]="filterRole()==='Admin'">Admin</option>
+      <option value="Seller"   [selected]="filterRole()==='Seller'">Seller</option>
+      <option value="Customer" [selected]="filterRole()==='Customer'">Customer</option>
     </select>
   </div>
 
@@ -71,8 +70,8 @@
                   <div style="display:flex;align-items:center;gap:.875rem;">
                     <div class="avatar">{{ user.fullName.charAt(0).toUpperCase() }}</div>
                     <div>
-                      <strong style="color:#0f172a;display:block;">{{ user.fullName }}</strong>
-                      <span style="font-size:.8rem;color:#94a3b8;">{{ user.id.slice(0,8) }}...</span>
+                      <strong style="color:var(--text-primary,#0f172a);display:block;">{{ user.fullName }}</strong>
+                      <span style="font-size:.8rem;color:var(--text-muted,#94a3b8);">{{ user.id.slice(0,8) }}...</span>
                     </div>
                   </div>
                 </td>
@@ -81,7 +80,7 @@
                 <td>
                   <div style="display:flex;flex-direction:column;gap:.2rem;">
                     <span>{{ user.email }}</span>
-                    <span style="color:#94a3b8;font-size:.82rem;">{{ user.phoneNumber || '—' }}</span>
+                    <span style="color:var(--text-muted,#94a3b8);font-size:.82rem;">{{ user.phoneNumber || '—' }}</span>
                   </div>
                 </td>
 

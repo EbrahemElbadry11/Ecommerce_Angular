@@ -3,13 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
-const API_BASE = 'https://localhost:7017';
+const API_BASE = 'https://ecommerceiti.runasp.net';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, ...SHARED_IMPORTS],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
 })
@@ -35,8 +36,8 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.getProfile().subscribe({
-      next: (res) => {
-        const p = res.data;
+      next: (res: any) => {
+        const p: UserProfile = res.data ?? res;
         if (!p) return;
         this.profile.set(p);
         this.form.patchValue({
@@ -44,9 +45,15 @@ export class UserProfileComponent implements OnInit {
           phoneNumber: p.phoneNumber ?? '',
           address:     p.address     ?? '',
         });
-        if (p.imagePath)
-          this.imagePreview.set(`${API_BASE}/${p.imagePath}`);
+        if (p.imagePath) {
+          // Build full URL – handle relative or absolute path
+          const img = p.imagePath.startsWith('http')
+            ? p.imagePath
+            : `${API_BASE}/${p.imagePath.replace(/^\//, '')}`;
+          this.imagePreview.set(img);
+        }
       },
+      error: () => this.loading.set(false),
       complete: () => this.loading.set(false),
     });
   }
@@ -55,6 +62,22 @@ export class UserProfileComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
     this.selectedFile = input.files[0];
+
+    // Validate file type and size
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(this.selectedFile.type)) {
+      this.message.set('Only JPG, PNG or WebP images are allowed.');
+      this.success.set(false);
+      this.selectedFile = null;
+      return;
+    }
+    if (this.selectedFile.size > 5 * 1024 * 1024) {
+      this.message.set('Image must be smaller than 5 MB.');
+      this.success.set(false);
+      this.selectedFile = null;
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = () => this.imagePreview.set(reader.result as string);
     reader.readAsDataURL(this.selectedFile);
@@ -78,7 +101,7 @@ export class UserProfileComponent implements OnInit {
       },
       error: (err) => {
         this.success.set(false);
-        this.message.set(err?.error?.data || 'Update failed. Try again.');
+        this.message.set(err?.error?.data || err?.error?.message || 'Update failed. Try again.');
         this.saving.set(false);
       },
       complete: () => this.saving.set(false),

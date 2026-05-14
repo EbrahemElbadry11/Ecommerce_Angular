@@ -1,67 +1,193 @@
-<nav class="navbar navbar-expand-lg fixed-top custom-nav" [class.scrolled]="isScrolled">
+<nav class="navbar navbar-expand-lg sticky-top custom-nav" [class.scrolled]="isScrolled" [class.dark]="isDarkMode">
   <div class="container">
-    
+
+    <!-- Brand -->
     <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/home">
       <div class="brand-icon">✦</div>
-      <span class="brand-text text-white fw-bold">BLUE LINK</span>
+      <span class="brand-text fw-bold">BLUE LINK</span>
     </a>
 
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    <!-- Hamburger -->
+    <button class="navbar-toggler border-0" type="button"
+            data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false">
+      <span class="hamburger-icon">
+        <span></span><span></span><span></span>
+      </span>
     </button>
 
     <div class="collapse navbar-collapse" id="mainNav">
+
+      <!-- ── Nav Links (role-aware) ── -->
       <ul class="navbar-nav mx-auto gap-1">
+
+        <!-- All users: Home -->
         <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/home" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/products" routerLinkActive="active-link">Products</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link px-3" routerLink="/categories" routerLinkActive="active-link">Categories</a>
+          <a class="nav-link px-3" routerLink="/home"
+             routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}">
+            <span class="nav-icon">🏠</span> Home
+          </a>
         </li>
 
-        @if (isSeller) {
+        <!-- Public: Products & Categories -->
+        @if (!isAdmin) {
           <li class="nav-item">
-            <a class="nav-link px-3 seller-link" routerLink="/sellers/dashboard" routerLinkActive="active-link">
-              <i class="bi bi-shop me-1"></i> My Store
+            <a class="nav-link px-3" routerLink="/products" routerLinkActive="active-link">
+              <span class="nav-icon">🛍️</span> Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3" routerLink="/categories" routerLinkActive="active-link">
+              <span class="nav-icon">📂</span> Categories
             </a>
           </li>
         }
 
+        <!-- Seller-only links -->
+        @if (isSeller) {
+          <li class="nav-item">
+            <a class="nav-link px-3 seller-link" routerLink="/sellers/dashboard" routerLinkActive="active-link">
+              <span class="nav-icon">🏪</span> My Store
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3 seller-link" routerLink="/products/create" routerLinkActive="active-link">
+              <span class="nav-icon">➕</span> Add Product
+            </a>
+          </li>
+        }
+
+        <!-- Admin-only links -->
         @if (isAdmin) {
           <li class="nav-item">
             <a class="nav-link px-3 admin-link" routerLink="/admin/dashboard" routerLinkActive="active-link">
-              Admin Panel
+              <span class="nav-icon">📊</span> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3 admin-link" routerLink="/admin/users" routerLinkActive="active-link">
+              <span class="nav-icon">👥</span> Users
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3" routerLink="/products" routerLinkActive="active-link">
+              <span class="nav-icon">🛍️</span> Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link px-3" routerLink="/categories" routerLinkActive="active-link">
+              <span class="nav-icon">📂</span> Categories
             </a>
           </li>
         }
       </ul>
 
-      <div class="d-flex align-items-center gap-3">
+      <!-- ── Right Side ── -->
+      <div class="d-flex align-items-center gap-2">
+
+        <!-- Theme Toggle -->
+        <button (click)="toggleTheme()" class="theme-toggle" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+          {{ isDarkMode ? '☀️' : '🌙' }}
+        </button>
+
+        <!-- Logged-in dropdown -->
         @if (isLogged) {
           <div class="dropdown">
-            <button class="profile-btn border-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
-              <div class="avatar">{{ userInitial }}</div>
-              <span class="d-none d-md-inline text-white-50">{{ userFullName }}</span>
+            <button class="profile-btn border-0 d-flex align-items-center gap-2"
+                    type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="avatar" [class.avatar-admin]="isAdmin" [class.avatar-seller]="isSeller">
+                {{ userInitial }}
+              </div>
+              <div class="d-none d-md-flex flex-column align-items-start">
+                <span class="user-name">{{ userFullName }}</span>
+                <span class="role-badge-small" [class.role-admin]="isAdmin" [class.role-seller]="isSeller">
+                  {{ userRole }}
+                </span>
+              </div>
             </button>
-            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow-lg border-0 mt-3 animate-slide-in">
-              <li><a class="dropdown-item py-2" routerLink="/user/profile">My Profile</a></li>
-              @if (!isAdmin) {
-                <li><a class="dropdown-item py-2" routerLink="/user/orders">Orders</a></li>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 animate-slide-in">
+              <li class="dropdown-header">
+                <div class="d-flex align-items-center gap-2 px-2 py-1">
+                  <div class="avatar avatar-sm" [class.avatar-admin]="isAdmin" [class.avatar-seller]="isSeller">
+                    {{ userInitial }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold small">{{ userFullName }}</div>
+                    <div class="text-muted" style="font-size:0.72rem;">{{ userRole }}</div>
+                  </div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider my-1"></li>
+
+              <!-- Customer links -->
+              @if (isCustomer) {
+                <li>
+                  <a class="dropdown-item" routerLink="/user/profile">
+                    <span class="me-2">👤</span> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/user/orders">
+                    <span class="me-2">📦</span> My Orders
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/sellers/register">
+                    <span class="me-2">🏪</span> Become a Seller
+                  </a>
+                </li>
               }
-              <li><hr class="dropdown-divider opacity-10"></li>
-              <li><button class="dropdown-item py-2 text-danger" (click)="logout()">Logout</button></li>
+
+              <!-- Seller links -->
+              @if (isSeller) {
+                <li>
+                  <a class="dropdown-item" routerLink="/user/profile">
+                    <span class="me-2">👤</span> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/sellers/dashboard">
+                    <span class="me-2">🏪</span> My Store
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/sellers/profile">
+                    <span class="me-2">✏️</span> Store Settings
+                  </a>
+                </li>
+              }
+
+              <!-- Admin links -->
+              @if (isAdmin) {
+                <li>
+                  <a class="dropdown-item" routerLink="/admin/dashboard">
+                    <span class="me-2">📊</span> Admin Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" routerLink="/admin/users">
+                    <span class="me-2">👥</span> Manage Users
+                  </a>
+                </li>
+              }
+
+              <li><hr class="dropdown-divider my-1"></li>
+              <li>
+                <button class="dropdown-item text-danger" (click)="logout()">
+                  <span class="me-2">🚪</span> Logout
+                </button>
+              </li>
             </ul>
           </div>
+
         } @else {
+          <!-- Not logged in -->
           <div class="d-flex gap-2">
-            <a routerLink="/auth/login" class="btn btn-login">Login</a>
+            <a routerLink="/auth/login"    class="btn btn-login">Login</a>
             <a routerLink="/auth/register" class="btn btn-register">Register</a>
           </div>
         }
-        <button appDarkmode class="theme-toggle">🌙</button>
       </div>
     </div>
   </div>

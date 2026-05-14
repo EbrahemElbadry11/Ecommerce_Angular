@@ -5,13 +5,14 @@ import { AdminService } from '../../services/admin.service';
 import { AdminDashboardStats } from '../../models/user-admin.model';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../../../../services/toast';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CurrencyPipe, DatePipe, RouterLink,CommonModule],
+  imports: [CurrencyPipe, DatePipe, RouterLink,CommonModule,...SHARED_IMPORTS],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: '../admin-shared.css',
 })

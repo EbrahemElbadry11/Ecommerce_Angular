@@ -264,3 +264,18 @@
     font-size: 12px;
   }
 }
+
+/* ══ DARK MODE ══ */
+body.dark-mode .category-list-container,
+body.dark-mode .categories-section {
+  background: var(--bg-primary, #0d0d1a) !important;
+  color: var(--text-primary, #f1f5f9) !important;
+}
+
+body.dark-mode .category-card {
+  background: var(--bg-card, #1a1a2e) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+}
+
+body.dark-mode .category-name { color: var(--text-primary, #f1f5f9) !important; }
+body.dark-mode .category-count { color: var(--text-secondary, #94a3b8) !important; }

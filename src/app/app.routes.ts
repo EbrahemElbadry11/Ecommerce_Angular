@@ -96,6 +96,12 @@ export const routes: Routes = [
             .then(m => m.CartComponent)
       },
 
+      // User orders (customer)
+      {
+        path: 'user/orders',
+        loadComponent: () => import('./modules/user/components/user-orders/user-orders.component').then(m => m.UserOrdersComponent),
+        canActivate: [authGuard],
+      },
     ],
   },
 

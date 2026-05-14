@@ -536,3 +536,43 @@
     width: 100%;
   }
 }
+
+/* ══ DARK MODE ══ */
+body.dark-mode .product-list-container {
+  background-color: var(--bg-primary, #0d0d1a) !important;
+}
+
+body.dark-mode .list-header {
+  background: var(--bg-card, #1a1a2e) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+}
+
+body.dark-mode .list-header h1 { color: var(--text-primary, #f1f5f9) !important; }
+
+body.dark-mode .search-input,
+body.dark-mode .filter-select,
+body.dark-mode .price-input {
+  background: var(--bg-secondary, #12121f) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.12)) !important;
+  color: var(--text-primary, #f1f5f9) !important;
+}
+
+body.dark-mode .filters-panel {
+  background: var(--bg-card, #1a1a2e) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+}
+
+body.dark-mode .filters-panel h2,
+body.dark-mode .filters-panel label {
+  color: var(--text-primary, #f1f5f9) !important;
+}
+
+body.dark-mode .product-card {
+  background: var(--bg-card, #1a1a2e) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+}
+
+body.dark-mode .product-name { color: var(--text-primary, #f1f5f9) !important; }
+body.dark-mode .product-price { color: #818cf8 !important; }
+body.dark-mode .product-category,
+body.dark-mode .product-store { color: var(--text-secondary, #94a3b8) !important; }
