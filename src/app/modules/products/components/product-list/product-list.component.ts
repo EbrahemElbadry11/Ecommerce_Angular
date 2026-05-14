@@ -116,9 +116,15 @@ export class ProductListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess && response.data) {
-            // API returns { TotalCount, Page, PageSize, Products: [] }
-            this.products = response.data.Products || [];
-            this.totalProducts = response.data.TotalCount || 0;
+            // API may return { TotalCount, Page, PageSize, Products: [] }
+            // or { totalCount, page, pageSize, products: [] }
+            const d = response.data;
+            this.products     = d.Products   || d.products   || [];
+            this.totalProducts = d.TotalCount || d.totalCount || 0;
+          } else if (Array.isArray(response.data)) {
+            // fallback: direct array
+            this.products      = response.data;
+            this.totalProducts = response.data.length;
           }
           this.isLoading = false;
         },

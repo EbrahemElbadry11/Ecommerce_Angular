@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { AdminUser, ManagedRole } from '../../models/user-admin.model';
 import { RouterLink } from '@angular/router';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink],
+  imports: [DatePipe, FormsModule, RouterLink,...SHARED_IMPORTS],
   templateUrl: './user-management.component.html',
   styleUrl: '../admin-shared.css',
 })

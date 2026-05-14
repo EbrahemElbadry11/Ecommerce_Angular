@@ -7,11 +7,12 @@ import { CategoryService } from '../../../categories/services/category.service';
 import { SellerResponseDto } from '../../../sellers/models/seller.model';
 import { SellerService } from '../../../sellers/services/seller.service';
 import { ProductFormComponent } from '../product-form/product-form.component';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-product-create-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, ProductFormComponent],
+  imports: [CommonModule, RouterLink, ProductFormComponent,...SHARED_IMPORTS],
   templateUrl: './product-create-page.component.html',
   styleUrls: ['./product-create-page.component.css'],
 })

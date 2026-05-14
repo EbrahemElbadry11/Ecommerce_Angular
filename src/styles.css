@@ -1,43 +1,209 @@
-/* You can add global styles to this file, and also import other style files */
-.dark-theme {
-  --bg-dark: #121212;
-  --card-dark: #1e1e1e;
-  --text-main: #ffffff;
-  --text-muted-dark: #b0b0b0;
-  --border-color: #333333;
+/* ═══════════════════════════════════════════════
+   GLOBAL STYLES  – BLUE LINK E-Commerce
+═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
-  background-color: var(--bg-dark) !important;
-  color: var(--text-main) !important;
+/* ── CSS Variables ── */
+:root {
+  --bg-primary:   #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-card:      #ffffff;
+  --bg-surface:   #ffffff;
+  --text-primary:   #0f172a;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+  --border-color:   #e2e8f0;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --accent:     #6366f1;
+  --accent-hover: #4f46e5;
+  --success: #22c55e;
+  --danger:  #ef4444;
+  --warning: #f59e0b;
+  --info:    #3b82f6;
+}
+
+body.dark-mode {
+  --bg-primary:   #0d0d1a;
+  --bg-secondary: #12121f;
+  --bg-card:      #1a1a2e;
+  --bg-surface:   #16213e;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+  --border-color:   rgba(255,255,255,0.08);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── Base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
 }
 
-.dark-theme .card, 
-.dark-theme .product-card {
-  background-color: var(--card-dark) !important;
-  color: var(--text-main) !important;
-  border: 1px solid var(--border-color) !important;
-  shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+/* ── Cards ── */
+.card {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
-.dark-theme .text-muted, 
-.dark-theme .card-text, 
-.dark-theme .form-label {
-  color: var(--text-muted-dark) !important;
-}
-
-.dark-theme .list-group-item {
-  background-color: transparent !important;
-  color: var(--text-main) !important;
+/* ── Navbar / Header ── */
+body.dark-mode .dropdown-menu,
+body.dark-mode .modal-content {
+  background-color: #1a1a2e !important;
+  color: var(--text-primary) !important;
   border-color: var(--border-color) !important;
 }
 
-.dark-theme .form-control, 
-.dark-theme .form-select {
-  background-color: #252525 !important;
-  border-color: var(--border-color) !important;
-  color: white !important;
+/* ── Tables ── */
+body.dark-mode .table {
+  color: var(--text-primary) !important;
 }
 
-.dark-theme i {
-  color: var(--text-main);
+body.dark-mode .table th {
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
 }
+
+body.dark-mode .table td {
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .table tbody tr:hover {
+  background: rgba(255,255,255,0.03) !important;
+}
+
+/* ── Admin / Seller panels ── */
+body.dark-mode .admin-page,
+body.dark-mode .dashboard-page {
+  background: var(--bg-primary) !important;
+}
+
+body.dark-mode .stats-grid article,
+body.dark-mode .table-panel,
+body.dark-mode .hero-copy,
+body.dark-mode .quick-stats,
+body.dark-mode .products-panel,
+body.dark-mode .stat-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .admin-header h1,
+body.dark-mode .hero-copy h1,
+body.dark-mode .table-panel h2,
+body.dark-mode .stats-grid article strong {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .stats-grid article span,
+body.dark-mode .table th,
+body.dark-mode .eyebrow {
+  color: var(--text-secondary) !important;
+}
+
+body.dark-mode .table-panel h2 { color: var(--text-primary) !important; }
+
+/* ── Forms ── */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* ── Admin select ── */
+body.dark-mode .admin-select {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── User management table ── */
+body.dark-mode .user-table-container,
+body.dark-mode .filters-section {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── Product list / filter panel ── */
+body.dark-mode .filters-panel,
+body.dark-mode .product-list-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .filter-select,
+body.dark-mode .search-input,
+body.dark-mode .price-input {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── Product cards ── */
+body.dark-mode .product-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .product-card h3,
+body.dark-mode .product-card strong {
+  color: var(--text-primary) !important;
+}
+
+body.dark-mode .product-card p,
+body.dark-mode .product-card .category,
+body.dark-mode .product-card .date {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Category cards ── */
+body.dark-mode .category-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ── Profile ── */
+body.dark-mode .profile-shell,
+body.dark-mode .profile-container,
+body.dark-mode .profile-sidebar,
+body.dark-mode .profile-main,
+body.dark-mode .form-card {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.dark-mode .profile-shell label,
+body.dark-mode .form-card label {
+  color: var(--text-secondary) !important;
+}
+
+/* ── Seller dashboard cards ── */
+body.dark-mode .product-card.seller {
+  background: rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.07) !important;
+}
+
+/* ── Scrollbar ── */
+body.dark-mode ::-webkit-scrollbar { width: 6px; }
+body.dark-mode ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }

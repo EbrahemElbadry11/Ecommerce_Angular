@@ -7,7 +7,7 @@ import { ToastService } from '../services/toast';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, FormsModule, HttpClientModule, ReactiveFormsModule],
+  imports: [RouterOutlet, FormsModule, HttpClientModule, ReactiveFormsModule,],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

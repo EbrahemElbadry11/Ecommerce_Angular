@@ -1,22 +1,30 @@
-import { Directive,HostListener,Renderer2 } from '@angular/core';
+import { Directive, HostListener, OnInit } from '@angular/core';
 
 @Directive({
-  selector: '[appDarkmode]',
+  selector: '[appDarkMode]',
   standalone: true
 })
-export class Darkmode {
- private isDark = false;
+export class Darkmode implements OnInit {
 
-  constructor(private renderer: Renderer2) {}
+  ngOnInit(): void {
+    const theme = localStorage.getItem('theme');
+
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  }
 
   @HostListener('click')
   toggleDarkMode() {
-    this.isDark = !this.isDark;
 
-    if (this.isDark) {
-      this.renderer.addClass(document.body, 'dark-theme');
+    const html = document.documentElement;
+
+    html.classList.toggle('dark');
+
+    if (html.classList.contains('dark')) {
+      localStorage.setItem('theme', 'dark');
     } else {
-      this.renderer.removeClass(document.body, 'dark-theme');
+      localStorage.setItem('theme', 'light');
     }
   }
 }

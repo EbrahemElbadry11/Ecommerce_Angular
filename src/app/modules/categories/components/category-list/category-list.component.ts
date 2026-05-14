@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CategoryDto } from '../../models/category.model';
+import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ...SHARED_IMPORTS],
   templateUrl: './category-list.component.html',
   styleUrls: ['./category-list.component.css'],
 })
@@ -45,8 +46,11 @@ export class CategoryListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          if (response.isSuccess && response.data) {
-            this.categories = response.data;
+          const r = response as any;
+          if (r.isSuccess && r.data) {
+            this.categories = Array.isArray(r.data) ? r.data : (r.data.categories || r.data.Categories || []);
+          } else if (Array.isArray(r)) {
+            this.categories = r;
           } else {
             this.categories = [];
           }

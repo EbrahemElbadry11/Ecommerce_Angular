@@ -235,3 +235,41 @@ input.ng-touched.ng-invalid {
   .span-2 { grid-column: span 1; }
   .profile-shell { padding: 1rem; }
 }
+
+/* ══ DARK MODE overrides ══ */
+body.dark-mode .profile-shell {
+  background: var(--bg-primary, #0d0d1a);
+}
+
+body.dark-mode .profile-sidebar,
+body.dark-mode .form-card {
+  background: var(--bg-card, #1a1a2e) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+  color: var(--text-primary, #f1f5f9);
+}
+
+body.dark-mode .sidebar-name,
+body.dark-mode .form-title {
+  color: var(--text-primary, #f1f5f9) !important;
+}
+
+body.dark-mode .sidebar-email,
+body.dark-mode .sidebar-date {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+body.dark-mode .form-card label {
+  color: var(--text-secondary, #94a3b8) !important;
+}
+
+body.dark-mode .form-card input,
+body.dark-mode .form-card select,
+body.dark-mode .form-card textarea {
+  background: var(--bg-secondary, #12121f) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.12)) !important;
+  color: var(--text-primary, #f1f5f9) !important;
+}
+
+body.dark-mode .form-card input::placeholder {
+  color: var(--text-muted, #64748b) !important;
+}
