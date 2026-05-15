@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ReviewService } from '../../services/review.service';
@@ -7,10 +7,10 @@ import { ReviewDto } from '../../models/review.model';
 /**
  * Reusable Review List Display Component
  * Displays reviews and handles deletion
- * 
+ *
  * Usage:
- * <app-review-list 
- *   [productId]="productId" 
+ * <app-review-list
+ *   [productId]="productId"
  *   [reviews]="reviews"
  *   [isLoggedIn]="isLoggedIn"
  *   [currentUserName]="currentUserName"
@@ -25,7 +25,7 @@ import { ReviewDto } from '../../models/review.model';
   templateUrl: './review-list.component.html',
   styleUrls: ['./review-list.component.css'],
 })
-export class ReviewListComponent implements OnInit, OnDestroy {
+export class ReviewListComponent implements OnInit, OnDestroy, OnChanges {
   @Input() productId!: number;
   @Input() reviews: ReviewDto[] = [];
   @Input() isLoggedIn: boolean = false;
@@ -37,14 +37,25 @@ export class ReviewListComponent implements OnInit, OnDestroy {
     reviewId: number;
     index: number;
   }>();
+  @Output() onEditReview = new EventEmitter<ReviewDto>();
+  @Output() userReviewChange = new EventEmitter<ReviewDto | null>();
   @Output() reviewsLoadingChange = new EventEmitter<boolean>();
 
   private destroy$ = new Subject<void>();
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(private reviewService: ReviewService) { }
 
   ngOnInit(): void {
     if (!this.reviews.length && this.productId) {
+      this.loadReviews();
+      return;
+    }
+
+    this.emitUserReview();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['productId'] && !changes['productId'].firstChange) {
       this.loadReviews();
     }
   }
@@ -58,6 +69,10 @@ export class ReviewListComponent implements OnInit, OnDestroy {
    * Load reviews for the product
    */
   private loadReviews(): void {
+    if (!this.productId) {
+      return;
+    }
+
     this.reviewsLoadingChange.emit(true);
 
     this.reviewService
@@ -70,11 +85,13 @@ export class ReviewListComponent implements OnInit, OnDestroy {
           } else {
             this.reviews = [];
           }
+          this.emitUserReview();
           this.reviewsLoadingChange.emit(false);
         },
         error: (err) => {
           console.error('Failed to load reviews:', err);
           this.reviews = [];
+          this.emitUserReview();
           this.reviewsLoadingChange.emit(false);
         },
       });
@@ -114,8 +131,23 @@ export class ReviewListComponent implements OnInit, OnDestroy {
   /**
    * Check if current user is the reviewer
    */
-  isUserReview(reviewerName: string): boolean {
-    return this.isLoggedIn && this.currentUserName === reviewerName;
+  isUserReview(review: ReviewDto): boolean {
+    const current = (this.currentUserName || '').trim().toLowerCase();
+    if (!this.isLoggedIn || !current) {
+      return false;
+    }
+
+    const candidates = [review.userName, review.userFullName]
+      .filter((name): name is string => !!name && name.trim().length > 0)
+      .map((name) => name.trim().toLowerCase());
+
+    return candidates.includes(current);
+  }
+
+  startEdit(review: ReviewDto): void {
+    if (this.isUserReview(review)) {
+      this.onEditReview.emit(review);
+    }
   }
 
   /**
@@ -123,5 +155,17 @@ export class ReviewListComponent implements OnInit, OnDestroy {
    */
   retryLoadReviews(): void {
     this.loadReviews();
+  }
+
+  private emitUserReview(): void {
+    if (!this.isLoggedIn || !this.currentUserName) {
+      this.userReviewChange.emit(null);
+      return;
+    }
+
+    const existing = this.reviews.find((review) =>
+      this.isUserReview(review)
+    );
+    this.userReviewChange.emit(existing ?? null);
   }
 }

@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -7,152 +6,90 @@ import {
   OnInit,
   ViewChild,
 } from '@angular/core';
-
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink, } from '@angular/router';
+import { finalize, Subject, takeUntil, } from 'rxjs';
+import { ProductCardDto, ProductDto, ProductFilterDto, ProductListResponse, } from '../../models/product.model';
+import { ProductService } from '../../services/product.service';
+import { CartService } from '../../../cart/services/cart.service';
+import { ReviewDto } from '../../../reviews/models/review.model';
+import { ReviewService } from '../../../reviews/services/review.service';
+import { ReviewFormComponent } from '../../../reviews/components/review-form/review-form.component';
+import { ReviewListComponent } from '../../../reviews/components/review-list/review-list.component';
 
-import {
-  ActivatedRoute,
-  Router,
-  RouterLink,
-} from '@angular/router';
-
-import {
-  finalize,
-  Subject,
-  takeUntil,
-} from 'rxjs';
-
-import {
-  ProductCardDto,
-  ProductDto,
-  ProductFilterDto,
-  ProductListResponse,
-} from '../../models/product.model';
-
-import {
-  ProductService
-} from '../../services/product.service';
-
-import {
-  CartService
-} from '../../../cart/services/cart.service';
-
-import {
-  ReviewDto
-} from '../../../reviews/models/review.model';
-
-import {
-  ReviewService
-} from '../../../reviews/services/review.service';
-
-import {
-  ReviewFormComponent
-} from '../../../reviews/components/review-form/review-form.component';
-
-import {
-  ReviewListComponent
-} from '../../../reviews/components/review-list/review-list.component';
-
-import {
-  AuthService
-} from '../../../auth/services/auth.service';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector:
     'app-product-detail',
-
   standalone: true,
-
   imports: [
     CommonModule,
     RouterLink,
     ReviewFormComponent,
     ReviewListComponent,
   ],
-
-  templateUrl:
-    './product-detail.component.html',
-
+  templateUrl: './product-detail.component.html',
   styleUrls: [
     './product-detail.component.css',
   ],
 
-  changeDetection:
-    ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductDetailComponent
-  implements OnInit, OnDestroy {
+
+export class ProductDetailComponent implements OnInit, OnDestroy {
   @ViewChild(ReviewListComponent)
   reviewList?: ReviewListComponent;
-
   product: ProductDto | null = null;
-
   isLoadingProduct = false;
-
   errorMessage = '';
-
   currentImageIndex = 0;
-
-  currentImageUrl =
-    'assets/images/no-image.png';
-
+  currentImageUrl = 'assets/images/no-image.png';
   formattedPrice = '';
-
   formattedDate = '';
-
   isLowStockValue = false;
-
   quantity = 1;
-
   isAddingToCart = false;
-
   isLoggedIn = false;
-
   currentUserName = '';
-
+  userReview: ReviewDto | null = null;
   isLoadingReviews = false;
-
   reviewSuccessMessage = '';
-
   reviewErrorMessage = '';
-
   relatedProducts: ProductCardDto[] = [];
-
   recommendedProducts: ProductCardDto[] = [];
-
   isLoadingSuggestions = false;
-
-  private destroy$ =
-    new Subject<void>();
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private route:
-      ActivatedRoute,
-
-    private router:
-      Router,
-
-    private productService:
-      ProductService,
-
-    private cartService:
-      CartService,
-
-    private reviewService:
-      ReviewService,
-
-    private authService:
-      AuthService,
-
-    private cdr:
-      ChangeDetectorRef
+    private route: ActivatedRoute,
+    private router: Router,
+    private productService: ProductService,
+    private cartService: CartService,
+    private reviewService: ReviewService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
 
     this.setUserContext();
 
-    this.loadProduct();
+    this.route.paramMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const productId = Number(params.get('id'));
+
+        if (!productId) {
+          this.errorMessage = 'Invalid product id.';
+          this.product = null;
+          this.isLoadingProduct = false;
+          this.cdr.markForCheck();
+          return;
+        }
+
+        this.loadProduct(productId);
+      });
   }
 
   ngOnDestroy(): void {
@@ -162,24 +99,19 @@ export class ProductDetailComponent
     this.destroy$.complete();
   }
 
-  /**
-   * Load Product
-   */
-  loadProduct(): void {
+  // Product Details
+  loadProduct(productId: number): void {
 
-    const productId =
-      Number(
-        this.route.snapshot
-          .paramMap.get('id')
-      );
-
-    if (!productId) {
-
-      this.errorMessage =
-        'Invalid product id.';
-
-      return;
-    }
+    this.product = null;
+    this.userReview = null;
+    this.reviewSuccessMessage = '';
+    this.reviewErrorMessage = '';
+    this.isLoadingReviews = false;
+    this.relatedProducts = [];
+    this.recommendedProducts = [];
+    this.isLowStockValue = false;
+    this.currentImageIndex = 0;
+    this.currentImageUrl = 'assets/images/no-image.png';
 
     this.isLoadingProduct = true;
 
@@ -243,8 +175,8 @@ export class ProductDetailComponent
               ).toLocaleDateString();
 
             this.isLowStockValue =
-              this.product.stockQuantity <
-              10;
+              this.product.stockQuantity <=
+              3;
 
             this.loadSuggestions();
 
@@ -268,9 +200,7 @@ export class ProductDetailComponent
       });
   }
 
-  /**
-   * Images
-   */
+  // Image Gallery
   nextImage(): void {
 
     if (
@@ -342,9 +272,7 @@ export class ProductDetailComponent
     this.cdr.markForCheck();
   }
 
-  /**
-   * Quantity
-   */
+  // Quantity
   increaseQuantity(): void {
 
     if (!this.product) {
@@ -372,9 +300,7 @@ export class ProductDetailComponent
     }
   }
 
-  /**
-   * Cart
-   */
+  // cart
   onAddToCart(): void {
 
     if (
@@ -423,15 +349,14 @@ export class ProductDetailComponent
       });
   }
 
-  /**
-   * Reviews
-   */
+  // Reviews
   private setUserContext(): void {
 
     this.isLoggedIn =
       this.authService.isLoggedIn();
 
     this.currentUserName =
+      this.authService.session()?.email ??
       this.authService.session()?.fullName ??
       '';
   }
@@ -440,6 +365,14 @@ export class ProductDetailComponent
     review: ReviewDto
   ): void {
 
+    this.reviewErrorMessage = '';
+
+    this.reviewList?.retryLoadReviews();
+
+    this.cdr.markForCheck();
+  }
+
+  onReviewUpdated(review: ReviewDto): void {
     this.reviewErrorMessage = '';
 
     this.reviewList?.retryLoadReviews();
@@ -510,15 +443,16 @@ export class ProductDetailComponent
       });
   }
 
-  onReviewsLoadingChange(
-    isLoading: boolean
-  ): void {
+  onReviewsLoadingChange(isLoading: boolean): void {
     this.isLoadingReviews = isLoading;
   }
 
-  /**
-   * Related products
-   */
+  onUserReviewChange(review: ReviewDto | null): void {
+    this.userReview = review;
+    this.cdr.markForCheck();
+  }
+
+  // Related products
   private loadSuggestions(): void {
 
     if (!this.product) {
@@ -536,15 +470,11 @@ export class ProductDetailComponent
 
     this.productService
       .getAllProducts(filter)
-
       .pipe(
-
         takeUntil(this.destroy$),
 
         finalize(() => {
-
           this.isLoadingSuggestions = false;
-
           this.cdr.markForCheck();
         })
       )
@@ -553,11 +483,7 @@ export class ProductDetailComponent
 
         next: (response) => {
 
-          if (
-            response.isSuccess &&
-            response.data
-          ) {
-
+          if (response.isSuccess && response.data) {
             const data:
               ProductListResponse =
               response.data;
@@ -571,55 +497,33 @@ export class ProductDetailComponent
 
             const related =
               candidates
-                .filter(
-                  (item) =>
-                    item.categoryName ===
-                    this.product?.categoryName
-                )
+                .filter((item) => item.categoryName === this.product?.categoryName)
                 .slice(0, 6);
 
             const relatedIds =
-              new Set(
-                related.map(
-                  (item) =>
-                    item.productId
-                )
+              new Set(related.map((item) => item.productId)
               );
 
             const recommended =
               candidates
                 .filter(
-                  (item) =>
-                    !relatedIds.has(
-                      item.productId
-                    )
-                )
+                  (item) => !relatedIds.has(item.productId))
                 .slice(0, 6);
 
             this.relatedProducts =
-              related.map((item) =>
-                this.mapToCard(item)
-              );
+              related.map((item) => this.mapToCard(item));
 
             this.recommendedProducts =
-              recommended.map((item) =>
-                this.mapToCard(item)
-              );
+              recommended.map((item) => this.mapToCard(item));
 
             return;
           }
-
           this.relatedProducts = [];
-
           this.recommendedProducts = [];
         },
 
         error: (err) => {
-
-          console.error(
-            'Related products error:',
-            err
-          );
+          console.error('Related products error:', err);
 
           this.relatedProducts = [];
 
@@ -628,10 +532,7 @@ export class ProductDetailComponent
       });
   }
 
-  private mapToCard(
-    product: ProductDto
-  ): ProductCardDto {
-
+  private mapToCard(product: ProductDto): ProductCardDto {
     return {
       ...product,
       imageUrl:
@@ -653,41 +554,46 @@ export class ProductDetailComponent
     };
   }
 
-  trackByProductId(
-    index: number,
-    item: ProductCardDto
-  ): number {
+  trackByProductId(index: number, item: ProductCardDto): number {
     return item.productId;
   }
 
-  scrollTrack(
-    track: HTMLElement | null,
-    direction: number
-  ): void {
+  scrollTrack(track: HTMLElement | null, direction: number): void {
 
     if (!track) {
       return;
     }
 
     const scrollAmount =
-      Math.max(
-        track.clientWidth * 0.8,
-        260
+      Math.max(track.clientWidth * 0.8, 260
       );
 
     track.scrollBy({
-      left: scrollAmount * direction,
-      behavior: 'smooth',
+      left: scrollAmount * direction, behavior: 'smooth',
     });
   }
 
-  /**
-   * Navigation
-   */
+  //Navigation
   goBack(): void {
-
-    this.router.navigate([
-      '/products'
-    ]);
+    this.router.navigate(['/products']);
   }
+
+
+  addRelatedToCart(product: ProductCardDto): void {
+    if (!product || product.stockQuantity <= 0) {
+      return;
+    }
+
+    this.cartService.addToCart(product.productId, 1)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log(`${product.name} added to cart`);
+        },
+        error: (err) => {
+          console.error('Add related product error:', err);
+        },
+      });
+  }
+
 }

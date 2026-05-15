@@ -6,7 +6,11 @@
 
   <!-- Review Form (Only if Logged In) -->
   <form *ngIf="isLoggedIn" class="review-form" (ngSubmit)="submitReview()">
-    <h3>Leave a Review</h3>
+    <h3>{{ isEditMode ? 'Edit Your Review' : 'Leave a Review' }}</h3>
+
+    <p *ngIf="isEditMode" class="review-info">
+      You already reviewed this product. You can update your review below.
+    </p>
 
     <!-- Star Rating -->
     <div class="form-group">
@@ -46,7 +50,11 @@
 
     <!-- Submit Button -->
     <button type="submit" class="submit-btn" [disabled]="isSubmitting || !comment.trim()">
-      {{ isSubmitting ? 'Submitting...' : 'Submit Review' }}
+      {{
+        isSubmitting
+          ? (isEditMode ? 'Updating...' : 'Submitting...')
+          : (isEditMode ? 'Update Review' : 'Submit Review')
+      }}
     </button>
   </form>
 </div>
