@@ -1,264 +1,466 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+
+import {
+  ActivatedRoute,
+  Router,
+} from '@angular/router';
+
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+} from 'rxjs';
+
 import { ProductService } from '../../services/product.service';
+
 import { CategoryService } from '../../../categories/services/category.service';
-import { ProductDto, ProductFilterDto } from '../../models/product.model';
+
+import { finalize } from 'rxjs/operators';
+
+
+import {
+  ProductCardDto,
+  ProductDto,
+  ProductFilterDto,
+  ProductListResponse,
+} from '../../models/product.model';
+
 import { CategoryDto } from '../../../categories/models/category.model';
 
 @Component({
   selector: 'app-product-list',
+
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css'],
+
+  imports: [
+    CommonModule,
+    FormsModule,
+  ],
+
+  templateUrl:
+    './product-list.component.html',
+
+  styleUrls: [
+    './product-list.component.css',
+  ],
 })
 export class ProductListComponent implements OnInit, OnDestroy {
-  // Data
-  products: ProductDto[] = [];
+  products: ProductCardDto[] = [];
+
   categories: CategoryDto[] = [];
 
-  // Filter state
-  searchText: string = '';
-  selectedCategory: number | null = null;
-  minPrice: number = 0;
-  maxPrice: number = 10000;
-  sortBy: 'name' | 'price' | 'createdAt' = 'createdAt';
-  sortOrder: 'asc' | 'desc' = 'desc';
-  currentPage: number = 1;
-  pageSize: number = 12;
-  totalProducts: number = 0;
+  searchText = '';
 
-  // UI states
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  showFilters: boolean = false;
+  selectedCategory?: number;
 
-  // Auto-unsubscribe
-  private destroy$ = new Subject<void>();
-  private searchSubject$ = new Subject<string>();
+  minPrice?: number;
+
+  maxPrice?: number;
+
+  sortBy:
+    | 'name'
+    | 'price'
+    | 'createdAt' = 'createdAt';
+
+  sortOrder:
+    | 'asc'
+    | 'desc' = 'desc';
+
+  currentPage = 1;
+
+  pageSize = 12;
+
+  totalProducts = 0;
+
+  totalPages = 0;
+
+  isLoading = false;
+
+  errorMessage = '';
+
+  showFilters = false;
+
+  private requestedCategoryName:
+    string | null = null;
+
+  private destroy$ =
+    new Subject<void>();
+
+  private searchSubject$ =
+    new Subject<string>();
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
+    this.listenToQueryParams();
+
     this.loadCategories();
+
     this.setupSearchDebounce();
+
     this.loadProducts();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
+
     this.destroy$.complete();
   }
 
   /**
-   * Setup search debounce to avoid excessive API calls
+   * Search Debounce
    */
   private setupSearchDebounce(): void {
     this.searchSubject$
       .pipe(
-        debounceTime(500), // Wait 500ms after user stops typing
-        distinctUntilChanged(), // Only fire if search text changed
+        debounceTime(400),
+        distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.currentPage = 1; // Reset to first page
+        this.currentPage = 1;
+
         this.loadProducts();
       });
   }
 
   /**
-   * Load categories for the filter dropdown
+   * Categories
    */
   private loadCategories(): void {
     this.categoryService
       .getAllCategories()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: any) => {
-          if (response.isSuccess && response.data) {
-            this.categories = response.data;
+        next: (response) => {
+          if (
+            response.isSuccess &&
+            response.data
+          ) {
+            this.categories =
+              response.data;
+
+            this.applyCategoryFromQuery();
           }
         },
-        error: (err: any) => {
-          console.error('Failed to load categories:', err);
+
+        error: (err) => {
+          console.error(
+            'Categories error:',
+            err
+          );
         },
       });
   }
 
+  private listenToQueryParams(): void {
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const category =
+          params.get('category');
+
+        this.requestedCategoryName =
+          category?.trim() || null;
+
+        this.applyCategoryFromQuery();
+      });
+  }
+
+  private applyCategoryFromQuery(): void {
+    if (
+      !this.requestedCategoryName ||
+      !this.categories.length
+    ) {
+      return;
+    }
+
+    const normalized =
+      this.requestedCategoryName
+        .toLowerCase();
+
+    const matchedCategory =
+      this.categories.find(
+        (category) =>
+          category.name
+            .toLowerCase() ===
+          normalized
+      );
+
+    if (
+      matchedCategory &&
+      this.selectedCategory !==
+      matchedCategory.categoryId
+    ) {
+      this.selectedCategory =
+        matchedCategory.categoryId;
+
+      this.currentPage = 1;
+
+      this.loadProducts();
+    }
+  }
+
   /**
-   * Load products with current filters and pagination
+   * Products
    */
+
   loadProducts(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    console.log('🔍 A — loadProducts called, isLoading=true');
 
     const filter: ProductFilterDto = {
-      search: this.searchText.trim() || undefined,
-      categoryId: this.selectedCategory || undefined,
-      minPrice: this.minPrice > 0 ? this.minPrice : undefined,
-      maxPrice: this.maxPrice < 10000 ? this.maxPrice : undefined,
-      sortBy: this.sortBy,
-      order: this.sortOrder,
-      page: this.currentPage,
-      pageSize: this.pageSize,
+      search:
+        this.searchText.trim() ||
+        undefined,
+      categoryId:
+        this.selectedCategory,
+      minPrice:
+        this.minPrice,
+      maxPrice:
+        this.maxPrice,
+      sortBy:
+        this.sortBy,
+      order:
+        this.sortOrder,
+      page:
+        this.currentPage,
+      pageSize:
+        this.pageSize,
     };
 
     this.productService
       .getAllProducts(filter)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          console.log('🔍 D — finalize fired, setting isLoading=false');
+          // ALWAYS runs
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
-        next: (response: any) => {
-          if (response.isSuccess && response.data) {
-            // API may return { TotalCount, Page, PageSize, Products: [] }
-            // or { totalCount, page, pageSize, products: [] }
-            const d = response.data;
-            this.products     = d.Products   || d.products   || [];
-            this.totalProducts = d.TotalCount || d.totalCount || 0;
-          } else if (Array.isArray(response.data)) {
-            // fallback: direct array
-            this.products      = response.data;
-            this.totalProducts = response.data.length;
+        next: (response) => {
+          console.log('🔍 C-next — got response', response);
+          if (
+            response.isSuccess &&
+            response.data
+          ) {
+
+            const data:
+              ProductListResponse =
+              response.data;
+
+            this.products =
+              data.products.map(
+                (product) => ({
+
+                  ...product,
+
+                  imageUrl:
+                    product.imagesNames?.length
+                      ? product.imagesNames[0]
+                      : 'assets/images/no-image.png',
+
+                  shortDescription:
+                    product.description
+                      ? product.description.slice(0, 100)
+                      : '',
+
+                  formattedPrice:
+                    new Intl.NumberFormat(
+                      'en-US',
+                      {
+                        style: 'currency',
+                        currency: 'USD',
+                      }
+                    ).format(product.price),
+
+                })
+              );
+
+            this.totalProducts =
+              data.totalCount;
+
+            this.totalPages =
+              Math.ceil(
+                data.totalCount /
+                data.pageSize
+              );
+
+            return;
           }
-          this.isLoading = false;
-        },
-        error: (err: any) => {
-          console.error('Failed to load products:', err);
-          this.errorMessage =
-            'Failed to load products. Please try again later.';
+
           this.products = [];
-          this.isLoading = false;
+
+          this.totalProducts = 0;
+
+          this.totalPages = 0;
+          this.cdr.detectChanges();
+        },
+
+        error: (err) => {
+          console.error('🔍 C-error — got error', err);
+
+          console.error('Products error:', err);
+
+          this.errorMessage =
+            'Failed to load products.';
+          this.cdr.detectChanges();
         },
       });
   }
 
+
   /**
-   * Handle search input with debounce
+   * Search
    */
-  onSearchChange(searchValue: string): void {
-    this.searchText = searchValue;
-    this.searchSubject$.next(searchValue);
+  onSearchChange(
+    value: string
+  ): void {
+    this.searchText = value;
+
+    this.searchSubject$.next(value);
   }
 
   /**
-   * Handle category filter change
+   * Filters
    */
   onCategoryChange(): void {
     this.currentPage = 1;
+
     this.loadProducts();
   }
 
-  /**
-   * Handle price range changes
-   */
   onPriceChange(): void {
     this.currentPage = 1;
+
     this.loadProducts();
   }
 
-  /**
-   * Handle sort change
-   */
   onSortChange(): void {
     this.currentPage = 1;
+
     this.loadProducts();
   }
 
-  /**
-   * Handle sort order change (asc/desc)
-   */
   onSortOrderChange(): void {
     this.currentPage = 1;
+
     this.loadProducts();
   }
 
   /**
-   * Navigate to previous page
+   * Pagination
    */
   previousPage(): void {
-    if (this.currentPage > 1) {
+    if (
+      this.currentPage > 1
+    ) {
       this.currentPage--;
+
       this.loadProducts();
     }
   }
 
-  /**
-   * Navigate to next page
-   */
   nextPage(): void {
-    if (this.hasNextPage()) {
+    if (
+      this.currentPage <
+      this.totalPages
+    ) {
       this.currentPage++;
+
       this.loadProducts();
     }
   }
 
-  /**
-   * Check if there's a next page
-   */
+  hasPreviousPage(): boolean {
+    return this.currentPage > 1;
+  }
+
   hasNextPage(): boolean {
-    return this.products.length === this.pageSize;
+    return (
+      this.currentPage <
+      this.totalPages
+    );
   }
 
   /**
-   * Go to specific page
-   */
-  goToPage(page: number): void {
-    if (page >= 1) {
-      this.currentPage = page;
-      this.loadProducts();
-    }
-  }
-
-  /**
-   * Toggle filter panel on mobile
+   * Filters
    */
   toggleFilters(): void {
-    this.showFilters = !this.showFilters;
+    this.showFilters =
+      !this.showFilters;
   }
 
-  /**
-   * Clear all filters and reset
-   */
   resetFilters(): void {
+
     this.searchText = '';
-    this.selectedCategory = null;
-    this.minPrice = 0;
-    this.maxPrice = 10000;
+
+    this.selectedCategory =
+      undefined;
+
+    this.minPrice = undefined;
+
+    this.maxPrice = undefined;
+
     this.sortBy = 'createdAt';
+
     this.sortOrder = 'desc';
+
     this.currentPage = 1;
+
     this.loadProducts();
   }
 
   /**
-   * Calculate display price (format currency)
+   * Navigation
    */
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(price);
+  viewProduct(
+    productId: number
+  ): void {
+    this.router.navigate([
+      '/products',
+      productId,
+    ]);
   }
 
   /**
-   * Truncate description for grid display
+   * TrackBy
    */
-  truncateDescription(desc: string | null, length: number = 100): string {
-    if (!desc) return '';
-    return desc.length > length ? desc.substring(0, length) + '...' : desc;
+  trackByProductId(
+    index: number,
+    product: ProductDto
+  ): number {
+    return product.productId;
   }
 
   /**
-   * Navigate to product detail page
-   * Will be used for Feature 3: Product Detail Page with Reviews
+   * Empty State
    */
-  viewProduct(productId: number): void {
-    this.router.navigate(['/products', productId]);
+  get isEmpty(): boolean {
+    return (
+      !this.isLoading &&
+      this.products.length === 0
+    );
   }
 }

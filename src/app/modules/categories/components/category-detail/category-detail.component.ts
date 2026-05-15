@@ -5,14 +5,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProductService } from '../../../products/services/product.service';
 import { CategoryService } from '../../services/category.service';
-import { ProductDto, ProductFilterDto } from '../../../products/models/product.model';
+import { ProductDto, ProductFilterDto, ProductListResponse } from '../../../products/models/product.model';
 import { CategoryDto } from '../../models/category.model';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-category-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule,...SHARED_IMPORTS],
+  imports: [CommonModule, FormsModule, ...SHARED_IMPORTS],
   templateUrl: './category-detail.component.html',
   styleUrls: ['./category-detail.component.css'],
 })
@@ -47,7 +47,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     private router: Router,
     private productService: ProductService,
     private categoryService: CategoryService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAllCategories();
@@ -151,7 +151,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess && response.data) {
-            this.products = response.data;
+            const data = response.data as ProductListResponse;
+            this.products = data.products ?? [];
+          } else {
+            this.products = [];
           }
           this.isLoadingProducts = false;
         },

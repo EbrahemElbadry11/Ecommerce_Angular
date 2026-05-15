@@ -30,7 +30,7 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
     private sellerService: SellerService,
     private productService: ProductService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadSellerAndProducts();
@@ -53,7 +53,7 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
           this.isLoadingSeller = false;
           if (response.isSuccess && response.data) {
             this.seller = response.data;
-            this.loadProducts(response.data.id);
+            this.loadProducts();
           } else {
             this.seller = null;
             this.errorMessage = 'Seller profile not found. Register your store first.';
@@ -67,11 +67,11 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadProducts(sellerProfileId: number): void {
+  private loadProducts(): void {
     this.isLoadingProducts = true;
 
     this.productService
-      .getProductsBySeller(sellerProfileId)
+      .getProductsBySeller()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -146,7 +146,7 @@ export class SellerDashboardComponent implements OnInit, OnDestroy {
 
     this.successMessage = 'Product image uploaded successfully.';
     this.errorMessage = '';
-    this.loadProducts(this.seller.id);
+    this.loadProducts();
   }
 
   onImageError(message: string): void {
