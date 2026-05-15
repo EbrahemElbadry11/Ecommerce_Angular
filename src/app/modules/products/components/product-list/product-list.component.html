@@ -1,8 +1,28 @@
 <div class="product-list-container">
-  <!-- Header with Search -->
+
+  <!-- Header -->
   <div class="list-header">
-    <h1>Products</h1>
+
+    <div class="header-top">
+
+      <h1 class="page-title">
+        Products
+      </h1>
+
+      <button
+        class="filter-toggle-btn"
+        (click)="toggleFilters()"
+        [class.active]="showFilters"
+        type="button"
+      >
+        Filters
+      </button>
+
+    </div>
+
+    <!-- Search -->
     <div class="search-bar">
+
       <input
         type="text"
         placeholder="Search products..."
@@ -10,38 +30,76 @@
         (ngModelChange)="onSearchChange($event)"
         class="search-input"
       />
-      <button class="clear-btn" *ngIf="searchText" (click)="searchText = ''; onSearchChange('')">
+
+      <button
+        type="button"
+        class="clear-btn"
+        *ngIf="searchText"
+        (click)="searchText = ''; onSearchChange('')"
+      >
         ✕
       </button>
+
     </div>
-    <button class="filter-toggle-btn" (click)="toggleFilters()" [class.active]="showFilters">
-      Filters
-    </button>
+
   </div>
 
-  <!-- Filters Sidebar -->
+  <!-- Main -->
   <div class="main-content">
-    <aside class="filters-panel" [class.open]="showFilters">
+
+    <!-- Filters -->
+    <aside
+      class="filters-panel"
+      [class.open]="showFilters"
+    >
+
       <div class="filter-header">
+
         <h2>Filters</h2>
-        <button class="close-filters" (click)="showFilters = false">✕</button>
+
+        <button
+          type="button"
+          class="close-filters"
+          (click)="showFilters = false"
+        >
+          ✕
+        </button>
+
       </div>
 
-      <!-- Category Filter -->
+      <!-- Category -->
       <div class="filter-group">
+
         <label>Category</label>
-        <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="filter-select">
-          <option [value]="null">All Categories</option>
-          <option *ngFor="let cat of categories" [value]="cat.categoryId">
+
+        <select
+          [(ngModel)]="selectedCategory"
+          (change)="onCategoryChange()"
+          class="filter-select"
+        >
+
+          <option [ngValue]="undefined">
+            All Categories
+          </option>
+
+          <option
+            *ngFor="let cat of categories"
+            [ngValue]="cat.categoryId"
+          >
             {{ cat.name }}
           </option>
+
         </select>
+
       </div>
 
-      <!-- Price Range Filter -->
+      <!-- Price -->
       <div class="filter-group">
+
         <label>Price Range</label>
+
         <div class="price-inputs">
+
           <input
             type="number"
             placeholder="Min"
@@ -50,7 +108,9 @@
             min="0"
             class="price-input"
           />
+
           <span>-</span>
+
           <input
             type="number"
             placeholder="Max"
@@ -59,122 +119,274 @@
             min="0"
             class="price-input"
           />
+
         </div>
-        <div class="price-display">
-          {{ formatPrice(minPrice) }} - {{ formatPrice(maxPrice) }}
-        </div>
+
       </div>
 
-      <!-- Sort By -->
+      <!-- Sort -->
       <div class="filter-group">
+
         <label>Sort By</label>
-        <select [(ngModel)]="sortBy" (change)="onSortChange()" class="filter-select">
-          <option value="createdAt">Newest</option>
-          <option value="name">Name</option>
-          <option value="price">Price</option>
+
+        <select
+          [(ngModel)]="sortBy"
+          (change)="onSortChange()"
+          class="filter-select"
+        >
+
+          <option value="createdAt">
+            Newest
+          </option>
+
+          <option value="name">
+            Name
+          </option>
+
+          <option value="price">
+            Price
+          </option>
+
         </select>
+
       </div>
 
-      <!-- Sort Order -->
+      <!-- Order -->
       <div class="filter-group">
+
         <label>Order</label>
+
         <div class="radio-group">
+
           <label class="radio-label">
-            <input type="radio" [(ngModel)]="sortOrder" value="asc" (change)="onSortOrderChange()" />
+
+            <input
+              type="radio"
+              [(ngModel)]="sortOrder"
+              value="asc"
+              (change)="onSortOrderChange()"
+            />
+
             Ascending
+
           </label>
+
           <label class="radio-label">
-            <input type="radio" [(ngModel)]="sortOrder" value="desc" (change)="onSortOrderChange()" />
+
+            <input
+              type="radio"
+              [(ngModel)]="sortOrder"
+              value="desc"
+              (change)="onSortOrderChange()"
+            />
+
             Descending
+
           </label>
+
         </div>
+
       </div>
 
-      <!-- Reset Button -->
-      <button class="reset-btn" (click)="resetFilters()">Reset Filters</button>
+      <!-- Reset -->
+      <button
+        type="button"
+        class="reset-btn"
+        (click)="resetFilters()"
+      >
+        Reset Filters
+      </button>
+
     </aside>
 
-    <!-- Products Grid -->
-    <div class="products-section">
-      <!-- Loading State -->
-      <div *ngIf="isLoading" class="loading">
+    <!-- Products Section -->
+    <section class="products-section">
+
+      <!-- Loading -->
+      <div
+        *ngIf="isLoading"
+        class="loading"
+      >
+
         <div class="spinner"></div>
+
         <p>Loading products...</p>
+
       </div>
 
-      <!-- Error State -->
-      <div *ngIf="errorMessage && !isLoading" class="error-message">
-        <p>{{ errorMessage }}</p>
-        <button (click)="loadProducts()">Retry</button>
+      <!-- Error -->
+      <div
+        *ngIf="
+          errorMessage &&
+          !isLoading
+        "
+        class="error-message"
+      >
+
+        <p>
+          {{ errorMessage }}
+        </p>
+
+        <button
+          type="button"
+          (click)="loadProducts()"
+        >
+          Retry
+        </button>
+
       </div>
 
       <!-- Products Grid -->
-      <div class="products-grid" *ngIf="!isLoading && !errorMessage">
-        <div *ngIf="products.length === 0" class="no-products">
-          <p>No products found. Try adjusting your filters.</p>
+      <div
+        *ngIf="
+          !isLoading &&
+          !errorMessage
+        "
+        class="products-grid"
+      >
+
+        <!-- Empty -->
+        <div
+          *ngIf="isEmpty"
+          class="no-products"
+        >
+
+          <p>
+            No products found.
+          </p>
+
+          <small>
+            Try adjusting your filters.
+          </small>
+
         </div>
 
-        <div *ngFor="let product of products" class="product-card">
+        <!-- Product -->
+        <article
+          *ngFor="
+            let product of products;
+            trackBy: trackByProductId
+          "
+          class="product-card"
+        >
+
+          <!-- Image -->
           <div class="product-image-container">
+
             <img
-              *ngIf="product.imagesNames && product.imagesNames.length > 0"
-              [src]="'https://localhost:7125/Images/Products/' + product.imagesNames[0]"
+              [src]="product.imageUrl"
               [alt]="product.name"
               class="product-image"
+              loading="lazy"
+              decoding="async"
+              width="300"
+              height="300"
             />
-            <div *ngIf="!product.imagesNames || product.imagesNames.length === 0" class="no-image">
-              No Image
-            </div>
           </div>
 
+          <!-- Info -->
           <div class="product-info">
-            <h3 class="product-name">{{ product.name }}</h3>
+
+            <h3 class="product-name">
+              {{ product.name }}
+            </h3>
+
             <p class="product-description">
-              {{ truncateDescription(product.description) }}
+              {{ product.shortDescription }}
             </p>
 
+            <!-- Meta -->
             <div class="product-meta">
-              <span class="category">{{ product.categoryName }}</span>
-              <span class="store" title="Store">{{ product.storeName }}</span>
+
+              <span class="category">
+                {{ product.categoryName }}
+              </span>
+
+              <span class="store">
+                {{ product.storeName }}
+              </span>
+
             </div>
 
+            <!-- Footer -->
             <div class="product-footer">
+
               <div class="price-stock">
-                <span class="price">{{ formatPrice(product.price) }}</span>
-                <span class="stock" [class.low]="product.stockQuantity < 10">
-                  {{ product.stockQuantity }} in stock
+
+                <span class="price">
+                  {{ product.formattedPrice }}
                 </span>
+
+                <span
+                  class="stock"
+                  [class.low]="
+                    product.stockQuantity < 10
+                  "
+                >
+                  {{ product.stockQuantity }}
+                  in stock
+                </span>
+
               </div>
-              <button class="view-btn" (click)="viewProduct(product.productId)">
+
+              <button
+                type="button"
+                class="view-btn"
+                (click)="
+                  viewProduct(
+                    product.productId
+                  )
+                "
+              >
                 View Details
               </button>
+
             </div>
+
           </div>
-        </div>
+
+        </article>
+
       </div>
 
       <!-- Pagination -->
-      <div class="pagination" *ngIf="products.length > 0 && !isLoading">
+      <div
+        class="pagination"
+        *ngIf="
+          products.length > 0 &&
+          !isLoading
+        "
+      >
+
         <button
-          (click)="previousPage()"
-          [disabled]="currentPage === 1"
+          type="button"
           class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage()"
         >
           ← Previous
         </button>
 
         <span class="page-info">
+
           Page {{ currentPage }}
+          of {{ totalPages }}
+
         </span>
 
         <button
+          type="button"
+          class="pagination-btn"
           (click)="nextPage()"
           [disabled]="!hasNextPage()"
-          class="pagination-btn"
         >
           Next →
         </button>
+
       </div>
-    </div>
+
+    </section>
+
   </div>
+
 </div>

@@ -1,157 +1,624 @@
 <div class="product-detail-container">
-  <!-- Back Button -->
+  <!-- Back -->
   <div class="header">
-    <button class="back-btn" (click)="goBack()">← Back to Products</button>
+    <button
+      class="back-btn"
+      (click)="goBack()"
+    >
+      ← Back to Products
+    </button>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading -->
   <div *ngIf="isLoadingProduct" class="loading">
     <div class="spinner"></div>
-    <p>Loading product...</p>
+    <p>
+      Loading product...
+    </p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="errorMessage && !isLoadingProduct" class="error-banner">
-    <p>{{ errorMessage }}</p>
+  <!-- Error -->
+  <div *ngIf="errorMessage &&!isLoadingProduct" class="error-banner">
+    <p>
+      {{ errorMessage }}
+    </p>
   </div>
 
-  <!-- Product Content -->
-  <div *ngIf="product && !isLoadingProduct" class="product-content">
-    <!-- Product Main Section -->
+  <!-- Product -->
+  <div *ngIf="product &&!isLoadingProduct" class="product-content">
     <div class="product-main">
-      <!-- Image Gallery -->
+      <!-- Images -->
       <div class="image-gallery">
         <div class="main-image-container">
           <img
-            *ngIf="getCurrentImageUrl()"
-            [src]="getCurrentImageUrl()"
+            *ngIf="currentImageUrl"
+            [src]="currentImageUrl"
             [alt]="product.name"
             class="main-image"
+            loading="lazy"
+            decoding="async"
           />
-          <div *ngIf="!getCurrentImageUrl()" class="no-image">No Image Available</div>
-
-          <!-- Image Navigation -->
-          <div *ngIf="product.imagesNames && product.imagesNames.length > 1" class="image-nav">
-            <button class="nav-btn prev" (click)="previousImage()">‹</button>
-            <button class="nav-btn next" (click)="nextImage()">›</button>
+          <div *ngIf="!currentImageUrl" class="no-image">
+            No Image Available
           </div>
 
-          <!-- Image Counter -->
+          <!-- Navigation -->
           <div
-            *ngIf="product.imagesNames && product.imagesNames.length > 1"
+            *ngIf="
+              product.imagesNames &&
+              product.imagesNames
+                .length > 1
+            "
+            class="image-nav"
+          >
+
+            <button
+              class="nav-btn prev"
+              (click)="previousImage()"
+            >
+              ‹
+            </button>
+
+            <button
+              class="nav-btn next"
+              (click)="nextImage()"
+            >
+              ›
+            </button>
+
+          </div>
+
+          <!-- Counter -->
+          <div
+            *ngIf="
+              product.imagesNames &&
+              product.imagesNames
+                .length > 1
+            "
             class="image-counter"
           >
-            {{ currentImageIndex + 1 }} / {{ product.imagesNames.length }}
+
+            {{
+              currentImageIndex + 1
+            }}
+            /
+            {{
+              product.imagesNames
+                .length
+            }}
+
           </div>
+
         </div>
 
-        <!-- Thumbnail Gallery -->
-        <div *ngIf="product.imagesNames && product.imagesNames.length > 1" class="thumbnails">
+        <!-- Thumbnails -->
+        <div
+          *ngIf="
+            product.imagesNames &&
+            product.imagesNames
+              .length > 1
+          "
+          class="thumbnails"
+        >
+
           <button
-            *ngFor="let image of product.imagesNames; let i = index"
+            *ngFor="
+              let image of
+              product.imagesNames;
+              let i = index
+            "
             class="thumbnail"
-            [class.active]="i === currentImageIndex"
+            [class.active]="
+              i ===
+              currentImageIndex
+            "
             (click)="selectImage(i)"
           >
-            <img [src]="'https://localhost:7125/Images/Products/' + image" [alt]="'Image ' + (i + 1)" />
+
+            <img
+              [src]="image"
+              [alt]="
+                'Image ' + (i + 1)
+              "
+              loading="lazy"
+            />
+
           </button>
+
         </div>
+
       </div>
 
-      <!-- Product Info -->
+      <!-- Info -->
       <div class="product-info">
-        <h1 class="product-name">{{ product.name }}</h1>
 
-        <!-- Category & Store -->
+        <h1 class="product-name">
+          {{ product.name }}
+        </h1>
+
+        <!-- Meta -->
         <div class="product-meta">
-          <span class="category-badge">{{ product.categoryName }}</span>
-          <span class="store-badge">{{ product.storeName }}</span>
+
+          <span
+            class="category-badge"
+          >
+            {{
+              product.categoryName
+            }}
+          </span>
+
+          <span
+            class="store-badge"
+          >
+            {{
+              product.storeName
+            }}
+          </span>
+
         </div>
 
-        <!-- Price & Stock -->
-        <div class="price-stock-section">
+        <!-- Price -->
+        <div
+          class="price-stock-section"
+        >
+
           <div class="price">
-            <span class="label">Price</span>
-            <span class="value">{{ formatPrice(product.price) }}</span>
+
+            <span class="label">
+              Price
+            </span>
+
+            <span class="value">
+              {{ formattedPrice }}
+            </span>
+
           </div>
-          <div class="stock" [class.low]="isLowStock()">
-            <span class="label">Stock</span>
-            <span class="value">{{ product.stockQuantity }} available</span>
+
+          <div
+            class="stock"
+            [class.low]="
+              isLowStockValue
+            "
+          >
+
+            <span class="label">
+              Stock
+            </span>
+
+            <span class="value">
+
+              {{
+                product.stockQuantity
+              }}
+              available
+
+            </span>
+
+          </div>
+
+        </div>
+        <div
+          class="purchase-panel"
+        >
+          <div
+            class="quantity-control"
+          >
+            <span class="label">
+              Quantity
+            </span>
+
+            <div class="stepper">
+
+              <button
+                type="button"
+                class="stepper-btn"
+                (click)="decreaseQuantity()"
+                [disabled]="quantity <= 1"
+              >
+                -
+              </button>
+
+              <span
+                class="stepper-value"
+              >
+                {{ quantity }}
+              </span>
+
+              <button
+                type="button"
+                class="stepper-btn"
+                (click)="increaseQuantity()"
+                [disabled]="
+                  !product ||
+                  quantity >=
+                  product.stockQuantity
+                "
+              >
+                +
+              </button>
+
+            </div>
+
+            <span *ngIf="product.stockQuantity > 0" class="stock-note">
+              {{ product.stockQuantity }}
+              in stock
+            </span>
+          </div>
+
+          <div class="action-buttons">
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onAddToCart()"
+              [disabled]="
+                product.stockQuantity === 0 ||
+                isAddingToCart">
+
+              <span class="btn-label">
+                {{
+                  product.stockQuantity === 0
+                    ? 'Out of Stock'
+                    : isAddingToCart
+                      ? 'Adding...'
+                      : 'Add to Cart'
+                }}
+              </span>
+
+              <span *ngIf="product.stockQuantity > 0" class="btn-subtitle">
+                Free returns in 30 days
+              </span>
+            </button>
+            <a class="btn btn-outline" routerLink="/cart">
+              View Cart
+            </a>
           </div>
         </div>
 
         <!-- Description -->
         <div class="description-section">
           <h3>Description</h3>
-          <p>{{ product.description || 'No description available' }}</p>
+          <p>
+            {{
+              product.description ||
+              'No description available'
+            }}
+          </p>
+
         </div>
 
-        <!-- Created Date -->
+        <!-- Date -->
         <div class="created-date">
-          <small>Added on {{ formatDate(product.createdAt) }}</small>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-buttons">
-          <button
-            class="btn btn-primary"
-            [disabled]="product.stockQuantity === 0"
-            (click)="onDebugAddToCart()"
-          >
-            {{ product.stockQuantity === 0 ? 'Out of Stock' : 'Add to Cart' }}
-          </button>
-          <button
-            class="btn btn-secondary"
-            (click)="onDebugSave()"
-          >
-            ♥ Save
-          </button>
+          <small>
+            Added on
+            {{ formattedDate }}
+          </small>
         </div>
       </div>
     </div>
 
-    <!-- Reviews Section -->
-    <div class="reviews-section">
-      <h2>Customer Reviews</h2>
+    <div class="related-sections">
 
-      <!-- Success Message -->
-      <div *ngIf="successMessage" class="success-banner">
-        {{ successMessage }}
+      <section class="related-section">
+
+        <div class="section-header">
+
+          <div class="section-title">
+
+            <h2>
+              Related in
+              {{ product.categoryName }}
+            </h2>
+
+            <p>
+              Products in the same category.
+            </p>
+
+          </div>
+
+          <a
+            class="section-link"
+            [routerLink]="['/products']"
+            [queryParams]="{
+              category: product.categoryName
+            }"
+          >
+            Browse all
+          </a>
+
+        </div>
+
+        <div
+          *ngIf="isLoadingSuggestions"
+          class="section-loading"
+        >
+          <div class="spinner"></div>
+          <p>Loading related products...</p>
+        </div>
+
+        <div
+          *ngIf="
+            !isLoadingSuggestions &&
+            !relatedProducts.length
+          "
+          class="section-empty"
+        >
+          No related products yet.
+        </div>
+
+        <div
+          *ngIf="
+            !isLoadingSuggestions &&
+            relatedProducts.length
+          "
+          class="slider-shell"
+        >
+
+          <button
+            type="button"
+            class="slider-btn prev"
+            (click)="scrollTrack(relatedTrack, -1)"
+            aria-label="Scroll left"
+          >
+            ‹
+          </button>
+
+          <div
+            class="related-track"
+            #relatedTrack
+          >
+
+            <a
+              *ngFor="
+                let item of
+                relatedProducts;
+                trackBy:
+                trackByProductId
+              "
+              class="related-card"
+              [routerLink]="[
+                '/products',
+                item.productId
+              ]"
+            >
+
+              <div class="card-media">
+                <img
+                  [src]="item.imageUrl"
+                  [alt]="item.name"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="card-body">
+
+                <span class="card-category">
+                  {{ item.categoryName }}
+                </span>
+
+                <h3>
+                  {{ item.name }}
+                </h3>
+
+                <p>
+                  {{
+                    item.shortDescription ||
+                    'Fresh picks curated for you.'
+                  }}
+                </p>
+
+                <div class="card-meta">
+                  <span class="card-price">
+                    {{ item.formattedPrice }}
+                  </span>
+
+                  <span
+                    class="card-stock"
+                    [class.low]="
+                      item.stockQuantity <= 5
+                    "
+                  >
+                    {{ item.stockQuantity }} left
+                  </span>
+                </div>
+
+              </div>
+
+            </a>
+
+          </div>
+
+          <button
+            type="button"
+            class="slider-btn next"
+            (click)="scrollTrack(relatedTrack, 1)"
+            aria-label="Scroll right"
+          >
+            ›
+          </button>
+
+        </div>
+
+      </section>
+
+      <section class="related-section alt">
+
+        <div class="section-header">
+
+          <div class="section-title">
+
+            <h2>
+              You might also like
+            </h2>
+
+            <p>
+              Trending picks we recommend.
+            </p>
+
+          </div>
+
+          <a
+            class="section-link"
+            [routerLink]="['/products']"
+            [queryParams]="{
+              category: product.categoryName
+            }"
+          >
+            See more
+          </a>
+
+        </div>
+
+        <div
+          *ngIf="isLoadingSuggestions"
+          class="section-loading"
+        >
+          <div class="spinner"></div>
+          <p>Loading recommendations...</p>
+        </div>
+
+        <div
+          *ngIf="
+            !isLoadingSuggestions &&
+            !recommendedProducts.length
+          "
+          class="section-empty"
+        >
+          No recommendations yet.
+        </div>
+
+        <div
+          *ngIf="
+            !isLoadingSuggestions &&
+            recommendedProducts.length
+          "
+          class="slider-shell"
+        >
+
+          <button
+            type="button"
+            class="slider-btn prev"
+            (click)="scrollTrack(recommendedTrack, -1)"
+            aria-label="Scroll left"
+          >
+            ‹
+          </button>
+
+          <div
+            class="related-track"
+            #recommendedTrack
+          >
+
+            <a
+              *ngFor="
+                let item of
+                recommendedProducts;
+                trackBy:
+                trackByProductId
+              "
+              class="related-card"
+              [routerLink]="[
+                '/products',
+                item.productId
+              ]"
+            >
+
+              <div class="card-media">
+                <img
+                  [src]="item.imageUrl"
+                  [alt]="item.name"
+                  loading="lazy"
+                />
+              </div>
+
+              <div class="card-body">
+
+                <span class="card-category">
+                  {{ item.storeName }}
+                </span>
+
+                <h3>
+                  {{ item.name }}
+                </h3>
+
+                <p>
+                  {{
+                    item.shortDescription ||
+                    'Hand-picked favorites this week.'
+                  }}
+                </p>
+
+                <div class="card-meta">
+                  <span class="card-price">
+                    {{ item.formattedPrice }}
+                  </span>
+
+                  <span class="card-stock">
+                    {{ item.storeName }}
+                  </span>
+                </div>
+
+              </div>
+
+            </a>
+
+          </div>
+
+          <button
+            type="button"
+            class="slider-btn next"
+            (click)="scrollTrack(recommendedTrack, 1)"
+            aria-label="Scroll right"
+          >
+            ›
+          </button>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <section class="reviews-section">
+
+      <h2>
+        Customer Reviews
+      </h2>
+
+      <div
+        *ngIf="reviewSuccessMessage"
+        class="success-banner"
+      >
+        {{ reviewSuccessMessage }}
       </div>
 
-      <!-- Error Message -->
-      <div *ngIf="errorMessage" class="error-banner">
-        {{ errorMessage }}
+      <div
+        *ngIf="reviewErrorMessage"
+        class="error-banner"
+      >
+        {{ reviewErrorMessage }}
       </div>
 
-      <!-- Review Form Component (Only if logged in) -->
       <app-review-form
-        *ngIf="product && isLoggedIn"
+        *ngIf="product"
         [productId]="product.productId"
         [isLoggedIn]="isLoggedIn"
         (onReviewAdded)="onReviewAdded($event)"
         (onError)="onReviewError($event)"
-        (onSuccess)="successMessage = $event"
+        (onSuccess)="onReviewSuccess($event)"
       ></app-review-form>
 
-      <!-- Not logged in message -->
-      <app-review-form
-        *ngIf="product && !isLoggedIn"
-        [productId]="product.productId"
-        [isLoggedIn]="isLoggedIn"
-      ></app-review-form>
-
-      <!-- Review List Component -->
       <app-review-list
         *ngIf="product"
         [productId]="product.productId"
-        [reviews]="reviews"
         [isLoggedIn]="isLoggedIn"
         [currentUserName]="currentUserName"
         [isLoading]="isLoadingReviews"
         (onDeleteReview)="onDeleteReview($event)"
-        (reviewsLoadingChange)="isLoadingReviews = $event"
+        (reviewsLoadingChange)="onReviewsLoadingChange($event)"
       ></app-review-list>
-    </div>
+
+    </section>
+
   </div>
 </div>
