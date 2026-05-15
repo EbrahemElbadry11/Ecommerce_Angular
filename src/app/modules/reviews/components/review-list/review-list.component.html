@@ -16,20 +16,32 @@
       <!-- Review Header -->
       <div class="review-header">
         <div class="reviewer-info">
-          <span class="reviewer-name">{{ review.userName }}</span>
+          <span class="reviewer-name">{{ review.userFullName || review.userName }}</span>
           <span class="review-date">{{ formatDate(review.createdAt) }}</span>
         </div>
-        
-        <!-- Delete Button (Owner Only) -->
-        <button
-          *ngIf="isUserReview(review.userName)"
-          class="delete-review-btn"
-          (click)="deleteReview(review.reviewId, i)"
-          title="Delete this review"
-          aria-label="Delete review"
-        >
-          ✕
-        </button>
+
+        <!-- Actions (Owner Only) -->
+        <div *ngIf="isUserReview(review)" class="review-actions">
+          <button
+            class="edit-review-btn"
+            (click)="startEdit(review)"
+            title="Edit this review"
+            aria-label="Edit review"
+            type="button"
+          >
+            Edit
+          </button>
+
+          <button
+            class="delete-review-btn"
+            (click)="deleteReview(review.reviewId, i)"
+            title="Delete this review"
+            aria-label="Delete review"
+            type="button"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <!-- Rating -->

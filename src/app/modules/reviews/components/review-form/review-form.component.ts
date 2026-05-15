@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { ReviewService } from '../../services/review.service';
-import { AddReviewDto, ReviewDto } from '../../models/review.model';
+import { AddReviewDto, ReviewDto, UpdateReviewDto } from '../../models/review.model';
 
 /**
  * Reusable Review Form Component
  * Form for adding new reviews to a product
  *
  * Usage:
- * <app-review-form 
+ * <app-review-form
  *   [productId]="productId"
  *   [isLoggedIn]="isLoggedIn"
  *   (onReviewAdded)="handleReviewAdded($event)"
@@ -27,8 +27,20 @@ import { AddReviewDto, ReviewDto } from '../../models/review.model';
 export class ReviewFormComponent implements OnDestroy {
   @Input() productId!: number;
   @Input() isLoggedIn: boolean = false;
+  @Input() set existingReview(value: ReviewDto | null) {
+    this._existingReview = value;
+    if (value) {
+      this.setFormFromReview(value);
+    } else {
+      this.resetForm();
+    }
+  }
+  get existingReview(): ReviewDto | null {
+    return this._existingReview;
+  }
 
   @Output() onReviewAdded = new EventEmitter<ReviewDto>();
+  @Output() onReviewUpdated = new EventEmitter<ReviewDto>();
   @Output() onError = new EventEmitter<string>();
   @Output() onSuccess = new EventEmitter<string>();
 
@@ -36,10 +48,11 @@ export class ReviewFormComponent implements OnDestroy {
   rating: number = 5;
   comment: string = '';
   isSubmitting: boolean = false;
+  private _existingReview: ReviewDto | null = null;
 
   private destroy$ = new Subject<void>();
 
-  constructor(private reviewService: ReviewService) {}
+  constructor(private reviewService: ReviewService) { }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -50,6 +63,11 @@ export class ReviewFormComponent implements OnDestroy {
    * Submit review
    */
   submitReview(): void {
+    if (!this.productId) {
+      this.onError.emit('Invalid product. Please refresh and try again.');
+      return;
+    }
+
     // Validation
     if (!this.comment.trim()) {
       this.onError.emit('Please enter a comment');
@@ -68,9 +86,42 @@ export class ReviewFormComponent implements OnDestroy {
 
     this.isSubmitting = true;
 
+    const trimmedComment = this.comment.trim();
+
+    if (this.isEditMode && this.existingReview) {
+      const dto: UpdateReviewDto = {
+        rating: this.rating,
+        comment: trimmedComment,
+      };
+
+      this.reviewService
+        .updateReview(this.productId, this.existingReview.reviewId, dto)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.isSuccess && response.data) {
+              this._existingReview = response.data;
+              this.setFormFromReview(response.data);
+              this.onReviewUpdated.emit(response.data);
+              this.onSuccess.emit('Review updated successfully!');
+            }
+            this.isSubmitting = false;
+          },
+          error: (err) => {
+            console.error('Failed to update review:', err);
+            this.onError.emit(
+              err.error?.message || 'Failed to update review. Please try again.'
+            );
+            this.isSubmitting = false;
+          },
+        });
+
+      return;
+    }
+
     const dto: AddReviewDto = {
       rating: this.rating,
-      comment: this.comment.trim(),
+      comment: trimmedComment,
     };
 
     this.reviewService
@@ -101,6 +152,15 @@ export class ReviewFormComponent implements OnDestroy {
   private resetForm(): void {
     this.rating = 5;
     this.comment = '';
+  }
+
+  private setFormFromReview(review: ReviewDto): void {
+    this.rating = review.rating ?? 5;
+    this.comment = review.comment ?? '';
+  }
+
+  get isEditMode(): boolean {
+    return !!this.existingReview;
   }
 
   /**

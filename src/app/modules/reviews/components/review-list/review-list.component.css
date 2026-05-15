@@ -84,6 +84,29 @@
   color: #999;
 }
 
+.review-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.edit-review-btn {
+  background: #e2e8f0;
+  border: 1px solid #cbd5f5;
+  color: #1f2937;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 10px;
+  transition: all 0.3s;
+}
+
+.edit-review-btn:hover {
+  background: #dbe3f0;
+}
+
 /* Delete Button */
 .delete-review-btn {
   background: #f8d7da;
@@ -153,6 +176,10 @@
   }
 
   .delete-review-btn {
+    align-self: flex-start;
+  }
+
+  .review-actions {
     align-self: flex-start;
   }
 }

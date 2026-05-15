@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ReviewDto, AddReviewDto } from '../models/review.model';
+import { ReviewDto, AddReviewDto, UpdateReviewDto } from '../models/review.model';
 import { GeneralResponse } from '../../../shared/models/api-response.model';
 
 /**
@@ -18,7 +18,7 @@ import { GeneralResponse } from '../../../shared/models/api-response.model';
 export class ReviewService {
   private readonly endpoint = '/product';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Get all reviews for a product (public endpoint)
@@ -59,6 +59,23 @@ export class ReviewService {
   ): Observable<GeneralResponse<string>> {
     return this.http.delete<GeneralResponse<string>>(
       `${this.endpoint}/${productId}/review/${reviewId}`
+    );
+  }
+
+  /**
+   * Update a review (requires authentication)
+   * PUT /api/product/{productId}/review/{reviewId}
+   * Requires: Authorization header with Bearer token
+   * Note: You can only update your own reviews
+   */
+  updateReview(
+    productId: number,
+    reviewId: number,
+    dto: UpdateReviewDto
+  ): Observable<GeneralResponse<ReviewDto>> {
+    return this.http.put<GeneralResponse<ReviewDto>>(
+      `${this.endpoint}/${productId}/review/${reviewId}`,
+      dto
     );
   }
 }

@@ -1,35 +1,67 @@
 <div class="product-detail-container">
+
   <!-- Back -->
   <div class="header">
+
     <button
       class="back-btn"
       (click)="goBack()"
     >
       ← Back to Products
     </button>
+
   </div>
 
   <!-- Loading -->
-  <div *ngIf="isLoadingProduct" class="loading">
+  <div
+    *ngIf="isLoadingProduct"
+    class="loading"
+  >
+
     <div class="spinner"></div>
+
     <p>
       Loading product...
     </p>
+
   </div>
 
   <!-- Error -->
-  <div *ngIf="errorMessage &&!isLoadingProduct" class="error-banner">
+  <div
+    *ngIf="
+      errorMessage &&
+      !isLoadingProduct
+    "
+    class="error-banner"
+  >
+
     <p>
       {{ errorMessage }}
     </p>
+
   </div>
 
   <!-- Product -->
-  <div *ngIf="product &&!isLoadingProduct" class="product-content">
+  <div
+    *ngIf="
+      product &&
+      !isLoadingProduct
+    "
+    class="product-content"
+  >
+
+    <!-- ================================================= -->
+    <!-- MAIN -->
+    <!-- ================================================= -->
+
     <div class="product-main">
+
       <!-- Images -->
       <div class="image-gallery">
+
+        <!-- Main Image -->
         <div class="main-image-container">
+
           <img
             *ngIf="currentImageUrl"
             [src]="currentImageUrl"
@@ -38,7 +70,11 @@
             loading="lazy"
             decoding="async"
           />
-          <div *ngIf="!currentImageUrl" class="no-image">
+
+          <div
+            *ngIf="!currentImageUrl"
+            class="no-image"
+          >
             No Image Available
           </div>
 
@@ -46,8 +82,7 @@
           <div
             *ngIf="
               product.imagesNames &&
-              product.imagesNames
-                .length > 1
+              product.imagesNames.length > 1
             "
             class="image-nav"
           >
@@ -72,20 +107,14 @@
           <div
             *ngIf="
               product.imagesNames &&
-              product.imagesNames
-                .length > 1
+              product.imagesNames.length > 1
             "
             class="image-counter"
           >
 
-            {{
-              currentImageIndex + 1
-            }}
+            {{ currentImageIndex + 1 }}
             /
-            {{
-              product.imagesNames
-                .length
-            }}
+            {{ product.imagesNames.length }}
 
           </div>
 
@@ -95,31 +124,26 @@
         <div
           *ngIf="
             product.imagesNames &&
-            product.imagesNames
-              .length > 1
+            product.imagesNames.length > 1
           "
           class="thumbnails"
         >
 
           <button
             *ngFor="
-              let image of
-              product.imagesNames;
+              let image of product.imagesNames;
               let i = index
             "
             class="thumbnail"
             [class.active]="
-              i ===
-              currentImageIndex
+              i === currentImageIndex
             "
             (click)="selectImage(i)"
           >
 
             <img
               [src]="image"
-              [alt]="
-                'Image ' + (i + 1)
-              "
+              [alt]="'Image ' + (i + 1)"
               loading="lazy"
             />
 
@@ -132,6 +156,7 @@
       <!-- Info -->
       <div class="product-info">
 
+        <!-- Name -->
         <h1 class="product-name">
           {{ product.name }}
         </h1>
@@ -139,27 +164,20 @@
         <!-- Meta -->
         <div class="product-meta">
 
-          <span
-            class="category-badge"
-          >
-            {{
-              product.categoryName
-            }}
+          <span class="category-badge">
+            {{ product.categoryName }}
           </span>
 
-          <span
-            class="store-badge"
-          >
-            {{
-              product.storeName
-            }}
+          <span class="store-badge">
+            {{ product.storeName }}
           </span>
 
         </div>
 
-        <!-- Price -->
+        <!-- Price / Stock -->
         <div
           class="price-stock-section"
+          [class.single]="!isLowStockValue"
         >
 
           <div class="price">
@@ -175,6 +193,7 @@
           </div>
 
           <div
+            *ngIf="isLowStockValue"
             class="stock"
             [class.low]="
               isLowStockValue
@@ -186,10 +205,8 @@
             </span>
 
             <span class="value">
-
-              {{
-                product.stockQuantity
-              }}
+              only
+              {{ product.stockQuantity }}
               available
 
             </span>
@@ -197,12 +214,13 @@
           </div>
 
         </div>
-        <div
-          class="purchase-panel"
-        >
-          <div
-            class="quantity-control"
-          >
+
+        <!-- Purchase -->
+        <div class="purchase-panel">
+
+          <!-- Quantity -->
+          <div class="quantity-control">
+
             <span class="label">
               Quantity
             </span>
@@ -218,9 +236,7 @@
                 -
               </button>
 
-              <span
-                class="stepper-value"
-              >
+              <span class="stepper-value">
                 {{ quantity }}
               </span>
 
@@ -230,8 +246,7 @@
                 (click)="increaseQuantity()"
                 [disabled]="
                   !product ||
-                  quantity >=
-                  product.stockQuantity
+                  quantity >= product.stockQuantity
                 "
               >
                 +
@@ -239,12 +254,19 @@
 
             </div>
 
-            <span *ngIf="product.stockQuantity > 0" class="stock-note">
+            <span
+              *ngIf="product.stockQuantity > 0 && isLowStockValue"
+              class="stock-note"
+            >
+
               {{ product.stockQuantity }}
               in stock
+
             </span>
+
           </div>
 
+          <!-- Buttons -->
           <div class="action-buttons">
 
             <button
@@ -253,9 +275,12 @@
               (click)="onAddToCart()"
               [disabled]="
                 product.stockQuantity === 0 ||
-                isAddingToCart">
+                isAddingToCart
+              "
+            >
 
               <span class="btn-label">
+
                 {{
                   product.stockQuantity === 0
                     ? 'Out of Stock'
@@ -263,41 +288,65 @@
                       ? 'Adding...'
                       : 'Add to Cart'
                 }}
+
               </span>
 
-              <span *ngIf="product.stockQuantity > 0" class="btn-subtitle">
-                Free returns in 30 days
-              </span>
             </button>
-            <a class="btn btn-outline" routerLink="/cart">
+
+            <a
+              class="btn btn-outline"
+              routerLink="/cart"
+            >
               View Cart
             </a>
+
           </div>
+
         </div>
 
         <!-- Description -->
         <div class="description-section">
-          <h3>Description</h3>
+
+          <h3>
+            Description
+          </h3>
+
           <p>
+
             {{
               product.description ||
               'No description available'
             }}
+
           </p>
 
         </div>
 
         <!-- Date -->
         <div class="created-date">
+
           <small>
+
             Added on
             {{ formattedDate }}
+
           </small>
+
         </div>
+
       </div>
+
     </div>
 
+    <!-- ================================================= -->
+    <!-- RELATED SECTIONS -->
+    <!-- ================================================= -->
+
     <div class="related-sections">
+
+      <!-- ===================================== -->
+      <!-- RELATED PRODUCTS -->
+      <!-- ===================================== -->
 
       <section class="related-section">
 
@@ -306,8 +355,10 @@
           <div class="section-title">
 
             <h2>
+
               Related in
               {{ product.categoryName }}
+
             </h2>
 
             <p>
@@ -328,14 +379,21 @@
 
         </div>
 
+        <!-- Loading -->
         <div
           *ngIf="isLoadingSuggestions"
           class="section-loading"
         >
+
           <div class="spinner"></div>
-          <p>Loading related products...</p>
+
+          <p>
+            Loading related products...
+          </p>
+
         </div>
 
+        <!-- Empty -->
         <div
           *ngIf="
             !isLoadingSuggestions &&
@@ -346,6 +404,7 @@
           No related products yet.
         </div>
 
+        <!-- Slider -->
         <div
           *ngIf="
             !isLoadingSuggestions &&
@@ -363,68 +422,103 @@
             ‹
           </button>
 
+          <!-- Track -->
           <div
             class="related-track"
             #relatedTrack
           >
 
-            <a
+            <!-- Card -->
+            <div
               *ngFor="
-                let item of
-                relatedProducts;
-                trackBy:
-                trackByProductId
+                let item of relatedProducts;
+                trackBy: trackByProductId
               "
               class="related-card"
-              [routerLink]="[
-                '/products',
-                item.productId
-              ]"
             >
 
-              <div class="card-media">
-                <img
-                  [src]="item.imageUrl"
-                  [alt]="item.name"
-                  loading="lazy"
-                />
-              </div>
+              <!-- Clickable -->
+              <a
+                class="card-link"
+                [routerLink]="[
+                  '/products',
+                  item.productId
+                ]"
+              >
 
-              <div class="card-body">
+                <div class="card-media">
 
-                <span class="card-category">
-                  {{ item.categoryName }}
-                </span>
+                  <img
+                    [src]="item.imageUrl"
+                    [alt]="item.name"
+                    loading="lazy"
+                  />
 
-                <h3>
-                  {{ item.name }}
-                </h3>
-
-                <p>
-                  {{
-                    item.shortDescription ||
-                    'Fresh picks curated for you.'
-                  }}
-                </p>
-
-                <div class="card-meta">
-                  <span class="card-price">
-                    {{ item.formattedPrice }}
-                  </span>
-
-                  <span
-                    class="card-stock"
-                    [class.low]="
-                      item.stockQuantity <= 5
-                    "
-                  >
-                    {{ item.stockQuantity }} left
-                  </span>
                 </div>
 
-              </div>
+                <div class="card-body">
 
-            </a>
+                  <span class="card-category">
+                    {{ item.categoryName }}
+                  </span>
+
+                  <h3>
+                    {{ item.name }}
+                  </h3>
+
+                  <p>
+
+                    {{
+                      item.shortDescription ||
+                      'Fresh picks curated for you.'
+                    }}
+
+                  </p>
+
+                  <div class="card-meta">
+
+                    <span class="card-price">
+                      {{ item.formattedPrice }}
+                    </span>
+
+                    <span
+                      *ngIf="item.stockQuantity <= 3"
+                      class="card-stock"
+                      [class.low]="
+                        item.stockQuantity <= 3
+                      "
+                    >
+
+                      {{ item.stockQuantity }}
+                      left
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </a>
+
+              <!-- Add To Cart -->
+              <button
+                type="button"
+                class="related-cart-btn"
+                (click)="addRelatedToCart(item)"
+                [disabled]="
+                  item.stockQuantity === 0
+                "
+              >
+
+                {{
+                  item.stockQuantity === 0
+                    ? 'Out Of Stock'
+                    : 'Add To Cart'
+                }}
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -440,6 +534,10 @@
         </div>
 
       </section>
+
+      <!-- ===================================== -->
+      <!-- RECOMMENDED -->
+      <!-- ===================================== -->
 
       <section class="related-section alt">
 
@@ -469,14 +567,21 @@
 
         </div>
 
+        <!-- Loading -->
         <div
           *ngIf="isLoadingSuggestions"
           class="section-loading"
         >
+
           <div class="spinner"></div>
-          <p>Loading recommendations...</p>
+
+          <p>
+            Loading recommendations...
+          </p>
+
         </div>
 
+        <!-- Empty -->
         <div
           *ngIf="
             !isLoadingSuggestions &&
@@ -487,6 +592,7 @@
           No recommendations yet.
         </div>
 
+        <!-- Slider -->
         <div
           *ngIf="
             !isLoadingSuggestions &&
@@ -504,63 +610,94 @@
             ‹
           </button>
 
+          <!-- Track -->
           <div
             class="related-track"
             #recommendedTrack
           >
 
-            <a
+            <!-- Card -->
+            <div
               *ngFor="
-                let item of
-                recommendedProducts;
-                trackBy:
-                trackByProductId
+                let item of recommendedProducts;
+                trackBy: trackByProductId
               "
               class="related-card"
-              [routerLink]="[
-                '/products',
-                item.productId
-              ]"
             >
 
-              <div class="card-media">
-                <img
-                  [src]="item.imageUrl"
-                  [alt]="item.name"
-                  loading="lazy"
-                />
-              </div>
+              <!-- Clickable -->
+              <a
+                class="card-link"
+                [routerLink]="[
+                  '/products',
+                  item.productId
+                ]"
+              >
 
-              <div class="card-body">
+                <div class="card-media">
 
-                <span class="card-category">
-                  {{ item.storeName }}
-                </span>
+                  <img
+                    [src]="item.imageUrl"
+                    [alt]="item.name"
+                    loading="lazy"
+                  />
 
-                <h3>
-                  {{ item.name }}
-                </h3>
-
-                <p>
-                  {{
-                    item.shortDescription ||
-                    'Hand-picked favorites this week.'
-                  }}
-                </p>
-
-                <div class="card-meta">
-                  <span class="card-price">
-                    {{ item.formattedPrice }}
-                  </span>
-
-                  <span class="card-stock">
-                    {{ item.storeName }}
-                  </span>
                 </div>
 
-              </div>
+                <div class="card-body">
 
-            </a>
+                  <span class="card-category">
+                    {{ item.storeName }}
+                  </span>
+
+                  <h3>
+                    {{ item.name }}
+                  </h3>
+
+                  <p>
+
+                    {{
+                      item.shortDescription ||
+                      'Hand-picked favorites this week.'
+                    }}
+
+                  </p>
+
+                  <div class="card-meta">
+
+                    <span class="card-price">
+                      {{ item.formattedPrice }}
+                    </span>
+
+                    <span class="card-stock">
+                      {{ item.storeName }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </a>
+
+              <!-- Add To Cart -->
+              <button
+                type="button"
+                class="related-cart-btn"
+                (click)="addRelatedToCart(item)"
+                [disabled]="
+                  item.stockQuantity === 0
+                "
+              >
+
+                {{
+                  item.stockQuantity === 0
+                    ? 'Out Of Stock'
+                    : 'Add To Cart'
+                }}
+
+              </button>
+
+            </div>
 
           </div>
 
@@ -579,12 +716,17 @@
 
     </div>
 
+    <!-- ================================================= -->
+    <!-- REVIEWS -->
+    <!-- ================================================= -->
+
     <section class="reviews-section">
 
       <h2>
         Customer Reviews
       </h2>
 
+      <!-- Success -->
       <div
         *ngIf="reviewSuccessMessage"
         class="success-banner"
@@ -592,6 +734,7 @@
         {{ reviewSuccessMessage }}
       </div>
 
+      <!-- Error -->
       <div
         *ngIf="reviewErrorMessage"
         class="error-banner"
@@ -599,15 +742,20 @@
         {{ reviewErrorMessage }}
       </div>
 
+      <!-- Review Form -->
       <app-review-form
         *ngIf="product"
         [productId]="product.productId"
         [isLoggedIn]="isLoggedIn"
+        [existingReview]="userReview"
         (onReviewAdded)="onReviewAdded($event)"
+        (onReviewUpdated)="onReviewUpdated($event)"
         (onError)="onReviewError($event)"
         (onSuccess)="onReviewSuccess($event)"
-      ></app-review-form>
+      >
+      </app-review-form>
 
+      <!-- Reviews List -->
       <app-review-list
         *ngIf="product"
         [productId]="product.productId"
@@ -615,10 +763,14 @@
         [currentUserName]="currentUserName"
         [isLoading]="isLoadingReviews"
         (onDeleteReview)="onDeleteReview($event)"
+        (onEditReview)="onUserReviewChange($event)"
+        (userReviewChange)="onUserReviewChange($event)"
         (reviewsLoadingChange)="onReviewsLoadingChange($event)"
-      ></app-review-list>
+      >
+      </app-review-list>
 
     </section>
 
   </div>
+
 </div>

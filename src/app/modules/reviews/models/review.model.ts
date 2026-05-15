@@ -9,9 +9,15 @@ export interface ReviewDto {
   comment: string;
   createdAt: string; // ISO date
   userName: string;
+  userFullName?: string | null;
 }
 
 export interface AddReviewDto {
+  rating: number;
+  comment: string;
+}
+
+export interface UpdateReviewDto {
   rating: number;
   comment: string;
 }
