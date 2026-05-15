@@ -26,6 +26,8 @@ import { ProductService } from '../../services/product.service';
 
 import { CategoryService } from '../../../categories/services/category.service';
 
+import { CartService } from '../../../cart/services/cart.service';
+
 import { finalize } from 'rxjs/operators';
 
 
@@ -91,6 +93,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   showFilters = false;
 
+  private addingToCartIds = new Set<number>();
+
   private requestedCategoryName:
     string | null = null;
 
@@ -103,6 +107,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
+    private cartService: CartService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -124,9 +129,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  /**
-   * Search Debounce
-   */
+  //search
   private setupSearchDebounce(): void {
     this.searchSubject$
       .pipe(
@@ -141,9 +144,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
       });
   }
 
-  /**
-   * Categories
-   */
+  //categories
   private loadCategories(): void {
     this.categoryService
       .getAllCategories()
@@ -218,9 +219,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Products
-   */
+  // Products
 
   loadProducts(): void {
     this.isLoading = true;
@@ -331,9 +330,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
 
-  /**
-   * Search
-   */
+  // Search
   onSearchChange(
     value: string
   ): void {
@@ -342,9 +339,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.searchSubject$.next(value);
   }
 
-  /**
-   * Filters
-   */
+  // Filter & Sort Changes
   onCategoryChange(): void {
     this.currentPage = 1;
 
@@ -369,9 +364,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.loadProducts();
   }
 
-  /**
-   * Pagination
-   */
+  //pagination
   previousPage(): void {
     if (
       this.currentPage > 1
@@ -404,9 +397,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     );
   }
 
-  /**
-   * Filters
-   */
+  //filter toggle
   toggleFilters(): void {
     this.showFilters =
       !this.showFilters;
@@ -432,9 +423,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.loadProducts();
   }
 
-  /**
-   * Navigation
-   */
+  // navigate to product detail
   viewProduct(
     productId: number
   ): void {
@@ -444,9 +433,43 @@ export class ProductListComponent implements OnInit, OnDestroy {
     ]);
   }
 
-  /**
-   * TrackBy
-   */
+  /// Add to Cart
+  addToCart(product: ProductCardDto): void {
+    if (!product || product.stockQuantity <= 0) {
+      return;
+    }
+
+    if (this.addingToCartIds.has(product.productId)) {
+      return;
+    }
+
+    this.addingToCartIds.add(product.productId);
+    this.cdr.markForCheck();
+
+    this.cartService
+      .addToCart(product.productId, 1)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.addingToCartIds.delete(product.productId);
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          console.log(`${product.name} added to cart`);
+        },
+        error: (err) => {
+          console.error('Add to cart error:', err);
+        },
+      });
+  }
+
+  isAddingToCart(productId: number): boolean {
+    return this.addingToCartIds.has(productId);
+  }
+
+  /// TrackBy for ngFor
   trackByProductId(
     index: number,
     product: ProductDto
@@ -454,9 +477,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     return product.productId;
   }
 
-  /**
-   * Empty State
-   */
+  // Helper to determine if we should show "No products found"
   get isEmpty(): boolean {
     return (
       !this.isLoading &&
