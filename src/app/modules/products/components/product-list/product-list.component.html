@@ -5,9 +5,10 @@
 
     <div class="header-top">
 
-      <h1 class="page-title">
-        Products
-      </h1>
+      <div class="title-block">
+        <span class="title-eyebrow">Catalogue</span>
+        <h1 class="page-title">Products</h1>
+      </div>
 
       <button
         class="filter-toggle-btn"
@@ -15,6 +16,9 @@
         [class.active]="showFilters"
         type="button"
       >
+        <span class="filter-icon">
+          <span></span><span></span><span></span>
+        </span>
         Filters
       </button>
 
@@ -22,6 +26,10 @@
 
     <!-- Search -->
     <div class="search-bar">
+
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
 
       <input
         type="text"
@@ -36,6 +44,7 @@
         class="clear-btn"
         *ngIf="searchText"
         (click)="searchText = ''; onSearchChange('')"
+        aria-label="Clear search"
       >
         ✕
       </button>
@@ -54,52 +63,38 @@
     >
 
       <div class="filter-header">
-
-        <h2>Filters</h2>
-
+        <h2>Refine</h2>
         <button
           type="button"
           class="close-filters"
           (click)="showFilters = false"
-        >
-          ✕
-        </button>
-
+          aria-label="Close filters"
+        >✕</button>
       </div>
 
       <!-- Category -->
       <div class="filter-group">
-
         <label>Category</label>
-
-        <select
-          [(ngModel)]="selectedCategory"
-          (change)="onCategoryChange()"
-          class="filter-select"
-        >
-
-          <option [ngValue]="undefined">
-            All Categories
-          </option>
-
-          <option
-            *ngFor="let cat of categories"
-            [ngValue]="cat.categoryId"
+        <div class="select-wrapper">
+          <select
+            [(ngModel)]="selectedCategory"
+            (change)="onCategoryChange()"
+            class="filter-select"
           >
-            {{ cat.name }}
-          </option>
-
-        </select>
-
+            <option [ngValue]="undefined">All Categories</option>
+            <option
+              *ngFor="let cat of categories"
+              [ngValue]="cat.categoryId"
+            >{{ cat.name }}</option>
+          </select>
+          <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
       </div>
 
       <!-- Price -->
       <div class="filter-group">
-
         <label>Price Range</label>
-
         <div class="price-inputs">
-
           <input
             type="number"
             placeholder="Min"
@@ -108,9 +103,7 @@
             min="0"
             class="price-input"
           />
-
-          <span>-</span>
-
+          <span class="price-sep">—</span>
           <input
             type="number"
             placeholder="Max"
@@ -119,73 +112,51 @@
             min="0"
             class="price-input"
           />
-
         </div>
-
       </div>
 
       <!-- Sort -->
       <div class="filter-group">
-
         <label>Sort By</label>
-
-        <select
-          [(ngModel)]="sortBy"
-          (change)="onSortChange()"
-          class="filter-select"
-        >
-
-          <option value="createdAt">
-            Newest
-          </option>
-
-          <option value="name">
-            Name
-          </option>
-
-          <option value="price">
-            Price
-          </option>
-
-        </select>
-
+        <div class="select-wrapper">
+          <select
+            [(ngModel)]="sortBy"
+            (change)="onSortChange()"
+            class="filter-select"
+          >
+            <option value="createdAt">Newest</option>
+            <option value="name">Name</option>
+            <option value="price">Price</option>
+          </select>
+          <svg class="select-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
       </div>
 
       <!-- Order -->
       <div class="filter-group">
-
         <label>Order</label>
-
         <div class="radio-group">
-
           <label class="radio-label">
-
             <input
               type="radio"
               [(ngModel)]="sortOrder"
               value="asc"
               (change)="onSortOrderChange()"
             />
-
+            <span class="radio-custom"></span>
             Ascending
-
           </label>
-
           <label class="radio-label">
-
             <input
               type="radio"
               [(ngModel)]="sortOrder"
               value="desc"
               (change)="onSortOrderChange()"
             />
-
+            <span class="radio-custom"></span>
             Descending
-
           </label>
-
         </div>
-
       </div>
 
       <!-- Reset -->
@@ -194,6 +165,7 @@
         class="reset-btn"
         (click)="resetFilters()"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
         Reset Filters
       </button>
 
@@ -203,76 +175,53 @@
     <section class="products-section">
 
       <!-- Loading -->
-      <div
-        *ngIf="isLoading"
-        class="loading"
-      >
-
-        <div class="spinner"></div>
-
-        <p>Loading products...</p>
-
+      <div *ngIf="isLoading" class="loading">
+        <div class="loader-ring">
+          <div></div><div></div><div></div><div></div>
+        </div>
+        <p>Loading products…</p>
       </div>
 
       <!-- Error -->
       <div
-        *ngIf="
-          errorMessage &&
-          !isLoading
-        "
+        *ngIf="errorMessage && !isLoading"
         class="error-message"
       >
-
-        <p>
-          {{ errorMessage }}
-        </p>
-
-        <button
-          type="button"
-          (click)="loadProducts()"
-        >
-          Retry
-        </button>
-
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>{{ errorMessage }}</p>
+        <button type="button" (click)="loadProducts()">Retry</button>
       </div>
 
       <!-- Products Grid -->
       <div
-        *ngIf="
-          !isLoading &&
-          !errorMessage
-        "
+        *ngIf="!isLoading && !errorMessage"
         class="products-grid"
       >
 
         <!-- Empty -->
-        <div
-          *ngIf="isEmpty"
-          class="no-products"
-        >
-
-          <p>
-            No products found.
-          </p>
-
-          <small>
-            Try adjusting your filters.
-          </small>
-
+        <div *ngIf="isEmpty" class="no-products">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <p>No products found.</p>
+          <small>Try adjusting your filters or search term.</small>
         </div>
 
-        <!-- Product -->
+        <!-- Product Card -->
         <article
-          *ngFor="
-            let product of products;
-            trackBy: trackByProductId
-          "
+          *ngFor="let product of products; trackBy: trackByProductId"
           class="product-card"
         >
 
+          <!-- Low Stock Badge -->
+          <div
+            class="low-stock-badge"
+            *ngIf="product.stockQuantity <= 3"
+          >
+            <span class="pulse-dot"></span>
+            Only {{ product.stockQuantity }} left
+          </div>
+
           <!-- Image -->
           <div class="product-image-container">
-
             <img
               [src]="product.imageUrl"
               [alt]="product.name"
@@ -281,65 +230,60 @@
               decoding="async"
               width="300"
               height="300"
+              style="object-fit: fill;"
             />
+            <div class="image-overlay">
+              <button
+                type="button"
+                class="quick-view-btn"
+                (click)="viewProduct(product.productId)"
+              >Quick View</button>
+            </div>
           </div>
 
           <!-- Info -->
           <div class="product-info">
 
-            <h3 class="product-name">
-              {{ product.name }}
-            </h3>
-
-            <p class="product-description">
-              {{ product.shortDescription }}
-            </p>
-
             <!-- Meta -->
             <div class="product-meta">
-
-              <span class="category">
-                {{ product.categoryName }}
-              </span>
-
-              <span class="store">
-                {{ product.storeName }}
-              </span>
-
+              <span class="category">{{ product.categoryName }}</span>
+              <span class="store">{{ product.storeName }}</span>
             </div>
+
+            <h3 class="product-name">{{ product.name }}</h3>
+
+            <p class="product-description">{{ product.shortDescription }}</p>
 
             <!-- Footer -->
             <div class="product-footer">
 
-              <div class="price-stock">
+              <span class="price">{{ product.formattedPrice }}</span>
 
-                <span class="price">
-                  {{ product.formattedPrice }}
-                </span>
+              <div class="action-buttons">
+                <button
+                  type="button"
+                  class="add-to-cart-btn"
 
-                <span
-                  class="stock"
-                  [class.low]="
-                    product.stockQuantity < 10
-                  "
+                  [disabled]="product.stockQuantity === 0"
                 >
-                  {{ product.stockQuantity }}
-                  in stock
-                </span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                  Add to Cart
+                </button>
 
+                <button
+                  type="button"
+                  class="view-btn"
+                  (click)="viewProduct(product.productId)"
+                  aria-label="View product details"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
               </div>
-
-              <button
-                type="button"
-                class="view-btn"
-                (click)="
-                  viewProduct(
-                    product.productId
-                  )
-                "
-              >
-                View Details
-              </button>
 
             </div>
 
@@ -352,35 +296,33 @@
       <!-- Pagination -->
       <div
         class="pagination"
-        *ngIf="
-          products.length > 0 &&
-          !isLoading
-        "
+        *ngIf="products.length > 0 && !isLoading"
       >
 
         <button
           type="button"
-          class="pagination-btn"
+          class="pagination-btn prev"
           (click)="previousPage()"
           [disabled]="!hasPreviousPage()"
         >
-          ← Previous
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Prev
         </button>
 
-        <span class="page-info">
-
-          Page {{ currentPage }}
-          of {{ totalPages }}
-
-        </span>
+        <div class="page-info">
+          <span class="current-page">{{ currentPage }}</span>
+          <span class="page-sep">/</span>
+          <span class="total-pages">{{ totalPages }}</span>
+        </div>
 
         <button
           type="button"
-          class="pagination-btn"
+          class="pagination-btn next"
           (click)="nextPage()"
           [disabled]="!hasNextPage()"
         >
-          Next →
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
 
       </div>
