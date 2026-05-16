@@ -20,9 +20,10 @@
     </div>
 
     <div class="summary-card" *ngIf="seller">
-      <div class="logo" *ngIf="seller.logoBase64; else fallbackLogo">
-        <img [src]="getLogoUrl(seller.logoBase64)" alt="Store logo" />
-      </div>
+    <div class="logo" *ngIf="seller.logo; else fallbackLogo">
+      <img [src]="sellerService.getLogoUrl(seller.logo)"alt="Store logo"loading="lazy"
+    />
+</div>
       <ng-template #fallbackLogo>
         <div class="logo placeholder">{{ seller.storeName.charAt(0) }}</div>
       </ng-template>

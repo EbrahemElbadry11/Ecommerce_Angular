@@ -21,7 +21,7 @@ import { GeneralResponse } from '../../../shared/models/api-response.model';
 export class SellerService {
   private readonly endpoint = '/seller';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Get all sellers (public endpoint)
@@ -107,5 +107,26 @@ export class SellerService {
     return this.http.delete<GeneralResponse<string>>(
       `${this.endpoint}/profile`
     );
+  }
+
+
+  // Helper method to get the full logo URL from the logo path or URL
+  getLogoUrl(logo?: string | null): string {
+
+    if (!logo) {
+
+      return 'assets/images/default-store.png';
+    }
+
+    if (
+      logo.startsWith('http://') ||
+      logo.startsWith('https://')
+    ) {
+
+      return logo;
+    }
+
+    // relative path
+    return `https://ecommerceiti.runasp.net/${logo}`;
   }
 }

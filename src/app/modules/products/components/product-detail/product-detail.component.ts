@@ -64,7 +64,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService,
+    public productService: ProductService,
     private cartService: CartService,
     private reviewService: ReviewService,
     private authService: AuthService,
@@ -152,9 +152,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
                 ?.length
             ) {
 
-              this.currentImageUrl =
-                this.product
-                  .imagesNames[0];
+              this.currentImageUrl = this.productService.getImageUrl(this.product.imagesNames[0]);
             }
 
             // Precomputed Values
@@ -217,11 +215,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       this.product.imagesNames
         .length;
 
-    this.currentImageUrl =
-      this.product.imagesNames[
+    this.currentImageUrl = this.productService.getImageUrl(this.product.imagesNames[
       this.currentImageIndex
-      ];
-
+    ]);
     this.cdr.markForCheck();
   }
 
@@ -244,10 +240,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       this.product.imagesNames
         .length;
 
-    this.currentImageUrl =
-      this.product.imagesNames[
+    this.currentImageUrl = this.productService.getImageUrl(this.product.imagesNames[
       this.currentImageIndex
-      ];
+    ]);
 
     this.cdr.markForCheck();
   }
@@ -265,9 +260,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       index;
 
     this.currentImageUrl =
-      this.product.imagesNames[
-      this.currentImageIndex
-      ];
+      this.productService.getImageUrl(this.product.imagesNames[
+        this.currentImageIndex
+      ]);
 
     this.cdr.markForCheck();
   }
@@ -537,7 +532,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       ...product,
       imageUrl:
         product.imagesNames?.length
-          ? product.imagesNames[0]
+          ? this.productService.getImageUrl(product.imagesNames[0])
           : 'assets/images/no-image.png',
       shortDescription:
         product.description

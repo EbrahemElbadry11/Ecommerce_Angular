@@ -10,9 +10,9 @@
     <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
 
     <div class="created-card" *ngIf="createdSeller">
-      <div class="logo" *ngIf="createdSeller.logoBase64; else noLogo">
-        <img [src]="getLogoUrl(createdSeller.logoBase64)" alt="Store logo" />
-      </div>
+    <div class="logo" ngIf="createdSeller.logo;else noLogo">
+      <img [src]="sellerService.getLogoUrl(createdSeller.logo)" alt="Store logo" loading="lazy"/>
+    </div>
       <ng-template #noLogo>
         <div class="logo placeholder">{{ createdSeller.storeName.charAt(0) }}</div>
       </ng-template>

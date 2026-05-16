@@ -28,22 +28,46 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
 
-      // Products (public)
-      { path: 'products', loadComponent: () => import('./modules/products/components/product-list/product-list.component').then(m => m.ProductListComponent) },
-      { path: 'products/:id', loadComponent: () => import('./modules/products/components/product-detail/product-detail.component').then(m => m.ProductDetailComponent) },
-
       // Products CRUD (Seller / Admin only)
       {
         path: 'products/create',
-        loadComponent: () => import('./modules/products/components/product-create-page/product-create-page.component').then(m => m.ProductCreatePageComponent),
+        loadComponent: () =>
+          import('./modules/products/components/product-create-page/product-create-page.component')
+            .then(m => m.ProductCreatePageComponent),
+
         canActivate: [authGuard, roleGuard],
-        data: { roles: ['Seller', 'Admin'] },
+
+        data: {
+          roles: ['Seller', 'Admin']
+        },
       },
+
       {
         path: 'products/:id/edit',
-        loadComponent: () => import('./modules/products/components/product-edit-page/product-edit-page.component').then(m => m.ProductEditPageComponent),
+        loadComponent: () =>
+          import('./modules/products/components/product-edit-page/product-edit-page.component')
+            .then(m => m.ProductEditPageComponent),
+
         canActivate: [authGuard, roleGuard],
-        data: { roles: ['Seller', 'Admin'] },
+
+        data: {
+          roles: ['Seller', 'Admin']
+        },
+      },
+
+      // Products (public)
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./modules/products/components/product-list/product-list.component')
+            .then(m => m.ProductListComponent)
+      },
+
+      {
+        path: 'products/:id',
+        loadComponent: () =>
+          import('./modules/products/components/product-detail/product-detail.component')
+            .then(m => m.ProductDetailComponent)
       },
 
       // Categories (public)

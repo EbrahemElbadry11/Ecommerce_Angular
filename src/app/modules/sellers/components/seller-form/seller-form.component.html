@@ -39,8 +39,11 @@
         </div>
         <small class="meta" *ngIf="selectedLogoName">Selected: {{ selectedLogoName }}</small>
 
-        <div class="preview" *ngIf="logoPreviewUrl">
-          <img [src]="logoPreviewUrl" alt="Store logo preview" />
+        <div class="preview" *ngIf="logoPreviewUrl ||seller?.logo">
+          <img [src]="logoPreviewUrl || sellerService.getLogoUrl(seller?.logo)"
+            alt="Store logo preview"
+            loading="lazy"
+          />
         </div>
       </div>
 

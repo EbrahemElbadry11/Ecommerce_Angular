@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   OnDestroy,
   OnInit,
@@ -11,6 +13,7 @@ import {
 } from '@angular/router';
 
 import {
+  finalize,
   forkJoin,
   Subject,
   takeUntil,
@@ -30,20 +33,29 @@ import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
 @Component({
   selector: 'app-product-create-page',
+
   standalone: true,
+
   imports: [
     CommonModule,
     ProductFormComponent,
     ...SHARED_IMPORTS,
   ],
+
   templateUrl:
     './product-create-page.component.html',
+
   styleUrls: [
     './product-create-page.component.css',
   ],
+
+  changeDetection:
+    ChangeDetectionStrategy.OnPush,
 })
+
 export class ProductCreatePageComponent
   implements OnInit, OnDestroy {
+
   seller: SellerResponseDto | null =
     null;
 
@@ -61,14 +73,17 @@ export class ProductCreatePageComponent
   constructor(
     private sellerService: SellerService,
     private categoryService: CategoryService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
+
     this.loadInitialData();
   }
 
   ngOnDestroy(): void {
+
     this.destroy$.next();
 
     this.destroy$.complete();
@@ -78,13 +93,17 @@ export class ProductCreatePageComponent
    * Load Seller + Categories
    */
   private loadInitialData(): void {
+
     this.isLoading = true;
 
     this.errorMessage = '';
 
     this.successMessage = '';
 
+    this.cdr.markForCheck();
+
     forkJoin({
+
       seller:
         this.sellerService
           .getCurrentSellerProfile(),
@@ -92,20 +111,38 @@ export class ProductCreatePageComponent
       categories:
         this.categoryService
           .getAllCategories(),
+
     })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (result) => {
+
+      .pipe(
+
+        takeUntil(this.destroy$),
+
+        finalize(() => {
+
           this.isLoading = false;
+
+          this.cdr.detectChanges();
+        })
+      )
+
+      .subscribe({
+
+        next: (result) => {
 
           // Seller
           if (
             result.seller.isSuccess &&
             result.seller.data
           ) {
+
             this.seller =
               result.seller.data;
-          } else {
+          }
+          else {
+
+            this.seller = null;
+
             this.errorMessage =
               'Seller profile not found. Please create your store first.';
           }
@@ -116,23 +153,33 @@ export class ProductCreatePageComponent
               .isSuccess &&
             result.categories.data
           ) {
+
             this.categories =
               result.categories.data;
-          } else {
+          }
+          else {
+
             this.categories = [];
           }
+
+          this.cdr.detectChanges();
         },
 
         error: (error) => {
-          this.isLoading = false;
 
           console.error(
             'Failed to load create page:',
             error
           );
 
+          this.seller = null;
+
+          this.categories = [];
+
           this.errorMessage =
             'Failed to load product form data. Please try again.';
+
+          this.cdr.detectChanges();
         },
       });
   }
@@ -141,15 +188,20 @@ export class ProductCreatePageComponent
    * Product Created
    */
   onSaved(): void {
+
     this.successMessage =
       'Product created successfully.';
 
     this.errorMessage = '';
 
+    this.cdr.detectChanges();
+
     setTimeout(() => {
+
       this.router.navigate([
         '/sellers/dashboard',
       ]);
+
     }, 1200);
   }
 
@@ -157,26 +209,34 @@ export class ProductCreatePageComponent
    * Child Success Event
    */
   onSuccess(message: string): void {
+
     this.successMessage = message;
 
     this.errorMessage = '';
+
+    this.cdr.detectChanges();
   }
 
   /**
    * Child Error Event
    */
   onError(message: string): void {
+
     this.errorMessage = message;
 
     if (message) {
+
       this.successMessage = '';
     }
+
+    this.cdr.detectChanges();
   }
 
   /**
    * Retry Loading
    */
   retry(): void {
+
     this.loadInitialData();
   }
 
@@ -184,6 +244,7 @@ export class ProductCreatePageComponent
    * Navigate Back
    */
   goBack(): void {
+
     this.router.navigate([
       '/sellers/dashboard',
     ]);
@@ -193,6 +254,7 @@ export class ProductCreatePageComponent
    * Has Seller
    */
   get hasSeller(): boolean {
+
     return !!this.seller;
   }
 
@@ -200,6 +262,7 @@ export class ProductCreatePageComponent
    * Has Error
    */
   get hasError(): boolean {
+
     return !!this.errorMessage;
   }
 
@@ -207,6 +270,7 @@ export class ProductCreatePageComponent
    * Categories Loaded
    */
   get hasCategories(): boolean {
+
     return this.categories.length > 0;
   }
 }

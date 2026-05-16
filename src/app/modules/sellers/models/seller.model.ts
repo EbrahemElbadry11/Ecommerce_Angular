@@ -10,7 +10,7 @@ export interface SellerResponseDto {
   email: string;
   storeName: string;
   description: string;
-  logoBase64?: string; // Base64 encoded image or null
+  logo?: string; // Base64 encoded image or null
   isApproved: boolean;
   totalEarnings: number;
   totalProducts: number;
