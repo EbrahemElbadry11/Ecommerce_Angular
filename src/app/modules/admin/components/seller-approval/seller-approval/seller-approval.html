@@ -1,0 +1,232 @@
+<section class="admin-page">
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div>
+      <span class="eyebrow">Admin Panel</span>
+      <h1>Seller Approval</h1>
+      <p class="header-desc">Review and approve seller applications.</p>
+    </div>
+    <div class="header-actions">
+      <div class="stats-badge">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        </svg>
+        <span>{{ pendingSellers().length }} Pending | {{ approvedSellers().length }} Approved</span>
+      </div>
+      <a routerLink="/admin/dashboard" class="action-btn action-btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-7H9v7H4a2 2 0 0 1-2-2z"/>
+        </svg>
+        Dashboard
+      </a>
+    </div>
+  </header>
+
+  <!-- Alert -->
+  @if (alertMessage()) {
+    <div class="alert" [class.alert-success]="alertType() === 'success'"
+                       [class.alert-danger]="alertType() === 'danger'"
+                       [class.alert-warning]="alertType() === 'warning'"
+                       [class.alert-info]="alertType() === 'info'">
+      <span class="alert-icon">{{ alertType() === 'success' ? '✓' : '⚠' }}</span>
+      <span class="alert-text">{{ alertMessage() }}</span>
+      <button class="alert-close" (click)="clearAlert()">×</button>
+    </div>
+  }
+
+  <!-- Tabs -->
+  <div class="tabs-section">
+    <button class="tab-btn" [class.active]="activeTab() === 'pending'" (click)="setTab('pending')">
+      🕐 Pending Applications
+      @if (pendingSellers().length > 0) {
+        <span class="badge-count">{{ pendingSellers().length }}</span>
+      }
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'approved'" (click)="setTab('approved')">
+      ✅ Approved Sellers
+    </button>
+  </div>
+
+  <!-- Search -->
+  @if (activeTab() === 'pending') {
+    <div class="filters-section">
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search by name or email..."
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+          class="search-input"
+        />
+      </div>
+      <button class="btn-refresh" (click)="refreshSellers()" [disabled]="loading()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6"/>
+          <path d="M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+      </button>
+    </div>
+  }
+
+  <!-- Pending Sellers Table -->
+  @if (activeTab() === 'pending') {
+    <div class="table-panel">
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+          <p>Loading pending sellers...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Seller</th>
+                <th>Contact</th>
+                <th>Applied On</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (seller of filteredPendingSellers(); track seller.id) {
+                <tr [class.row-loading]="actionLoading() === seller.id">
+                  <!-- Seller Info -->
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar">{{ getUserInitial(seller.fullName) }}</div>
+                      <div class="user-info">
+                        <strong class="user-name">{{ seller.fullName }}</strong>
+                        <span class="user-id">ID: {{ seller.id | slice:0:8 }}...</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Contact -->
+                  <td>
+                    <div class="contact-info">
+                      <span class="user-email">{{ seller.email }}</span>
+                      @if (seller.phoneNumber) {
+                        <span class="user-phone">{{ seller.phoneNumber }}</span>
+                      }
+                    </div>
+                  </td>
+
+                  <!-- Applied Date -->
+                  <td>
+                    <span class="date-text">{{ seller.createdAt | date:'MMM d, y' }}</span>
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="action-buttons">
+                    <!-- ✅ زر القبول - الميثود المهمة -->
+                    <button 
+                      class="btn-icon btn-success-icon" 
+                      (click)="approveSeller(seller)"
+                      [disabled]="actionLoading() === seller.id"
+                      title="Approve Seller"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </button>
+                    
+                    <button 
+                      class="btn-icon btn-danger-icon" 
+                      (click)="rejectSeller(seller)"
+                      [disabled]="actionLoading() === seller.id"
+                      title="Reject Application"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4">
+                    <div class="empty-state">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="7" width="20" height="14" rx="2"/>
+                        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                      </svg>
+                      <p>No pending seller applications.</p>
+                      <p class="empty-subtitle">All sellers have been reviewed.</p>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Approved Sellers Table -->
+  @if (activeTab() === 'approved') {
+    <div class="table-panel">
+      @if (loading()) {
+        <div class="loading-state">
+          <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+          <p>Loading approved sellers...</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Seller</th>
+                <th>Contact</th>
+                <th>Approved On</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (seller of approvedSellers(); track seller.id) {
+                <tr>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar">{{ getUserInitial(seller.fullName) }}</div>
+                      <div class="user-info">
+                        <strong class="user-name">{{ seller.fullName }}</strong>
+                        <span class="user-id">ID: {{ seller.id | slice:0:8 }}...</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="contact-info">
+                      <span class="user-email">{{ seller.email }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-success">✓ Approved</span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3">
+                    <div class="empty-state">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      <p>No approved sellers yet.</p>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</section>
