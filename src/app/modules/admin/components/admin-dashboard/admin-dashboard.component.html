@@ -250,52 +250,48 @@
     }
 
     <!-- Recent Orders -->
-    <div class="table-panel">
-      <div class="panel-header">
-        <h2>Recent Orders</h2>
-        <span class="panel-count">{{ (stats()?.recentOrders ?? []).length }} orders</span>
-      </div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Amount</th>
-              <th>Date</th>
-             </tr>
-          </thead>
-          <tbody>
-            @for (order of stats()?.recentOrders ?? []; track order.id) {
-              <tr>
-                <td><span class="order-id">#{{ order.id }}</span></td>
-                <td><span class="customer-name">{{ order.customerName }}</span></td>
-                <td>
-                  <span class="badge" [ngClass]="getStatusClass(order.status)">
-                    {{ order.status }}
-                  </span>
-                </td>
-                <td><strong class="amount">{{ order.totalAmount | currency:'USD':'symbol':'1.0-0' }}</strong></td>
-                <td><span class="date-text">{{ order.date | date:'mediumDate' }}</span></td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5">
-                  <div class="empty-state">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                      <rect x="2" y="7" width="20" height="14" rx="2"/>
-                      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-                    </svg>
-                    <p>No recent orders found.</p>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+   <!-- Recent Orders Section -->
+<div class="recent-orders-section mt-4">
+  <div class="section-header">
+    <h3>Recent Orders</h3>
+    <a routerLink="/admin/orders" class="view-all-link">View All</a>
+  </div>
+  
+  <div *ngIf="loading()" class="loading-state">
+    <div class="spinner"></div>
+  </div>
+  
+  <div *ngIf="!loading() && recentOrders().length === 0" class="empty-state">
+    <p>No orders found</p>
+  </div>
+  
+  <div class="orders-table-wrapper" *ngIf="!loading() && recentOrders().length > 0">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of recentOrders()">
+          <td>{{ order.orderNumber }}</td>
+          <td>{{ order.customerName }}</td>
+          <td>{{ order.createdAt | date:'mediumDate' }}</td>
+          <td>{{ formatCurrency(order.totalAmount) }}</td>
+          <td>
+            <span [class]="'badge ' + getOrderStatusClass(order.status)">
+              {{ order.status }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
   }
 

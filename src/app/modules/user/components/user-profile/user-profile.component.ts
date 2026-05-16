@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '.././../services/user.service'; // تأكد من صحة مسار الخدمة
@@ -14,9 +14,10 @@ import { UserProfile, UpdateProfileRequest } from '.././../models/user-profile.m
 export class UserProfileComponent implements OnInit {
   private userService = inject(UserService);
   private fb = inject(FormBuilder);
-
+ 
+   constructor(private cd : ChangeDetectorRef) { }
   // 1. رابط الباك-إند الأساسي لدمج مسار الصور (قم بتعديله حسب البورت عندك)
-  readonly backendBaseUrl = 'https://localhost:7017'; 
+  readonly backendBaseUrl = 'https://ecommerceiti.runasp.net/api'; 
 
   // Signals State المتوافقة تماماً مع الـ HTML الخاص بك
   readonly profile = signal<UserProfile | null>(null);
@@ -32,6 +33,7 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     this.initForm();
     this.loadUserProfile();
+    this.cd.markForCheck(); // تأكد من تحديث العرض بعد تحميل البيانات والتهيئة
   }
 
   // تهيئة الـ Form بالـ Validators المطلوبة في الـ HTML
@@ -64,6 +66,7 @@ export class UserProfileComponent implements OnInit {
           }
         }
         this.loading.set(false);
+        this.cd.markForCheck();
       },
       error: (err) => {
         console.error('Error loading profile:', err);
@@ -129,5 +132,5 @@ export class UserProfileComponent implements OnInit {
         this.success.set(false);
       }
     });
-  }
+  };
 }

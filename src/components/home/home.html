@@ -22,7 +22,7 @@
   </section>
 
   <!-- Categories Section -->
-  <section class="section categories-section" *ngIf="categories.length > 0">
+ <section class="section categories-section" *ngIf="categories.length > 0">
     <div class="section-header">
       <div>
         <span class="section-eyebrow">Categories</span>
@@ -30,7 +30,9 @@
       </div>
       <a routerLink="/categories" class="view-all-link">
         View All
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
       </a>
     </div>
     <div class="categories-scroll">
@@ -39,8 +41,12 @@
               [routerLink]="['/products']"
               [queryParams]="{ category: cat.name }">
         <div class="chip-icon">
-          <img *ngIf="getImageUrl(cat.icon)" [src]="getImageUrl(cat.icon)" [alt]="cat.name" class="chip-icon-img"/>
-          <span *ngIf="!getImageUrl(cat.icon)" class="chip-icon-placeholder">&#x1F4E6;</span>
+          <img *ngIf="getImageUrl(cat.icon)" 
+               [src]="getImageUrl(cat.icon)" 
+               [alt]="cat.name" 
+               class="chip-icon-img"
+               (error)="onImageError($event)"/>
+          <span *ngIf="!getImageUrl(cat.icon)" class="chip-icon-placeholder">📦</span>
         </div>
         <span class="chip-name">{{ cat.name }}</span>
       </button>

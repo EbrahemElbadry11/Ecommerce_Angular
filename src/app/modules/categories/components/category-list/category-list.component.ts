@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CategoryDto } from '../../models/category.model';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [CommonModule], // ✅ من غير Pipe
+  imports: [CommonModule],
   templateUrl: './category-list.component.html',
   styleUrls: ['./category-list.component.css'],
 })
@@ -21,6 +22,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   
   private categoryService = inject(CategoryService);
   private router = inject(Router);
+  private cd = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.loadCategories();
@@ -49,11 +51,17 @@ export class CategoryListComponent implements OnInit, OnDestroy {
             this.categories = [];
           }
           this.isLoading = false;
+          
+          // ✅ markForCheck أسرع من detectChanges
+          this.cd.markForCheck();
         },
         error: (err) => {
           console.error('Failed to load categories:', err);
           this.errorMessage = 'Failed to load categories. Please try again.';
           this.isLoading = false;
+          
+          // ✅ markForCheck أسرع من detectChanges
+          this.cd.markForCheck();
         },
       });
   }
@@ -66,45 +74,36 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     this.loadCategories();
   }
 
-  // ✅ دالة تحويل الصورة - هتضبط الرابط
   getImageUrl(icon: string | null | undefined): string {
-    // لو مفيش صورة
     if (!icon) {
       return 'assets/images/default-category.png';
     }
 
-    // لو كان رابط خارجي (زي رابط Google)
     if (icon.startsWith('http://') || icon.startsWith('https://')) {
-      // لو الرابط من Google، حاول تعرضه مباشرة
-      if (icon.includes('googleusercontent.com') || icon.includes('gstatic.com')) {
-        return icon;
-      }
       return icon;
     }
 
-    // لو كان Base64
     if (icon.startsWith('data:image')) {
       return icon;
     }
 
-    // لو كان من assets
     if (icon.startsWith('assets/')) {
       return icon;
     }
 
-    // لو كان مسار من API
     if (icon.startsWith('/')) {
       return `https://localhost:7017${icon}`;
     }
 
-    // مسار نسبي
     return `https://localhost:7017/${icon}`;
   }
 
-  // ✅ دالة لو فشلت الصورة
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.src = 'assets/images/default-category.png';
-    img.onerror = null; // منع التكرار
+    img.onerror = null;
+    
+    // ✅ markForCheck
+    this.cd.markForCheck();
   }
 }
