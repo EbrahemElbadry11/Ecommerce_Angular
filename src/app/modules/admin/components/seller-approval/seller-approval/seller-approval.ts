@@ -7,6 +7,7 @@ import { AdminService } from '../../../services/admin.service';
 import { AdminUser } from '../../../models/user-admin.model';
 import { SlicePipe } from '@angular/common';
 import { ToastService } from '../../...../../../../../../services/toast';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-seller-approval',
@@ -18,6 +19,7 @@ import { ToastService } from '../../...../../../../../../services/toast';
 export class SellerApprovalComponent implements OnInit {
   private adminService = inject(AdminService);
   private toastService = inject(ToastService);
+  private cd = inject(ChangeDetectorRef);
 
   // State
   readonly message = signal<string | null>(null);
@@ -29,10 +31,8 @@ export class SellerApprovalComponent implements OnInit {
   readonly alertMessage = signal<string | null>(null);
   readonly alertType = signal<'success' | 'danger' | 'warning' | 'info'>('info');
 
-  // Search
   readonly searchTerm = signal('');
 
-  // Computed filtered pending sellers
   readonly filteredPendingSellers = computed(() => {
     let filtered = this.pendingSellers();
     const search = this.searchTerm().toLowerCase();
@@ -49,12 +49,12 @@ export class SellerApprovalComponent implements OnInit {
 
  ngOnInit(): void {
     this.loadPendingSellers();
-    this.loadApprovedSellers(); // جلب المقبولين أيضاً عند تحميل الصفحة
+    this.loadApprovedSellers(); 
+      this.cd.markForCheck(); 
   }
 
   loadApprovedSellers(): void {
-    // إذا كان هناك API خاص بالمقبولين
-    this.adminService.getApprovedSellers() // تأكد من إضافة الدالة في الـ Service
+    this.adminService.getApprovedSellers() 
       .subscribe({
         next: (response: any) => {
           let sellersArray = this.extractDataArray(response);
@@ -64,7 +64,6 @@ export class SellerApprovalComponent implements OnInit {
       });
   }
 
-  // دالة مساعدة لتنظيف الكود ومنع التكرار في استخراج المصفوفات
   private extractDataArray(response: any): any[] {
     if (response.isSuccess && response.data) return response.data;
     if (Array.isArray(response)) return response;
@@ -72,7 +71,6 @@ export class SellerApprovalComponent implements OnInit {
     return response || [];
   }
 
-  // Load pending sellers from API
   loadPendingSellers(): void {
     this.loading.set(true);
     
@@ -80,9 +78,7 @@ export class SellerApprovalComponent implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response: any) => {
-          console.log('API Response:', response);
           
-          // Extract sellers array from response
           let sellersArray = [];
           
           if (response.isSuccess && response.data) {
@@ -94,6 +90,7 @@ export class SellerApprovalComponent implements OnInit {
           } else {
             sellersArray = response;
           }
+          this.cd.markForCheck();
           
           // Filter pending vs approved sellers
           const pending = sellersArray.filter((seller: any) => 
@@ -108,7 +105,6 @@ export class SellerApprovalComponent implements OnInit {
           this.pendingSellers.set(this.mapToAdminUsers(pending));
           this.approvedSellers.set(this.mapToAdminUsers(approved));
           
-          console.log(`✅ Pending sellers: ${pending.length}, Approved sellers: ${approved.length}`);
         },
         error: (error: any) => {
           console.error('❌ Error loading sellers:', error);

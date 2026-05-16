@@ -6,7 +6,7 @@ import { ProductService } from '../../app/modules/products/services/product.serv
 import { CategoryService } from '../../app/modules/categories/services/category.service';
 import { ProductDto, ProductCardDto } from '../../app/modules/products/models/product.model';
 import { CategoryDto } from '../../app/modules/categories/models/category.model';
-
+import { ChangeDetectorRef } from '@angular/core';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -23,7 +23,8 @@ export class Home implements OnInit, OnDestroy {
 
   constructor(
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -46,19 +47,55 @@ export class Home implements OnInit, OnDestroy {
             this.categories = Array.isArray(categories.data) ? categories.data : [];
           }
           this.isLoading = false;
+          this.cd.detectChanges();
         },
         error: () => (this.isLoading = false),
       });
   }
+  
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  getImageUrl(icon: string): string {
-    if (!icon) return '';
-    if (icon.startsWith('data:image')) return icon;
-    return `data:image/png;base64,${icon}`;
+   getImageUrl(icon: string | null | undefined): string {
+    // لو مفيش صورة
+    if (!icon) {
+      return '';
+    }
+
+    // لو كان رابط خارجي
+    if (icon.startsWith('http://') || icon.startsWith('https://')) {
+      return icon;
+    }
+
+    // لو كان Base64
+    if (icon.startsWith('data:image')) {
+      return icon;
+    }
+
+    // لو كان مسار من API
+    if (icon.startsWith('/')) {
+      return `https://localhost:7017${icon}`;
+    }
+
+    // مسار نسبي
+    return `https://localhost:7017/${icon}`;
+  }
+
+  // ✅ دالة لو الصورة فشلت
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const parent = img.parentElement;
+    if (parent) {
+      const placeholder = parent.querySelector('.chip-icon-placeholder');
+      if (placeholder) {
+        (placeholder as HTMLElement).style.display = 'flex';
+      }
+    }
   }
 }
+
+
