@@ -1,7 +1,5 @@
 <section class="cart-page pt-5">
-
   <!-- Loading -->
-
   <div
     *ngIf="isLoading"
     class="cart-loading">
@@ -15,8 +13,6 @@
     <p>Loading your cart...</p>
 
   </div>
-
-  <!-- Empty State -->
 
   <div
     *ngIf="!isLoading && isEmpty"
@@ -42,12 +38,8 @@
 
   </div>
 
-  <!-- Cart Content -->
-
   <div
     *ngIf="!isLoading && !isEmpty && cart">
-
-    <!-- HERO -->
 
     <div class="cart-hero">
 
@@ -99,11 +91,7 @@
 
     </div>
 
-    <!-- BODY -->
-
     <div class="row g-4 align-items-start">
-
-      <!-- CART ITEMS -->
 
       <div class="col-12 col-xl-8">
 
@@ -115,8 +103,6 @@
 
             <div class="cart-item-body">
 
-              <!-- IMAGE -->
-
               <div class="cart-thumb">
 
                 <img
@@ -124,9 +110,6 @@
                   [alt]="item.productName">
 
               </div>
-
-              <!-- INFO -->
-
               <div class="cart-info">
 
                 <h5 class="cart-title">
@@ -143,16 +126,40 @@
                     {{ item.price | currency:'USD' }}
                   </span>
 
-                  <span class="cart-qty">
-                    Qty {{ item.quantity }}
-                  </span>
+                  <!-- Quantity Controller -->
+
+                  <div class="qty-controller">
+                    <button
+                      class="qty-btn"
+                      (click)="updateQuantity(
+                        item.productId,
+                        item.quantity,
+                        -1,
+                        item.stockQuantity
+                      )">
+                      -
+                    </button>
+                    <span class="cart-qty">
+                      {{ item.quantity }}
+                    </span>
+
+                    <button
+                      class="qty-btn"
+                      [disabled]="item.quantity >= item.stockQuantity"
+                      (click)="updateQuantity(
+                        item.productId,
+                        item.quantity,
+                        1,
+                        item.stockQuantity
+                      )">
+                      +
+                    </button>
+
+                  </div>
 
                 </div>
 
               </div>
-
-              <!-- ACTIONS -->
-
               <div class="cart-actions">
 
                 <div class="line-total">
@@ -183,8 +190,6 @@
         </div>
 
       </div>
-
-      <!-- SUMMARY -->
 
       <div class="col-12 col-xl-4">
 
@@ -225,48 +230,24 @@
             </div>
 
             <div class="summary-divider"></div>
-
             <div class="summary-row total">
-
               <span>Total</span>
-
               <span>
                 {{ subtotal | currency:'USD' }}
               </span>
-
             </div>
 
           </div>
 
-          <button
-            class="btn checkout-btn w-100" routerLink="/checkout">
-
+          <button class="btn checkout-btn w-100" routerLink="/checkout">
             Proceed to Checkout
-
           </button>
 
-          <a
-            routerLink="/products"
-            class="btn continue-btn w-100">
-
+          <a routerLink="/products" class="btn continue-btn w-100">
             Continue Shopping
-
           </a>
 
         </div>
-
-        <!-- NOTE -->
-
-        <div class="cart-note">
-
-          <i class="bi bi-shield-check"></i>
-
-          <span>
-            Secure checkout and easy returns.
-          </span>
-
-        </div>
-
       </div>
 
     </div>

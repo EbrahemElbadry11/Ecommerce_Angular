@@ -298,26 +298,72 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   // cart
   onAddToCart(): void {
 
-    if (!this.product || this.product.stockQuantity <= 0) {
+    if (
+      !this.product ||
+      this.product.stockQuantity <= 0
+    ) {
+      return;
+    }
+
+    const existingQuantity =
+      this.cartService.getCartItemQuantity(
+        this.product.productId
+      );
+
+    const requestedQuantity =
+      existingQuantity + this.quantity;
+
+    if (
+      requestedQuantity >
+      this.product.stockQuantity
+    ) {
+
+      alert(
+        `Only ${this.product.stockQuantity} items available in stock`
+      );
+
       return;
     }
 
     this.isAddingToCart = true;
 
-    this.cartService.addToCart(
-      this.product.productId,
-      this.quantity).pipe(
+    this.cartService
+      .addToCart(
+        this.product.productId,
+        this.quantity
+      )
+
+      .pipe(
+
         takeUntil(this.destroy$),
+
         finalize(() => {
+
           this.isAddingToCart = false;
+
           this.cdr.markForCheck();
         })
-      ).subscribe({
+      )
+
+      .subscribe({
+
         next: () => {
+
+          // update local cart cache
+          this.cartService.loadCart()
+            .subscribe((res) => {
+
+              this.cartService.currentCart =
+                res.data ?? null;
+            });
+
           this.quantity = 1;
+
           this.cdr.markForCheck();
         },
+
         error: (err) => {
+
           console.error(
             'Add to cart error:',
             err

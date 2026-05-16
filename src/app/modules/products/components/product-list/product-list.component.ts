@@ -437,34 +437,74 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   /// Add to Cart
   addToCart(product: ProductCardDto): void {
-    if (!product || product.stockQuantity <= 0) {
+
+    if (
+      !product ||
+      product.stockQuantity <= 0
+    ) {
       return;
     }
 
-    if (this.addingToCartIds.has(product.productId)) {
+    const existingQuantity =
+      this.cartService.getCartItemQuantity(
+        product.productId
+      );
+
+    if (
+      existingQuantity + 1 >
+      product.stockQuantity
+    ) {
+
+      alert(
+        `Only ${product.stockQuantity} items available in stock`
+      );
+
+      return;
+    }
+
+    if (
+      this.addingToCartIds.has(
+        product.productId
+      )
+    ) {
       return;
     }
 
     this.addingToCartIds.add(product.productId);
     this.cdr.markForCheck();
+    this.cartService.addToCart(
+      product.productId,
+      1
+    ).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
 
-    this.cartService
-      .addToCart(product.productId, 1)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.addingToCartIds.delete(product.productId);
-          this.cdr.markForCheck();
-        })
-      )
-      .subscribe({
-        next: () => {
-          console.log(`${product.name} added to cart`);
-        },
-        error: (err) => {
-          console.error('Add to cart error:', err);
-        },
-      });
+        this.addingToCartIds.delete(
+          product.productId
+        );
+
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: () => {
+        // refresh cart cache
+        this.cartService.loadCart()
+          .subscribe((res) => {
+
+            this.cartService.currentCart =
+              res.data ?? null;
+          });
+        console.log(
+          `${product.name} added to cart`
+        );
+      },
+      error: (err) => {
+        console.error(
+          'Add to cart error:',
+          err
+        );
+      },
+    });
   }
 
   isAddingToCart(productId: number): boolean {
