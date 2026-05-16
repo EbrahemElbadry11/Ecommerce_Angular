@@ -125,12 +125,30 @@ export const routes: Routes = [
           import('./modules/cart/components/cart.component/cart.component')
             .then(m => m.CartComponent)
       },
-
+      {
+        path: 'checkout',
+        loadComponent: () =>
+          import(
+            './modules/checkout/components/checkout-page/checkout-page'
+          ).then(
+            m => m.CheckoutPageComponent
+          )
+      },
+      {
+        path: 'payment-success',
+        loadComponent: () =>
+          import(
+            './modules/checkout/components/payment-success/payment-success'
+          ).then(
+            m => m.PaymentSuccess
+          )
+      }
+      ,
       // User orders (customer)
       {
         path: 'user/orders',
         loadComponent: () => import('./modules/user/components/user-orders/user-orders.component').then(m => m.UserOrdersComponent),
-        canActivate: [authGuard],
+
       },
     ],
   },

@@ -23,7 +23,7 @@ export class CartComponent implements OnInit {
   isEmpty = false;
 
   constructor(
-    private cartService: CartService, private cdr: ChangeDetectorRef
+    public cartService: CartService, private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -76,7 +76,13 @@ export class CartComponent implements OnInit {
     this.cartService.removeItem(productId)
       .subscribe({
 
-        next: () => {
+        next: (res: any) => {
+
+          if (!res.isSuccess) {
+            console.error(res.data);
+            return;
+          }
+
           this.loadCart();
         },
 

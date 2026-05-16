@@ -6,15 +6,15 @@ import { ApiResponse, AuthResponse, ResetPasswordDto, VerifyCodeDto } from '../m
 import { LoginDto } from '../models/login-dto.model';
 import { RegisterDto } from '../models/register-dto.model';
 
-const TOKEN_KEY         = 'authToken';
+const TOKEN_KEY = 'authToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
-const SESSION_KEY       = 'authSession';
+const SESSION_KEY = 'authSession';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   readonly session = signal<AuthResponse | null>(this.readSession());
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) { }
 
   register(payload: RegisterDto): Observable<ApiResponse<string>> {
     const headers = new HttpHeaders({ 'X-Success-Message': 'Registration successful! Please check your email for confirmation.' });
@@ -23,7 +23,7 @@ export class AuthService {
 
   login(payload: LoginDto): Observable<ApiResponse<AuthResponse>> {
     const headers = new HttpHeaders({ 'X-Success-Message': 'Login successful! Welcome back.' });
-    return this.http.post<ApiResponse<AuthResponse>>('/auth/login', payload, { headers }).pipe(
+    return this.http.post<ApiResponse<AuthResponse>>('/auth/login', payload, { headers, withCredentials: true }).pipe(
       tap((response) => {
         if (response.data?.token) this.saveSession(response.data);
       })
@@ -76,11 +76,11 @@ export class AuthService {
     this.router.navigate(['/auth/login']);
   }
 
-  get token(): string | null         { return localStorage.getItem(TOKEN_KEY); }
+  get token(): string | null { return localStorage.getItem(TOKEN_KEY); }
   get refreshTokenValue(): string | null { return localStorage.getItem(REFRESH_TOKEN_KEY); }
-  isLoggedIn(): boolean              { return !!this.token; }
-  hasRole(role: string): boolean     { return this.session()?.role === role; }
-  getUserRole(): string              { return this.session()?.role ?? ''; }
+  isLoggedIn(): boolean { return !!this.token; }
+  hasRole(role: string): boolean { return this.session()?.role === role; }
+  getUserRole(): string { return this.session()?.role ?? ''; }
 
   private saveSession(session: AuthResponse): void {
     localStorage.setItem(TOKEN_KEY, session.token);

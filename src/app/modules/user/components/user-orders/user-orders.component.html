@@ -1,0 +1,154 @@
+<div class="orders-page">
+
+  <div class="orders-background"></div>
+
+  <section class="orders-wrapper">
+
+    <div class="orders-header">
+
+      <span class="orders-eyebrow">
+        Orders History
+      </span>
+
+      <h1>
+        My Orders
+      </h1>
+
+      <p>
+        Track your recent purchases and order activity.
+      </p>
+
+    </div>
+
+    @if (loading()) {
+
+      <div class="orders-loading">
+
+        <div class="loader"></div>
+
+        <span>
+          Loading your orders...
+        </span>
+
+      </div>
+    }
+
+    @else if (error()) {
+
+      <div class="orders-error">
+        {{ error() }}
+      </div>
+    }
+
+    @else if (!orders().length) {
+
+      <div class="empty-orders">
+
+        <div class="empty-icon">
+          📦
+        </div>
+
+        <h2>
+          No Orders Yet
+        </h2>
+
+        <p>
+          Start shopping to see your orders here.
+        </p>
+
+        <a
+          routerLink="/products"
+          class="shop-btn"
+        >
+          Explore Products
+        </a>
+
+      </div>
+    }
+
+    @else {
+
+      <div class="orders-grid">
+
+        @for (
+          order of orders();
+          track order.orderId
+        ) {
+
+          <article class="order-card">
+
+            <div class="order-top">
+
+              <div>
+
+                <span class="order-label">
+                  Order ID
+                </span>
+
+                <h3>
+                  {{ formatOrderCode(order.orderId) }}
+                </h3>
+
+              </div>
+
+              <span
+                class="status-badge"
+                [class]="
+                  'status-badge ' +
+                  getStatusClass(order.status)
+                "
+              >
+                {{ order.status }}
+              </span>
+
+            </div>
+
+            <div class="order-body">
+
+              <div class="order-info">
+
+                <span>
+                  Total
+                </span>
+
+                <strong>
+                  {{ order.totalAmount | currency }}
+                </strong>
+
+              </div>
+
+              <div class="order-info">
+
+                <span>
+                  Date
+                </span>
+
+                <strong>
+                  {{ order.orderDate | date:'mediumDate' }}
+                </strong>
+
+              </div>
+
+              <div class="order-info full-width">
+
+                <span>
+                  Shipping Address
+                </span>
+
+                <strong>
+                  {{ order.shippingAddress }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </article>
+        }
+
+      </div>
+    }
+
+  </section>
+
+</div>

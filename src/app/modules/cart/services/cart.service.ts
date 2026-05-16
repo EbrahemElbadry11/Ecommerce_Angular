@@ -65,4 +65,22 @@ export class CartService {
       }
     );
   }
+
+  getImageUrl(image: string): string {
+
+    if (!image) {
+
+      return 'assets/images/no-image.png';
+    }
+
+    if (
+      image.startsWith('http://') ||
+      image.startsWith('https://')
+    ) {
+
+      return image;
+    }
+
+    return `https://ecommerceiti.runasp.net/images/products/${image}`;
+  }
 }
