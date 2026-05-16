@@ -91,11 +91,37 @@ export interface UserOrder {
     </section>
   `,
   styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
     .orders-page {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-alt: #faf9f7;
+      --ink: #1a1714;
+      --muted: #8a867e;
+      --line: rgba(26,23,20,.09);
+      --accent: #c8602a;
+      --accent-deep: #a34d1f;
+      --accent-glow: rgba(200,96,42,.18);
+      --green: #2d6a4f;
+      --green-pale: rgba(45,106,79,.10);
+      --danger: #b91c1c;
+      --danger-pale: rgba(185,28,28,.10);
+      --warn: #b45309;
+      --warn-pale: rgba(180,83,9,.10);
+      --info: #1d4ed8;
+      --info-pale: rgba(59,130,246,.10);
+      --shadow-xs: 0 1px 3px rgba(26,23,20,.06), 0 1px 2px rgba(26,23,20,.04);
+      --shadow-sm: 0 4px 16px rgba(26,23,20,.08), 0 1px 4px rgba(26,23,20,.05);
+      --ff-display: 'Playfair Display', Georgia, serif;
+      --ff-body: 'DM Sans', 'Segoe UI', sans-serif;
+
       max-width: 900px;
       margin: 0 auto;
       padding: 2rem 1rem;
-      font-family: 'Outfit', sans-serif;
+      font-family: var(--ff-body);
+      color: var(--ink);
+      min-height: 80vh;
     }
 
     .orders-header {
@@ -109,76 +135,81 @@ export interface UserOrder {
 
     .eyebrow {
       display: block;
-      color: #6366f1;
-      font-size: 0.75rem;
-      font-weight: 700;
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.25rem;
+      letter-spacing: 2.5px;
+      margin-bottom: 4px;
     }
 
     h1 {
       margin: 0;
+      font-family: var(--ff-display);
       font-size: 2rem;
-      font-weight: 800;
-      color: var(--text-primary, #0f172a);
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.025em;
     }
 
     .back-btn {
       text-decoration: none;
-      color: #6366f1;
+      color: var(--ink);
       font-weight: 600;
-      font-size: 0.9rem;
-      border: 1.5px solid #6366f1;
-      padding: 0.5rem 1rem;
-      border-radius: 10px;
+      font-size: 0.85rem;
+      border: 1.5px solid var(--line);
+      padding: 0.5rem 1.1rem;
+      border-radius: 999px;
       transition: all 0.2s;
     }
-    .back-btn:hover { background: #6366f1; color: white; }
+    .back-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
 
     .loading-state, .empty-state {
       text-align: center;
       padding: 4rem 1rem;
-      color: var(--text-secondary, #64748b);
+      color: var(--muted);
     }
 
     .spinner-ring {
       width: 40px; height: 40px;
-      border: 3px solid rgba(99,102,241,0.2);
-      border-top-color: #6366f1;
+      border: 3px solid rgba(200,96,42,0.15);
+      border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 1rem;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .empty-icon { font-size: 3.5rem; display: block; margin-bottom: 1rem; }
-    .empty-state h2 { color: var(--text-primary, #0f172a); margin: 0 0 0.5rem; }
+    .empty-icon { font-size: 3.5rem; display: block; margin-bottom: 1rem; opacity: 0.5; }
+    .empty-state h2 { color: var(--ink); margin: 0 0 0.5rem; font-family: var(--ff-display); }
 
     .shop-btn {
       display: inline-block;
       margin-top: 1.5rem;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      background: var(--accent);
       color: white;
       padding: 0.75rem 2rem;
-      border-radius: 12px;
+      border-radius: 999px;
       text-decoration: none;
       font-weight: 600;
-      transition: all 0.2s;
+      font-size: 0.9rem;
+      transition: all 0.25s;
+      box-shadow: 0 4px 12px rgba(200,96,42,.25);
     }
-    .shop-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99,102,241,0.4); }
+    .shop-btn:hover { background: var(--accent-deep); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(200,96,42,.35); }
 
-    .orders-list { display: flex; flex-direction: column; gap: 1rem; }
+    .orders-list { display: flex; flex-direction: column; gap: 1.25rem; }
 
     .order-card {
-      background: var(--bg-card, white);
-      border: 1px solid var(--border-color, #e2e8f0);
-      border-radius: 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
       padding: 1.5rem;
-      box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
-      transition: box-shadow 0.2s;
+      box-shadow: var(--shadow-xs);
+      transition: transform 0.25s, box-shadow 0.25s;
+      animation: riseIn 0.5s cubic-bezier(.22,1,.36,1) both;
     }
-    .order-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .order-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-sm); }
 
     .order-top {
       display: flex;
@@ -188,41 +219,36 @@ export interface UserOrder {
     }
 
     .label {
-      font-size: 0.72rem;
+      font-size: 10.5px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted, #94a3b8);
+      letter-spacing: 1.5px;
+      color: var(--muted);
       display: block;
     }
 
-    .order-id strong { font-size: 1rem; font-weight: 700; color: #6366f1; }
-    .order-date span, .order-total strong { color: var(--text-primary, #0f172a); }
+    .order-id strong { font-size: 1rem; font-weight: 700; color: var(--accent); }
+    .order-date span { color: var(--ink); }
     .order-total { margin-left: auto; }
-    .order-total strong { font-size: 1.1rem; font-weight: 700; color: #6366f1; }
+    .order-total strong { font-family: var(--ff-display); font-size: 1.15rem; font-weight: 700; color: var(--ink); }
 
     .status-badge {
-      padding: 0.3rem 0.85rem;
+      padding: 4px 12px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 11px;
       font-weight: 600;
+      letter-spacing: 0.3px;
     }
-    .badge-success { background: #dcfce7; color: #15803d; }
-    .badge-warning { background: #fef9c3; color: #854d0e; }
-    .badge-danger  { background: #fee2e2; color: #b91c1c; }
-    .badge-info    { background: #dbeafe; color: #1d4ed8; }
-    .badge-neutral { background: #f1f5f9; color: #475569; }
-
-    body.dark-mode .badge-success { background: rgba(34,197,94,0.15);  color: #4ade80; }
-    body.dark-mode .badge-warning { background: rgba(234,179,8,0.15);  color: #facc15; }
-    body.dark-mode .badge-danger  { background: rgba(239,68,68,0.15);  color: #f87171; }
-    body.dark-mode .badge-info    { background: rgba(59,130,246,0.15); color: #60a5fa; }
-    body.dark-mode .badge-neutral { background: rgba(255,255,255,0.08);color: #94a3b8; }
+    .badge-success { background: var(--green-pale); color: var(--green); }
+    .badge-warning { background: var(--warn-pale); color: var(--warn); }
+    .badge-danger  { background: var(--danger-pale); color: var(--danger); }
+    .badge-info    { background: var(--info-pale); color: var(--info); }
+    .badge-neutral { background: var(--surface-alt); color: var(--muted); border: 1px solid var(--line); }
 
     .order-items {
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px solid var(--border-color, #e2e8f0);
+      border-top: 1px solid var(--line);
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
@@ -234,14 +260,42 @@ export interface UserOrder {
       gap: 1rem;
       font-size: 0.875rem;
     }
-    .item-name { flex: 1; color: var(--text-primary, #334155); }
-    .item-qty  { color: var(--text-secondary, #64748b); }
-    .item-price { font-weight: 600; color: var(--text-primary, #0f172a); }
+    .item-name { flex: 1; color: var(--ink); }
+    .item-qty  { color: var(--muted); }
+    .item-price { font-weight: 600; color: var(--ink); }
 
     .order-address {
       margin-top: 0.75rem;
       font-size: 0.85rem;
-      color: var(--text-secondary, #64748b);
+      color: var(--muted);
+    }
+
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Dark Mode ── */
+    :host-context(body.dark-mode) .orders-page {
+      --bg: #0e0d0b;
+      --surface: #17150f;
+      --surface-alt: #1d1b14;
+      --ink: #f5f2ec;
+      --muted: #776f63;
+      --line: rgba(245,242,236,.09);
+      --accent: #e07840;
+      --accent-deep: #c8602a;
+      --accent-glow: rgba(224,120,64,.2);
+      --green: #4ade80;
+      --green-pale: rgba(74,222,128,.1);
+      --danger: #f87171;
+      --danger-pale: rgba(239,68,68,.12);
+      --warn: #fbbf24;
+      --warn-pale: rgba(234,179,8,.12);
+      --info: #60a5fa;
+      --info-pale: rgba(59,130,246,.12);
+      --shadow-xs: 0 1px 3px rgba(0,0,0,.3);
+      --shadow-sm: 0 4px 16px rgba(0,0,0,.4);
     }
 
     @media (max-width: 640px) {

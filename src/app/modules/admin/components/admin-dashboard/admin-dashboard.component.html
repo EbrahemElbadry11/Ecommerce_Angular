@@ -1,3 +1,4 @@
+<!-- admin-dashboard.component.html -->
 <section class="admin-page">
 
   <!-- Header -->
@@ -5,45 +6,255 @@
     <div>
       <span class="eyebrow">Admin Panel</span>
       <h1>Dashboard Overview</h1>
+      <p class="header-desc">Monitor your store performance and manage operations at a glance.</p>
     </div>
-    <div class="header-actions">
-      <a routerLink="/admin/users" class="btn btn-outline-primary">👥 Manage Users</a>
-    </div>
+   <div class="header-actions">
+    <!-- View Products -->
+    <a routerLink="/products" class="action-btn action-btn-outline">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+      View Products
+    </a>
+
+    <!-- View Users -->
+    <a routerLink="/admin/users" class="action-btn action-btn-outline">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Manage Users
+    </a>
+
+    <!-- Approve Sellers -->
+    <a routerLink="/admin/seller-approval" class="action-btn action-btn-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Approve Sellers
+    </a>
+  </div>
   </header>
 
+  <!-- Alert Messages -->
+  @if (alertMessage()) {
+    <div class="alert" [ngClass]="'alert-' + alertType()">
+      <strong>{{ alertType() === 'success' ? '✓' : '⚠' }}</strong> {{ alertMessage() }}
+      <button class="alert-close" (click)="clearAlert()">×</button>
+    </div>
+  }
+
   @if (loading()) {
-    <div style="display:flex;justify-content:center;padding:4rem">
-      <div class="spinner" style="width:40px;height:40px;border-width:3px;border-color:#e2e8f0;border-top-color:#6366f1;"></div>
+    <div class="loading-state">
+      <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+      <p>Loading dashboard data...</p>
     </div>
   } @else {
 
     <!-- Stats Cards -->
     <div class="stats-grid">
-      <article>
-        <span>Total Users</span>
-        <strong>{{ stats()?.totalUsers ?? 0 | number }}</strong>
-        <span class="stat-icon">👥</span>
+      <article class="stat-card stat-users">
+        <div class="stat-content">
+          <span class="stat-label">Total Users</span>
+          <strong class="stat-value">{{ stats()?.totalUsers ?? 0 | number }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
       </article>
-      <article>
-        <span>Total Orders</span>
-        <strong>{{ stats()?.totalOrders ?? 0 | number }}</strong>
-        <span class="stat-icon">📦</span>
+      <article class="stat-card stat-orders">
+        <div class="stat-content">
+          <span class="stat-label">Total Orders</span>
+          <strong class="stat-value">{{ stats()?.totalOrders ?? 0 | number }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
       </article>
-      <article>
-        <span>Total Products</span>
-        <strong>{{ stats()?.totalProducts ?? 0 | number }}</strong>
-        <span class="stat-icon">🛍️</span>
+      <article class="stat-card stat-products">
+        <div class="stat-content">
+          <span class="stat-label">Total Products</span>
+          <strong class="stat-value">{{ stats()?.totalProducts ?? 0 | number }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="9" cy="21" r="1"/>
+            <circle cx="20" cy="21" r="1"/>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+          </svg>
+        </div>
       </article>
-      <article>
-        <span>Total Revenue</span>
-        <strong>{{ stats()?.totalRevenue ?? 0 | currency:'USD':'symbol':'1.0-0' }}</strong>
-        <span class="stat-icon">💰</span>
+      <article class="stat-card stat-revenue">
+        <div class="stat-content">
+          <span class="stat-label">Total Revenue</span>
+          <strong class="stat-value">{{ stats()?.totalRevenue ?? 0 | currency:'USD':'symbol':'1.0-0' }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
       </article>
     </div>
 
+    <!-- Charts Row -->
+    <div class="charts-grid">
+      <div class="chart-panel">
+        <div class="panel-header">
+          <h2>Monthly Revenue</h2>
+          <span class="panel-count">{{ currentYear }}</span>
+        </div>
+        <div class="chart-container">
+          <canvas #revenueChart></canvas>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <div class="panel-header">
+          <h2>Orders by Status</h2>
+          <span class="panel-count">{{ stats()?.totalOrders ?? 0 }} total</span>
+        </div>
+        <div class="chart-container pie-chart-container">
+          <canvas #ordersPieChart></canvas>
+        </div>
+        <div class="pie-legend">
+          @for (item of orderStatusData; track item.status) {
+            <div class="legend-item">
+              <span class="legend-color" [style.background]="item.color"></span>
+              <span class="legend-label">{{ item.status }}</span>
+              <span class="legend-value">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Management Section (Toggle) -->
+    @if (showUsersManagement) {
+      <div class="users-panel">
+        <div class="panel-header">
+          <h2>User Management</h2>
+          <div class="filters-section">
+            <input 
+              type="text" 
+              [(ngModel)]="userSearchTerm" 
+              (input)="filterUsers()"
+              placeholder="Search users..." 
+              class="search-input"
+            >
+            <select [(ngModel)]="userRoleFilter" (change)="filterUsers()" class="admin-select">
+              <option value="all">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="seller">Seller</option>
+              <option value="user">User</option>
+            </select>
+            <select [(ngModel)]="userStatusFilter" (change)="filterUsers()" class="admin-select">
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+        </div>
+        
+        @if (usersLoading()) {
+          <div class="loading-spinner"><div class="spinner"></div> Loading users...</div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                 </tr>
+              </thead>
+              <tbody>
+                @for (user of filteredUsers(); track user.id) {
+                  <tr>
+                    <td>
+                      <div class="user-cell">
+                        <div class="avatar">{{ user.fullName.charAt(0) }}</div>
+                        <span>{{ user.fullName }}</span>
+                      </div>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                      <select [value]="user.role" (change)="onRoleChange(user.id, $event)" class="role-select" [disabled]="actionLoading() === user.id">
+                        <option value="user">User</option>
+                        <option value="seller">Seller</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="user.isBlocked ? 'badge-danger' : 'badge-success'">
+                        {{ user.isBlocked ? 'Blocked' : 'Active' }}
+                      </span>
+                    </td>
+                    <td>{{ user.createdAt | date:'mediumDate' }}</td>
+                    <td class="action-buttons">
+                      @if (!user.isBlocked ) {
+                        <button (click)="blockUser(user.id)" class="btn-sm btn-warning-sm" [disabled]="actionLoading() === user.id">
+                          Block
+                        </button>
+                      } @else {
+                        <button (click)="unblockUser(user.id)" class="btn-sm btn-success-sm" [disabled]="actionLoading() === user.id">
+                          Unblock
+                        </button>
+                      }
+                      <button (click)="deleteUser(user.id)" class="btn-sm btn-danger-sm" [disabled]="actionLoading() === user.id">
+                        Delete
+                      </button>
+                      @if (user.role === 'seller' && !user.isSellerApproved) {
+                        <button (click)="approveSeller(user.id)" class="btn-sm btn-primary-sm" [disabled]="actionLoading() === user.id">
+                          Approve
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="6">
+                      <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                          <circle cx="9" cy="7" r="4"/>
+                        </svg>
+                        <p>No users found.</p>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    }
+
     <!-- Recent Orders -->
     <div class="table-panel">
-      <h2>📋 Recent Orders</h2>
+      <div class="panel-header">
+        <h2>Recent Orders</h2>
+        <span class="panel-count">{{ (stats()?.recentOrders ?? []).length }} orders</span>
+      </div>
       <div class="table-responsive">
         <table class="table">
           <thead>
@@ -53,27 +264,30 @@
               <th>Status</th>
               <th>Amount</th>
               <th>Date</th>
-            </tr>
+             </tr>
           </thead>
           <tbody>
             @for (order of stats()?.recentOrders ?? []; track order.id) {
               <tr>
-                <td><span style="color:#6366f1;font-weight:700;">#{{ order.id }}</span></td>
-                <td>{{ order.customerName }}</td>
+                <td><span class="order-id">#{{ order.id }}</span></td>
+                <td><span class="customer-name">{{ order.customerName }}</span></td>
                 <td>
                   <span class="badge" [ngClass]="getStatusClass(order.status)">
                     {{ order.status }}
                   </span>
                 </td>
-                <td><strong>{{ order.totalAmount | currency:'USD':'symbol':'1.0-0' }}</strong></td>
-                <td style="color:#64748b;">{{ order.date | date:'mediumDate' }}</td>
+                <td><strong class="amount">{{ order.totalAmount | currency:'USD':'symbol':'1.0-0' }}</strong></td>
+                <td><span class="date-text">{{ order.date | date:'mediumDate' }}</span></td>
               </tr>
             } @empty {
               <tr>
                 <td colspan="5">
                   <div class="empty-state">
-                    <span class="empty-icon">📭</span>
-                    No recent orders found.
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="2" y="7" width="20" height="14" rx="2"/>
+                      <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                    </svg>
+                    <p>No recent orders found.</p>
                   </div>
                 </td>
               </tr>

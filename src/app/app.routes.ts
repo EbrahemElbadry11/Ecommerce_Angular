@@ -82,6 +82,12 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['Admin'] },
       },
+      {
+        path: 'admin/seller-approval',
+        loadComponent: () => import('./modules/admin/components/seller-approval/seller-approval/seller-approval').then(m => m.SellerApprovalComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+      },
 
       // User profile (any logged-in user)
       {

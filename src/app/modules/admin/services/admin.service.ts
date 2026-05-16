@@ -34,10 +34,26 @@ export class AdminService {
     return this.http.delete<ApiResponse<string>>(`/admin/delete-user/${id}`, { headers });
   }
 
-  changeRole(id: string, role: ManagedRole): Observable<ApiResponse<string>> {
-    const headers = new HttpHeaders({ 'X-Success-Message': 'User role changed successfully.' });
-    return this.http.put<ApiResponse<string>>(`/admin/change-role/${id}`, { role }, { headers });
-  }
+
+// admin.service.ts
+// admin.service.ts
+
+changeRole(id: string, role: string): Observable<ApiResponse<string>> {
+  const headers = new HttpHeaders({ 
+    'Content-Type': 'application/json'
+  });
+  
+  const body = { role: role };
+  console.log('Sending request:', {
+    url: `/Admin/change-role/${id}`,
+    body: body
+  });
+  return this.http.put<ApiResponse<string>>(
+    `/Admin/change-role/${id}`, 
+    body, 
+    { headers }
+  );
+}
 
   approveSeller(sellerId: number): Observable<ApiResponse<string>> {
     const headers = new HttpHeaders({ 'X-Success-Message': 'Seller approved successfully.' });

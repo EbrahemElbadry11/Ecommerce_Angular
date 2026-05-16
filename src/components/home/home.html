@@ -1,44 +1,135 @@
-<div class="container-fluid p-0">
-  <section class="bg-dark text-white text-center py-5 shadow-sm" 
-           style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1500') center/cover;">
-    <div class="container py-5">
-      <h1 class="display-3 fw-bold">Welcome to Our Store</h1>
-      <p class="lead mb-4">Discover the best deals on the latest high-quality products.</p>
-      <a routerLink="/products" class="btn btn-primary btn-lg px-5 rounded-pill" >Shop Now</a>
+<div class="home-container">
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <span class="hero-eyebrow">Premium Marketplace</span>
+      <h1 class="hero-title">Discover Products <br/>You'll Love</h1>
+      <p class="hero-subtitle">Curated selections from top sellers, delivered to your door.</p>
+      <div class="hero-actions">
+        <a routerLink="/products" class="btn-hero-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Shop Now
+        </a>
+        <a routerLink="/categories" class="btn-hero-secondary">Browse Categories</a>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="hero-circle hero-circle-1"></div>
+      <div class="hero-circle hero-circle-2"></div>
+      <div class="hero-circle hero-circle-3"></div>
     </div>
   </section>
 
-  <section class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">Featured Products</h2>
-      <a routerLink="/products" class="text-decoration-none">View All &rarr;</a>
+  <!-- Categories Section -->
+  <section class="section categories-section" *ngIf="categories.length > 0">
+    <div class="section-header">
+      <div>
+        <span class="section-eyebrow">Categories</span>
+        <h2 class="section-title">Shop by Category</h2>
+      </div>
+      <a routerLink="/categories" class="view-all-link">
+        View All
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="categories-scroll">
+      <button *ngFor="let cat of categories"
+              class="category-chip"
+              [routerLink]="['/products']"
+              [queryParams]="{ category: cat.name }">
+        <div class="chip-icon">
+          <img *ngIf="getImageUrl(cat.icon)" [src]="getImageUrl(cat.icon)" [alt]="cat.name" class="chip-icon-img"/>
+          <span *ngIf="!getImageUrl(cat.icon)" class="chip-icon-placeholder">&#x1F4E6;</span>
+        </div>
+        <span class="chip-name">{{ cat.name }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <span class="section-eyebrow">Catalogue</span>
+        <h2 class="section-title">Featured Products</h2>
+      </div>
+      <a routerLink="/products" class="view-all-link">
+        View All
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
 
-    <div class="row g-4">
-      <!-- Product Card Example (Repeated via *ngFor) -->
-      @for (product of products; track product.id) {
-        <div class="col-12 col-md-6 col-lg-3">
-          <div class="card h-100 shadow-sm border-0 product-card">
-            <div class="position-relative overflow-hidden">
-              <img [src]="product.image" class="card-img-top p-3" [alt]="product.name" style="height: 250px; object-fit: contain;">
-              <span class="badge bg-danger position-absolute top-0 start-0 m-3" *ngIf="product.discount">Sale</span>
-            </div>
-            <div class="card-body text-center">
-              <h5 class="card-title text-truncate">{{ product.name }}</h5>
-              <p class="text-muted mb-2 small">{{ product.category }}</p>
-              <div class="d-flex justify-content-center gap-2 mb-3">
-                <span class="fw-bold text-primary">${{ product.price }}</span>
-                <span class="text-decoration-line-through text-muted" *ngIf="product.oldPrice">${{ product.oldPrice }}</span>
-              </div>
-              <button class="btn btn-outline-primary w-100 rounded-pill shadow-sm">
-                Add to Cart
-              </button>
-            </div>
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+      <p>Loading products...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!isLoading" class="products-grid">
+      <article *ngFor="let product of featuredProducts" class="product-card" [routerLink]="['/products', product.productId]">
+        <div *ngIf="product.stockQuantity <= 3 && product.stockQuantity > 0" class="low-stock-badge">
+          <span class="pulse-dot"></span>
+          Only {{ product.stockQuantity }} left
+        </div>
+        <div class="product-image-container">
+          <img [src]="product.imageUrl" [alt]="product.name" class="product-image" loading="lazy" decoding="async"/>
+          <div class="image-overlay">
+            <span class="quick-view-label">View Details</span>
           </div>
         </div>
-      }
+        <div class="product-info">
+          <div class="product-meta">
+            <span class="meta-category">{{ product.categoryName }}</span>
+            <span class="meta-store">{{ product.storeName }}</span>
+          </div>
+          <h3 class="product-name">{{ product.name }}</h3>
+          <p class="product-desc">{{ product.shortDescription }}</p>
+          <div class="product-footer">
+            <span class="product-price">{{ product.formattedPrice }}</span>
+          </div>
+        </div>
+      </article>
+
+      <div *ngIf="featuredProducts.length === 0 && !isLoading" class="empty-state">
+        <p>No products available yet.</p>
+        <a routerLink="/products" class="btn-hero-primary" style="display:inline-flex;">Browse Store</a>
+      </div>
     </div>
   </section>
 
-  
+  <!-- Features Section -->
+  <section class="section features-section">
+    <div class="section-header" style="justify-content:center;text-align:center;">
+      <div>
+        <span class="section-eyebrow">Why Choose Us</span>
+        <h2 class="section-title">Built for Your Confidence</h2>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+        </div>
+        <h3>Free Shipping</h3>
+        <p>On all orders over $50. Fast and reliable delivery nationwide.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h3>Secure Payment</h3>
+        <p>Powered by Stripe. Your transactions are encrypted and protected.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        </div>
+        <h3>Quality Guaranteed</h3>
+        <p>Products from verified sellers. Hassle-free returns within 30 days.</p>
+      </div>
+    </div>
+  </section>
+
 </div>

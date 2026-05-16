@@ -1,0 +1,134 @@
+/* profile-image-upload.component.css */
+.profile-image-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.image-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--accent, #c8602a);
+  box-shadow: var(--shadow-sm);
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--surface-alt, #f5f3ef);
+  border: 1px solid var(--line, #e2e0db);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.upload-btn:hover {
+  background: var(--accent, #c8602a);
+  color: white;
+  border-color: var(--accent, #c8602a);
+}
+
+.file-name {
+  font-size: 0.75rem;
+  color: var(--muted, #8a867e);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.clear-btn svg {
+  width: 18px;
+  height: 18px;
+  color: var(--danger, #dc2626);
+}
+
+.clear-btn:hover {
+  background: var(--danger-pale, #fee2e2);
+}
+
+.upload-btn-submit {
+  padding: 8px 20px;
+  background: var(--accent, #c8602a);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-btn-submit:hover:not(:disabled) {
+  background: var(--accent-deep, #a34d1f);
+  transform: translateY(-1px);
+}
+
+.upload-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--green-pale, #e8f5e9);
+  color: var(--green, #2e7d32);
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
