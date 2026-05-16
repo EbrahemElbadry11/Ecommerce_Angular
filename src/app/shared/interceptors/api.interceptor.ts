@@ -19,11 +19,11 @@ import { ToastService } from '../../../services/toast';
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
   // Update this to match your API server URL
-  private readonly API_BASE_URL = 'https://localhost:7017/api';
+  private readonly API_BASE_URL = 'https://ecommerceiti.runasp.net/api';
   private readonly toastService = inject(ToastService);
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    console.log('🔍 B — interceptor hit:', request.method, request.url);
+    // console.log('🔍 B — interceptor hit:', request.method, request.url);
 
     // Skip interceptor for external URLs (if needed)
     if (!request.url.startsWith('http')) {
@@ -42,9 +42,15 @@ export class ApiInterceptor implements HttpInterceptor {
         setHeaders: {
           Authorization: `Bearer ${token}`,
         },
+        withCredentials: true, // Include cookies for CORS requests
       });
     }
+    else {
 
+      request = request.clone({
+        withCredentials: true,
+      });
+    }
     // Add Content-Type for JSON only when sending a body
     if (
       ['POST', 'PUT', 'PATCH'].includes(
@@ -69,10 +75,12 @@ export class ApiInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       tap((event) => {
-        console.log('🔍 B-response — got HttpResponse for:', request.url);
+        // console.log('🔍 B-response — got HttpResponse for:', request.url);
         if (
           event instanceof HttpResponse &&
           ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+          &&
+          !request.url.includes('/order') // Skip showing success toast for order creation/update
         ) {
           const customMessage = request.headers.get('X-Success-Message');
           const message = customMessage || 'Action completed successfully.';
@@ -80,7 +88,7 @@ export class ApiInterceptor implements HttpInterceptor {
         }
       }),
       catchError((error: HttpErrorResponse) => {
-        console.error('🔍 B-error — interceptor caught error:', error.status, error.message);
+        // console.error('🔍 B-error — interceptor caught error:', error.status, error.message);
 
         const message =
           error.error?.message ||
