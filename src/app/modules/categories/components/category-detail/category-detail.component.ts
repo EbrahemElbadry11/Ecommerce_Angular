@@ -8,6 +8,7 @@ import { CategoryService } from '../../services/category.service';
 import { ProductDto, ProductFilterDto, ProductListResponse } from '../../../products/models/product.model';
 import { CategoryDto } from '../../models/category.model';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-category-detail',
@@ -49,7 +50,8 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private cd: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +63,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       if (this.categoryId) {
         this.loadCategoryDetails(this.categoryId);
         this.loadProductsByCategory(this.categoryId);
+        this.cd.markForCheck();
       }
     });
   }
@@ -84,6 +87,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
         this.currentPage = 1;
         if (this.categoryId) {
           this.loadProductsByCategory(this.categoryId);
+          this.cd.markForCheck();
         }
       });
   }
@@ -101,10 +105,12 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
             this.allCategories = Array.isArray(response.data) 
               ? response.data 
               : (response.data.categories || response.data.Categories || []);
+            this.cd.markForCheck();
           }
         },
         error: (err: any) => {
           console.error('Failed to load categories:', err);
+          this.cd.markForCheck();
         },
       });
   }
@@ -122,12 +128,14 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           if (response.isSuccess && response.data) {
             this.category = response.data;
+            this.cd.markForCheck();
           }
           this.isLoadingCategory = false;
         },
         error: (err: any) => {
           console.error('Failed to load category:', err);
           this.isLoadingCategory = false;
+          this.cd.markForCheck();
         },
       });
   }
@@ -162,12 +170,14 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
             this.products = [];
           }
           this.isLoadingProducts = false;
+          this.cd.markForCheck();
         },
         error: (err: any) => {
           console.error('Failed to load products:', err);
           this.errorMessage = 'Failed to load products. Please try again.';
           this.products = [];
           this.isLoadingProducts = false;
+          this.cd.markForCheck();
         },
       });
   }
@@ -334,6 +344,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     const img = event.target as HTMLImageElement;
     img.src = 'assets/images/default-image.png';
     img.onerror = null;
+    this.cd.markForCheck();
   }
 
   /**
