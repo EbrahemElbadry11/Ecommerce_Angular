@@ -148,7 +148,7 @@ export const routes: Routes = [
       {
         path: 'user/orders',
         loadComponent: () => import('./modules/user/components/user-orders/user-orders.component').then(m => m.UserOrdersComponent),
-        canActivate: [authGuard],
+
       },
     ],
   },
