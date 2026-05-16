@@ -9,22 +9,34 @@
 
       <!-- Sidebar -->
       <aside class="profile-sidebar">
-        <div class="avatar-section">
-          <!-- ✅ Profile Image Upload Component -->
-          <!-- profile.component.html -->
-            <app-profile-image-upload 
-              [currentImageUrl]="imagePreview() || profile()?.imagePath || ''"
-              (uploaded)="onImageUploaded($event)"
-              (error)="onImageError($event)">
-            </app-profile-image-upload>
+        <div class="text-center mb-4 position-relative">
+          
+          <!-- قسم الصورة الشخصية المطور -->
+          <div class="profile-img-wrapper d-inline-block position-relative">
+            <img [src]="userImageUrl()" 
+                 alt="Profile Picture" 
+                 class="rounded-circle img-thumbnail shadow" 
+                 style="width: 140px; height: 140px; object-fit: cover;" />
+            
+            <!-- زر رفع الصورة المخفي الأنيق فوق الصورة -->
+            <label for="fileInput" class="btn btn-sm btn-dark rounded-circle position-absolute bottom-0 end-0 p-2 shadow" style="cursor: pointer;">
+              <i class="bi bi-camera-fill"></i>
+              <input type="file" id="fileInput" (change)="onFileSelected($event)" accept="image/*" hidden />
+            </label>
+          </div>
+          <small class="text-muted d-block mt-2">Click the camera icon to change avatar</small>
 
-          <h2 class="sidebar-name">{{ profile()?.fullName }}</h2>
-          <span class="role-badge" [style.background]="getRoleBadgeColor() + '20'"
+          <!-- قراءة السجنال بشكل سليم كـ دالة -->
+          <h2 class="sidebar-name mt-3">{{ profile()?.fullName || 'Unknown User' }}</h2>
+          
+          <span class="role-badge d-inline-block my-2 px-3 py-1 rounded-pill" 
+                [style.background]="getRoleBadgeColor() + '20'"
                 [style.color]="getRoleBadgeColor()">
             {{ profile()?.role }}
           </span>
-          <p class="sidebar-email">{{ profile()?.email }}</p>
-          <p class="sidebar-date">
+          
+          <p class="sidebar-email text-muted">{{ profile()?.email }}</p>
+          <p class="sidebar-date text-secondary small">
             Member since {{ profile()?.createdAt | date:'longDate' }}
           </p>
         </div>
@@ -47,9 +59,10 @@
             <div class="form-group span-2">
               <label>Full Name</label>
               <input type="text" formControlName="fullName" placeholder="Your full name"/>
-              @if (f.fullName.touched && f.fullName.hasError('required')) {
+              
+              @if (form.get('fullName')?.touched && form.get('fullName')?.hasError('required')) {
                 <span class="field-error">⚡ Full name is required</span>
-              } @else if (f.fullName.touched && f.fullName.hasError('minlength')) {
+              } @else if (form.get('fullName')?.touched && form.get('fullName')?.hasError('minlength')) {
                 <span class="field-error">⚡ At least 3 characters</span>
               }
             </div>
@@ -58,16 +71,17 @@
             <div class="form-group">
               <label>Email Address</label>
               <input type="email" [value]="profile()?.email || ''" readonly
-                     style="opacity:.6;cursor:not-allowed;"/>
-              <span style="font-size:.78rem;color:#94a3b8;margin-top:.3rem;">Email cannot be changed</span>
+                     style="opacity:.6; cursor:not-allowed; background-color: #f1f5f9;"/>
+              <span style="font-size:.78rem; color:#94a3b8; margin-top:.3rem; display: block;">Email cannot be changed</span>
             </div>
 
             <!-- Phone -->
             <div class="form-group">
               <label>Phone Number</label>
               <input type="tel" formControlName="phoneNumber" placeholder="+20 10XXXXXXXX"/>
-              @if (f.phoneNumber.touched && f.phoneNumber.hasError('pattern')) {
-                <span class="field-error">⚡ Enter a valid phone number</span>
+              
+              @if (form.get('phoneNumber')?.touched && form.get('phoneNumber')?.hasError('required')) {
+                <span class="field-error">⚡ Phone number is required</span>
               }
             </div>
 
@@ -75,15 +89,20 @@
             <div class="form-group span-2">
               <label>Address</label>
               <input type="text" formControlName="address" placeholder="City, Country"/>
-              @if (f.address.touched && f.address.hasError('maxlength')) {
+              
+              @if (form.get('address')?.touched && form.get('address')?.hasError('maxlength')) {
                 <span class="field-error">⚡ Max 100 characters</span>
               }
             </div>
 
-            <div class="form-actions span-2">
-              <button type="submit" class="btn-save" [disabled]="saving()">
-                @if (saving()) { <span class="spinner"></span> Saving... }
-                @else { Save Changes }
+            <!-- Actions -->
+            <div class="form-actions span-2 mt-4">
+              <button type="submit" class="btn-save" [disabled]="saving() || form.invalid">
+                @if (saving()) { 
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span> Saving... 
+                } @else { 
+                  Save Changes 
+                }
               </button>
             </div>
 

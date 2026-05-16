@@ -96,7 +96,7 @@
             </thead>
             <tbody>
               @for (seller of filteredPendingSellers(); track seller.id) {
-                <tr [class.row-loading]="actionLoading() === seller.id">
+                <tr [class.row-loading]="actionLoading() === +seller.id">
                   <!-- Seller Info -->
                   <td>
                     <div class="user-cell">
@@ -129,7 +129,7 @@
                     <button 
                       class="btn-icon btn-success-icon" 
                       (click)="approveSeller(seller)"
-                      [disabled]="actionLoading() === seller.id"
+                      [disabled]="actionLoading() === +seller.id"
                       title="Approve Seller"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -140,7 +140,7 @@
                     <button 
                       class="btn-icon btn-danger-icon" 
                       (click)="rejectSeller(seller)"
-                      [disabled]="actionLoading() === seller.id"
+                      [disabled]="actionLoading() === +seller.id"
                       title="Reject Application"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
