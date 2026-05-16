@@ -1,158 +1,133 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DatePipe } from '@angular/common';
-import { UserService } from '../../services/user.service';
-import { UserProfile } from '../../models/user-profile.model';
-import { ProfileImageUploadComponent } from '../ProfileImageUploadComponent/ProfileImageUploadComponent';
-import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
-
-const API_BASE = 'https://localhost:7017/api';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserService } from '.././../services/user.service'; // تأكد من صحة مسار الخدمة
+import { UserProfile, UpdateProfileRequest } from '.././../models/user-profile.model'; // تأكد من صحة مسار الموديل
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe, ProfileImageUploadComponent, ...SHARED_IMPORTS],
+  imports: [CommonModule, ReactiveFormsModule, DatePipe],
   templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css',
+  styleUrls: ['./user-profile.component.css']
 })
 export class UserProfileComponent implements OnInit {
-  private readonly fb = inject(FormBuilder);
-  private readonly userService = inject(UserService);
+  private userService = inject(UserService);
+  private fb = inject(FormBuilder);
 
+  // 1. رابط الباك-إند الأساسي لدمج مسار الصور (قم بتعديله حسب البورت عندك)
+  readonly backendBaseUrl = 'https://localhost:7017'; 
+
+  // Signals State المتوافقة تماماً مع الـ HTML الخاص بك
   readonly profile = signal<UserProfile | null>(null);
-  readonly loading = signal(true);
-  readonly saving = signal(false);
-  readonly message = signal('');
-  readonly success = signal(false);
-  readonly imagePreview = signal<string | null>(null);
+  readonly userImageUrl = signal<string>('assets/images/default-avatar.png'); // صورة افتراضية
+  readonly loading = signal<boolean>(true);
+  readonly saving = signal<boolean>(false);
+  readonly message = signal<string | null>(null);
+  readonly success = signal<boolean>(true);
+  
+  form!: FormGroup;
   selectedFile: File | null = null;
 
-  readonly form = this.fb.nonNullable.group({
-    fullName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-    phoneNumber: ['', [Validators.pattern(/^[0-9+\-\s]{7,15}$/)]],
-    address: ['', [Validators.maxLength(100)]],
-  });
-
-  get f() { return this.form.controls; }
-
   ngOnInit(): void {
+    this.initForm();
+    this.loadUserProfile();
+  }
+
+  // تهيئة الـ Form بالـ Validators المطلوبة في الـ HTML
+  private initForm(): void {
+    this.form = this.fb.group({
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
+      phoneNumber: ['', [Validators.required]],
+      address: ['', [Validators.maxLength(100)]]
+    });
+  }
+
+  // جلب بيانات البروفايل عند فتح الصفحة
+  loadUserProfile(): void {
+    this.loading.set(true);
     this.userService.getProfile().subscribe({
-      next: (res: any) => {
-        const p: UserProfile = res.data ?? res;
-        if (!p) return;
-        this.profile.set(p);
-        this.form.patchValue({
-          fullName: p.fullName,
-          phoneNumber: p.phoneNumber ?? '',
-          address: p.address ?? '',
-        });
-        if (p.imagePath) {
-          const img = p.imagePath.startsWith('http')
-            ? p.imagePath
-            : `${API_BASE}/${p.imagePath.replace(/^\//, '')}`;
-          this.imagePreview.set(img);
+      next: (response) => {
+        if (response.isSuccess && response.data) {
+          this.profile.set(response.data);
+          
+          // ملء الـ Form بالبيانات القادمة من السيرفر
+          this.form.patchValue({
+            fullName: response.data.fullName,
+            phoneNumber: response.data.phoneNumber,
+            address: response.data.address
+          });
+
+          // دمج رابط السيرفر مع الـ ImagePath المخزن في قاعدة البيانات
+          if (response.data.imagePath) {
+            this.userImageUrl.set(`${this.backendBaseUrl}/${response.data.imagePath}`);
+          }
         }
         this.loading.set(false);
       },
-      error: () => this.loading.set(false),
+      error: (err) => {
+        console.error('Error loading profile:', err);
+        this.loading.set(false);
+        this.message.set('Failed to load profile data.');
+        this.success.set(false);
+      }
     });
   }
 
-  onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-    this.selectedFile = input.files[0];
+  // معالجة اختيار صورة جديدة من جهاز المستخدم (Preview محلي)
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowed.includes(this.selectedFile.type)) {
-      this.message.set('Only JPG, PNG or WebP images are allowed.');
-      this.success.set(false);
-      this.selectedFile = null;
-      return;
+      // عمل عرض مؤقت للصورة المختارة في الواجهة قبل الرفع
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.userImageUrl.set(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-    if (this.selectedFile.size > 5 * 1024 * 1024) {
-      this.message.set('Image must be smaller than 5 MB.');
-      this.success.set(false);
-      this.selectedFile = null;
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => this.imagePreview.set(reader.result as string);
-    reader.readAsDataURL(this.selectedFile);
   }
 
+  // دالة تحديد لون الـ Badge بناءً على الـ Role
+  getRoleBadgeColor(): string {
+    const role = this.profile()?.role?.toLowerCase();
+    if (role === 'admin') return '#ef4444'; // أحمر للأدمن
+    if (role === 'seller') return '#10b981'; // أخضر للبائع
+    return '#3b82f6'; // أزرق للمستخدم العادي
+  }
+
+  // إرسال البيانات المحدثة والصورة إلى الباك-إند
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.form.invalid) return;
+
     this.saving.set(true);
-    this.message.set('');
-    const v = this.form.getRawValue();
-    this.userService.updateProfile({
-      fullName: v.fullName || null,
-      phoneNumber: v.phoneNumber || null,
-      address: v.address || null,
-      image: this.selectedFile,
-    }).subscribe({
-      next: () => {
-        this.success.set(true);
+    this.message.set(null);
+
+    // تجهيز الـ Payload المتوافق مع الـ Service والـ FormData
+    const updatePayload: UpdateProfileRequest = {
+      fullName: this.form.value.fullName,
+      phoneNumber: this.form.value.phoneNumber,
+      address: this.form.value.address,
+      image: this.selectedFile || undefined
+    };
+
+    this.userService.updateProfile(updatePayload).subscribe({
+      next: (response) => {
+        this.saving.set(false);
+        this.selectedFile = null; // تصفير الملف المختار بعد النجاح
         this.message.set('Profile updated successfully!');
-        this.selectedFile = null;
-        this.refreshProfile();
+        this.success.set(true);
+        
+        // إعادة جلب البيانات لتحديث الـ Sidebar بالكامل بالصورة والاسم الجديد من السيرفر
+        this.loadUserProfile(); 
       },
       error: (err) => {
-        this.success.set(false);
-        this.message.set(err?.error?.data || err?.error?.message || 'Update failed. Try again.');
+        console.error('Error updating profile:', err);
         this.saving.set(false);
-      },
-      complete: () => this.saving.set(false),
+        this.message.set(err.error?.message || 'Error updating profile. Please try again.');
+        this.success.set(false);
+      }
     });
-  }
-
-  private refreshProfile(): void {
-    this.userService.getProfile().subscribe({
-      next: (res: any) => {
-        const p: UserProfile = res.data ?? res;
-        if (!p) return;
-        this.profile.set(p);
-        if (p.imagePath) {
-          const img = p.imagePath.startsWith('http')
-            ? p.imagePath
-            : `${API_BASE}/${p.imagePath.replace(/^\//, '')}`;
-          this.imagePreview.set(img);
-        }
-      },
-    });
-  }
-
-  // ✅ دالة استقبال الصورة المرفوعة من الـ Component
-  onImageUploaded(newImageUrl: string): void {
-    const currentProfile = this.profile();
-    if (currentProfile) {
-      this.profile.set({
-        ...currentProfile,
-        imagePath: newImageUrl
-      });
-    }
-    this.imagePreview.set(newImageUrl);
-    this.success.set(true);
-    this.message.set('Profile image updated successfully!');
-    setTimeout(() => this.message.set(''), 3000);
-  }
-
-  // ✅ دالة استقبال الأخطاء
-  onImageError(errorMessage: string): void {
-    this.success.set(false);
-    this.message.set(errorMessage);
-    setTimeout(() => this.message.set(''), 3000);
-  }
-
-  getRoleBadgeColor(): string {
-    const role = this.profile()?.role;
-    if (role === 'Admin') return '#ef4444';
-    if (role === 'Seller') return '#f59e0b';
-    return '#6366f1';
   }
 }

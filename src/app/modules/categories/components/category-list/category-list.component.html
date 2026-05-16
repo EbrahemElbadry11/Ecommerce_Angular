@@ -18,7 +18,11 @@
 
   <!-- Error State -->
   <div *ngIf="errorMessage && !isLoading" class="error-state">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
     <p>{{ errorMessage }}</p>
     <button (click)="retry()" class="retry-btn">Retry</button>
   </div>
@@ -26,7 +30,10 @@
   <!-- Categories Grid -->
   <div class="categories-grid" *ngIf="!isLoading && !errorMessage">
     <div *ngIf="categories.length === 0" class="empty-state">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="2" width="20" height="8" rx="2"/>
+        <rect x="2" y="14" width="20" height="8" rx="2"/>
+      </svg>
       <p>No categories available yet.</p>
     </div>
 
@@ -36,21 +43,21 @@
       (click)="viewCategory(category.categoryId)"
     >
       <div class="card-visual">
+        <!-- ✅ استخدم الدالة getImageUrl -->
         <img
-          *ngIf="getImageUrl(category.icon)"
           [src]="getImageUrl(category.icon)"
           [alt]="category.name"
           class="card-icon-img"
+          (error)="onImageError($event)"
         />
-        <div *ngIf="!getImageUrl(category.icon)" class="card-icon-placeholder">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
-        </div>
       </div>
       <div class="card-content">
         <h3 class="card-name">{{ category.name }}</h3>
         <span class="card-link">
           Browse Products
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
         </span>
       </div>
     </button>

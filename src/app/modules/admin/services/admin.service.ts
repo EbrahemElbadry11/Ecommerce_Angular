@@ -35,8 +35,6 @@ export class AdminService {
   }
 
 
-// admin.service.ts
-// admin.service.ts
 
 changeRole(id: string, role: string): Observable<ApiResponse<string>> {
   const headers = new HttpHeaders({ 
@@ -55,8 +53,23 @@ changeRole(id: string, role: string): Observable<ApiResponse<string>> {
   );
 }
 
+  getPendingSellers(): Observable<ApiResponse<string>> {
+    return this.http.get<ApiResponse<string>>(`/admin/pending-sellers`);
+  }
+
   approveSeller(sellerId: number): Observable<ApiResponse<string>> {
     const headers = new HttpHeaders({ 'X-Success-Message': 'Seller approved successfully.' });
     return this.http.put<ApiResponse<string>>(`/admin/approve-seller/${sellerId}`, {}, { headers });
   }
+
+  // داخل ملف admin.service.ts
+getApprovedSellers(): Observable<ApiResponse<string>> {
+  return this.http.get<ApiResponse<string>>(`/admin/approved-sellers`); 
 }
+
+   rejectSeller(sellerId: number): Observable<ApiResponse<string>> {
+  console.log('Calling reject API for seller ID:', sellerId);
+  return this.http.delete<ApiResponse<string>>(`/admin/reject-seller/${sellerId}`);
+}
+}
+

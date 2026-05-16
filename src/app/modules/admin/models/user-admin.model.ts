@@ -9,6 +9,7 @@ export interface AdminUser {
   createdAt: string;
   isBlocked: boolean;
   isSellerApproved: boolean;
+  storeName?: string | null;
 }
 
 export interface AdminDashboardStats {

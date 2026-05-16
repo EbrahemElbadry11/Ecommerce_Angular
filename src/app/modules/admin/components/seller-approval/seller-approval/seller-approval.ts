@@ -6,21 +6,25 @@ import { finalize } from 'rxjs';
 import { AdminService } from '../../../services/admin.service';
 import { AdminUser } from '../../../models/user-admin.model';
 import { SlicePipe } from '@angular/common';
+import { ToastService } from '../../...../../../../../../services/toast';
+
 @Component({
   selector: 'app-seller-approval',
   standalone: true,
-  imports: [DatePipe, FormsModule, RouterLink,SlicePipe],
+  imports: [DatePipe, FormsModule, RouterLink, SlicePipe],
   templateUrl: './seller-approval.html',
   styleUrls: ['./seller-approval.css']
 })
 export class SellerApprovalComponent implements OnInit {
   private adminService = inject(AdminService);
+  private toastService = inject(ToastService);
 
   // State
+  readonly message = signal<string | null>(null);
   readonly pendingSellers = signal<AdminUser[]>([]);
   readonly approvedSellers = signal<AdminUser[]>([]);
   readonly loading = signal(true);
-  readonly actionLoading = signal<string | null>(null);
+  readonly actionLoading = signal<number | null>(null); 
   readonly activeTab = signal<'pending' | 'approved'>('pending');
   readonly alertMessage = signal<string | null>(null);
   readonly alertType = signal<'success' | 'danger' | 'warning' | 'info'>('info');
@@ -43,97 +47,215 @@ export class SellerApprovalComponent implements OnInit {
     return filtered;
   });
 
-  ngOnInit(): void {
-    this.loadSellers();
+ ngOnInit(): void {
+    this.loadPendingSellers();
+    this.loadApprovedSellers(); // جلب المقبولين أيضاً عند تحميل الصفحة
   }
 
-  loadSellers(): void {
+  loadApprovedSellers(): void {
+    // إذا كان هناك API خاص بالمقبولين
+    this.adminService.getApprovedSellers() // تأكد من إضافة الدالة في الـ Service
+      .subscribe({
+        next: (response: any) => {
+          let sellersArray = this.extractDataArray(response);
+          this.approvedSellers.set(this.mapToAdminUsers(sellersArray));
+        },
+        error: (error) => console.error('Error loading approved sellers:', error)
+      });
+  }
+
+  // دالة مساعدة لتنظيف الكود ومنع التكرار في استخراج المصفوفات
+  private extractDataArray(response: any): any[] {
+    if (response.isSuccess && response.data) return response.data;
+    if (Array.isArray(response)) return response;
+    if (response.$values) return response.$values;
+    return response || [];
+  }
+
+  // Load pending sellers from API
+  loadPendingSellers(): void {
     this.loading.set(true);
-    this.adminService.getUsers()
+    
+    this.adminService.getPendingSellers()
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
-        next: (res) => {
-          if (res.isSuccess && res.data) {
-            // فصل التجار المعلقين عن المعتمدين
-            const allSellers = res.data.filter(user => user.role === 'Seller');
-            
-            const pending = allSellers.filter(seller => !seller.isSellerApproved);
-            const approved = allSellers.filter(seller => seller.isSellerApproved);
-            
-            this.pendingSellers.set(pending);
-            this.approvedSellers.set(approved);
-            
-            console.log(`Pending sellers: ${pending.length}, Approved sellers: ${approved.length}`);
-          }
-        },
-        error: (err) => {
-          this.showAlert('Failed to load sellers', 'danger');
-          console.error('Error:', err);
-        }
-      });
-  }
-
-  // ✅ الميثود المهمة - قبول البائع
-  approveSeller(seller: AdminUser): void {
-    if (!confirm(`Approve ${seller.fullName} as a seller? They will be able to sell products on the platform.`)) return;
-
-    this.actionLoading.set(seller.id);
-    
-    // تحويل الـ id من string لـ number
-    const sellerId = parseInt(seller.id, 10);
-    
-    this.adminService.approveSeller(sellerId)
-      .pipe(finalize(() => this.actionLoading.set(null)))
-      .subscribe({
-        next: () => {
-          this.showAlert(`${seller.fullName} has been approved as a seller!`, 'success');
+        next: (response: any) => {
+          console.log('API Response:', response);
           
-          // نقل التاجر من المعلقين للمعتمدين
-          this.pendingSellers.update(pending => 
-            pending.filter(s => s.id !== seller.id)
+          // Extract sellers array from response
+          let sellersArray = [];
+          
+          if (response.isSuccess && response.data) {
+            sellersArray = response.data;
+          } else if (Array.isArray(response)) {
+            sellersArray = response;
+          } else if (response.$values) {
+            sellersArray = response.$values;
+          } else {
+            sellersArray = response;
+          }
+          
+          // Filter pending vs approved sellers
+          const pending = sellersArray.filter((seller: any) => 
+            seller.isApproved === false
           );
-          this.approvedSellers.update(approved => 
-            [...approved, { ...seller, isSellerApproved: true }]
+          
+          const approved = sellersArray.filter((seller: any) => 
+            seller.isApproved === true
           );
+          
+          // Map to AdminUser model
+          this.pendingSellers.set(this.mapToAdminUsers(pending));
+          this.approvedSellers.set(this.mapToAdminUsers(approved));
+          
+          console.log(`✅ Pending sellers: ${pending.length}, Approved sellers: ${approved.length}`);
         },
-        error: (err) => {
-          console.error('Approve error:', err);
-          this.showAlert('Failed to approve seller', 'danger');
+        error: (error: any) => {
+          console.error('❌ Error loading sellers:', error);
+          this.handleApiError(error);
         }
       });
   }
 
-  rejectSeller(seller: AdminUser): void {
-    if (!confirm(`Reject ${seller.fullName}? They will need to reapply.`)) return;
+  private mapToAdminUsers(sellers: any[]): AdminUser[] {
+    const mappedUsers: AdminUser[] = [];
     
-    // يمكنك إضافة ميثود للرفض في الـ Service
-    this.showAlert(`Rejected ${seller.fullName}`, 'warning');
-    this.pendingSellers.update(pending => 
-      pending.filter(s => s.id !== seller.id)
-    );
+    if (sellers && sellers.length > 0) {
+      for (const seller of sellers) {
+        const user: AdminUser = {
+          id: (seller.id || seller.sellerId || '').toString(),
+          fullName: seller.fullName || seller.name || 'Unknown',
+          email: seller.email || '',
+          role: 'Seller',
+          isSellerApproved: seller.isApproved === true,
+          createdAt: seller.createdAt || new Date(),
+          storeName: seller.storeName || '',
+          phoneNumber: seller.phoneNumber || '',
+          isBlocked: false,
+          isDeleted: false,
+        };
+        mappedUsers.push(user);
+      }
+    }
+    
+    return mappedUsers;
   }
 
+  // Approve seller via Custom Toast Confirm
+  approveSeller(seller: AdminUser): void {
+    this.toastService.show({
+      message: `Approve ${seller.fullName} as a seller? They will be able to sell products on the platform.`,
+      type: 'info',
+      isConfirm: true,
+      onConfirm: () => {
+        this.actionLoading.set(parseInt(seller.id, 10));
+        const sellerId = parseInt(seller.id, 10);
+        
+        this.adminService.approveSeller(sellerId)
+          .pipe(finalize(() => this.actionLoading.set(null)))
+          .subscribe({
+            next: (response: any) => {
+              console.log('Approve response:', response);
+              this.toastService.show(`${seller.fullName} has been approved as a seller!`, 'success');
+              
+              // Move seller from pending to approved
+              this.pendingSellers.update(pending => 
+                pending.filter(s => s.id !== seller.id)
+              );
+              
+              this.approvedSellers.update(approved => 
+                [...approved, { ...seller, isSellerApproved: true }]
+              );
+            },
+            error: (error: any) => {
+              console.error('❌ Error approving seller:', error);
+              let errorMsg = 'Failed to approve seller';
+              if (error.error?.message) errorMsg = error.error.message;
+              this.toastService.show(errorMsg, 'danger');
+            }
+          });
+      }
+    });
+  }
+
+  // Reject seller via Custom Toast Confirm
+  rejectSeller(seller: AdminUser): void {
+    this.toastService.show({
+      message: `Reject ${seller.fullName}? They will need to reapply.`,
+      type: 'warning',
+      isConfirm: true,
+      onConfirm: () => {
+        this.actionLoading.set(parseInt(seller.id, 10));
+        
+        this.adminService.rejectSeller(parseInt(seller.id, 10))
+          .pipe(finalize(() => this.actionLoading.set(null)))
+          .subscribe({
+            next: () => {
+              this.toastService.show(`${seller.fullName} has been rejected.`, 'warning');
+              this.pendingSellers.update(pending => 
+                pending.filter(s => s.id !== seller.id)
+              );
+            },
+            error: (error: any) => {
+              console.error('Error rejecting seller:', error);
+              // Remove locally even if API fails (for testing)
+              this.pendingSellers.update(pending => 
+                pending.filter(s => s.id !== seller.id)
+              );
+              this.toastService.show(`${seller.fullName} rejected locally (API reject endpoint missing)`, 'warning');
+            }
+          });
+      }
+    });
+  }
+
+  // Refresh sellers list
   refreshSellers(): void {
-    this.loadSellers();
-    this.showAlert('Refreshing seller list...', 'info');
+    if (this.activeTab() === 'pending') {
+      this.loadPendingSellers();
+    } else {
+      this.loadApprovedSellers();
+    }
+    this.toastService.show('Refreshing list...', 'info');
   }
 
+  // Change active tab
   setTab(tab: 'pending' | 'approved'): void {
     this.activeTab.set(tab);
     this.searchTerm.set('');
   }
 
+  // Get user initial for avatar
   getUserInitial(name: string): string {
     return name?.charAt(0).toUpperCase() || '?';
   }
 
+  // Show alert message
   private showAlert(message: string, type: 'success' | 'danger' | 'warning' | 'info'): void {
     this.alertMessage.set(message);
     this.alertType.set(type);
     setTimeout(() => this.alertMessage.set(null), 4000);
   }
 
+  // Clear alert
   clearAlert(): void {
     this.alertMessage.set(null);
+  }
+
+  // Handle API errors
+  private handleApiError(error: any): void {
+    if (error.status === 0) {
+      this.showAlert('Cannot connect to server. Make sure the backend is running on the correct port.', 'danger');
+    } else if (error.status === 404) {
+      this.showAlert('API endpoint not found. Make sure GetPendingSellers method exists in the Controller.', 'danger');
+    } else if (error.status === 401) {
+      this.showAlert('Unauthorized. Please login as admin.', 'danger');
+    } else if (error.status === 403) {
+      this.showAlert('Forbidden. You don\'t have admin permissions.', 'danger');
+    } else if (error.status === 500) {
+      this.showAlert('Server error. Check backend logs for details.', 'danger');
+    } else {
+      this.showAlert(`Failed to load sellers: ${error.message || 'Unknown error'}`, 'danger');
+    }
   }
 }

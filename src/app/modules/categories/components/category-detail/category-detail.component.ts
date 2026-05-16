@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -37,6 +37,9 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   isLoadingProducts: boolean = false;
   errorMessage: string = '';
   showFilters: boolean = false;
+
+  // Image API URL
+  private apiUrl: string = 'https://localhost:7017'; // غير البورت حسب اللي عندك
 
   // Auto-unsubscribe
   private destroy$ = new Subject<void>();
@@ -95,7 +98,9 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess && response.data) {
-            this.allCategories = response.data;
+            this.allCategories = Array.isArray(response.data) 
+              ? response.data 
+              : (response.data.categories || response.data.Categories || []);
           }
         },
         error: (err: any) => {
@@ -274,15 +279,75 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Get category icon
+   * ✅ دالة الحصول على رابط صورة الكاتيجوري (معدلة)
    */
-  getCategoryImageUrl(icon: string): string {
-    if (icon && icon.startsWith('data:image')) {
+  getCategoryImageUrl(icon: string | null | undefined): string {
+    if (!icon) {
+      return '';
+    }
+
+    // لو كان رابط خارجي (http/https)
+    if (icon.startsWith('http://') || icon.startsWith('https://')) {
       return icon;
     }
-    if (icon) {
-      return `data:image/png;base64,${icon}`;
+
+    // لو كان Base64
+    if (icon.startsWith('data:image')) {
+      return icon;
     }
-    return '';
+
+    // لو كان مسار من API
+    if (icon.startsWith('/')) {
+      return `${this.apiUrl}${icon}`;
+    }
+
+    // مسار نسبي
+    return `${this.apiUrl}/${icon}`;
+  }
+
+  /**
+   * ✅ دالة الحصول على رابط صورة المنتج (مضافة جديدة)
+   */
+  getProductImageUrl(imageName: string | null | undefined): string {
+    if (!imageName) {
+      return '';
+    }
+
+    // لو كان رابط خارجي
+    if (imageName.startsWith('http://') || imageName.startsWith('https://')) {
+      return imageName;
+    }
+
+    // لو كان Base64
+    if (imageName.startsWith('data:image')) {
+      return imageName;
+    }
+
+    // مسار صور المنتجات
+    return `${this.apiUrl}/Images/Products/${imageName}`;
+  }
+
+  /**
+   * ✅ دالة معالجة خطأ تحميل الصورة
+   */
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = 'assets/images/default-image.png';
+    img.onerror = null;
+  }
+
+  /**
+   * ✅ دالة معالجة خطأ صورة الكاتيجوري
+   */
+  onCategoryImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const parent = img.parentElement;
+    if (parent) {
+      const fallback = document.createElement('div');
+      fallback.className = 'category-icon-fallback';
+      fallback.textContent = '📦';
+      parent.appendChild(fallback);
+    }
   }
 }
