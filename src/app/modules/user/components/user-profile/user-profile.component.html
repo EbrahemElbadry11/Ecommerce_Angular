@@ -10,15 +10,14 @@
       <!-- Sidebar -->
       <aside class="profile-sidebar">
         <div class="avatar-section">
-          <div class="avatar-wrapper">
-            <img [src]="imagePreview() || 'assets/default-avatar.png'"
-                 alt="Profile photo" class="avatar-img" />
-            <label class="avatar-edit-btn" title="Change photo">
-              <input type="file" accept="image/jpeg,image/png,image/webp"
-                     (change)="onFileChange($event)" hidden />
-              ✏️
-            </label>
-          </div>
+          <!-- ✅ Profile Image Upload Component -->
+          <!-- profile.component.html -->
+            <app-profile-image-upload 
+              [currentImageUrl]="imagePreview() || profile()?.imagePath || ''"
+              (uploaded)="onImageUploaded($event)"
+              (error)="onImageError($event)">
+            </app-profile-image-upload>
+
           <h2 class="sidebar-name">{{ profile()?.fullName }}</h2>
           <span class="role-badge" [style.background]="getRoleBadgeColor() + '20'"
                 [style.color]="getRoleBadgeColor()">

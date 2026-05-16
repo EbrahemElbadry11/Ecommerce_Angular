@@ -12,12 +12,26 @@ export class UserService {
   }
 
   updateProfile(payload: UpdateProfileRequest): Observable<ApiResponse<string>> {
-    const form = new FormData();
-    if (payload.fullName)    form.append('FullName',    payload.fullName);
-    if (payload.phoneNumber) form.append('PhoneNumber', payload.phoneNumber);
-    if (payload.address)     form.append('Address',     payload.address);
-    if (payload.image)       form.append('Image',       payload.image);
+  const form = new FormData();
+  
+  if (payload.fullName)    form.append('FullName',    payload.fullName);
+  if (payload.phoneNumber) form.append('PhoneNumber', payload.phoneNumber);
+  if (payload.address)     form.append('Address',     payload.address);
+  
+  if (payload.image) {
+      form.append('Image', payload.image, payload.image.name);
+    }
+
     const headers = new HttpHeaders({ 'X-Success-Message': 'Profile updated successfully!' });
     return this.http.put<ApiResponse<string>>('/user/update-profile', form, { headers });
   }
+
+   uploadProfileImage(file: File): Observable<ApiResponse<string>> {
+    const form = new FormData();
+    form.append('Image', file, file.name);
+    
+    const headers = new HttpHeaders({ 'X-Success-Message': 'Profile image uploaded successfully!' });
+    return this.http.post<ApiResponse<string>>(`${this.http}/user/upload-profile-image`, form, { headers });
+  }
 }
+

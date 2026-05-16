@@ -3,33 +3,34 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { UserService } from '../../services/user.service';
 import { UserProfile } from '../../models/user-profile.model';
+import { ProfileImageUploadComponent } from '../ProfileImageUploadComponent/ProfileImageUploadComponent';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
 
-const API_BASE = 'https://ecommerceiti.runasp.net';
+const API_BASE = 'https://localhost:7017/api';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe, ...SHARED_IMPORTS],
+  imports: [ReactiveFormsModule, DatePipe, ProfileImageUploadComponent, ...SHARED_IMPORTS],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css',
 })
 export class UserProfileComponent implements OnInit {
-  private readonly fb          = inject(FormBuilder);
+  private readonly fb = inject(FormBuilder);
   private readonly userService = inject(UserService);
 
-  readonly profile      = signal<UserProfile | null>(null);
-  readonly loading      = signal(true);
-  readonly saving       = signal(false);
-  readonly message      = signal('');
-  readonly success      = signal(false);
+  readonly profile = signal<UserProfile | null>(null);
+  readonly loading = signal(true);
+  readonly saving = signal(false);
+  readonly message = signal('');
+  readonly success = signal(false);
   readonly imagePreview = signal<string | null>(null);
   selectedFile: File | null = null;
 
   readonly form = this.fb.nonNullable.group({
-    fullName:    ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+    fullName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
     phoneNumber: ['', [Validators.pattern(/^[0-9+\-\s]{7,15}$/)]],
-    address:     ['', [Validators.maxLength(100)]],
+    address: ['', [Validators.maxLength(100)]],
   });
 
   get f() { return this.form.controls; }
@@ -41,20 +42,19 @@ export class UserProfileComponent implements OnInit {
         if (!p) return;
         this.profile.set(p);
         this.form.patchValue({
-          fullName:    p.fullName,
+          fullName: p.fullName,
           phoneNumber: p.phoneNumber ?? '',
-          address:     p.address     ?? '',
+          address: p.address ?? '',
         });
         if (p.imagePath) {
-          // Build full URL – handle relative or absolute path
           const img = p.imagePath.startsWith('http')
             ? p.imagePath
             : `${API_BASE}/${p.imagePath.replace(/^\//, '')}`;
           this.imagePreview.set(img);
         }
+        this.loading.set(false);
       },
       error: () => this.loading.set(false),
-      complete: () => this.loading.set(false),
     });
   }
 
@@ -63,7 +63,6 @@ export class UserProfileComponent implements OnInit {
     if (!input.files?.length) return;
     this.selectedFile = input.files[0];
 
-    // Validate file type and size
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowed.includes(this.selectedFile.type)) {
       this.message.set('Only JPG, PNG or WebP images are allowed.');
@@ -84,20 +83,24 @@ export class UserProfileComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.saving.set(true);
     this.message.set('');
     const v = this.form.getRawValue();
     this.userService.updateProfile({
-      fullName:    v.fullName    || null,
+      fullName: v.fullName || null,
       phoneNumber: v.phoneNumber || null,
-      address:     v.address     || null,
-      image:       this.selectedFile,
+      address: v.address || null,
+      image: this.selectedFile,
     }).subscribe({
       next: () => {
         this.success.set(true);
         this.message.set('Profile updated successfully!');
         this.selectedFile = null;
+        this.refreshProfile();
       },
       error: (err) => {
         this.success.set(false);
@@ -108,9 +111,47 @@ export class UserProfileComponent implements OnInit {
     });
   }
 
+  private refreshProfile(): void {
+    this.userService.getProfile().subscribe({
+      next: (res: any) => {
+        const p: UserProfile = res.data ?? res;
+        if (!p) return;
+        this.profile.set(p);
+        if (p.imagePath) {
+          const img = p.imagePath.startsWith('http')
+            ? p.imagePath
+            : `${API_BASE}/${p.imagePath.replace(/^\//, '')}`;
+          this.imagePreview.set(img);
+        }
+      },
+    });
+  }
+
+  // ✅ دالة استقبال الصورة المرفوعة من الـ Component
+  onImageUploaded(newImageUrl: string): void {
+    const currentProfile = this.profile();
+    if (currentProfile) {
+      this.profile.set({
+        ...currentProfile,
+        imagePath: newImageUrl
+      });
+    }
+    this.imagePreview.set(newImageUrl);
+    this.success.set(true);
+    this.message.set('Profile image updated successfully!');
+    setTimeout(() => this.message.set(''), 3000);
+  }
+
+  // ✅ دالة استقبال الأخطاء
+  onImageError(errorMessage: string): void {
+    this.success.set(false);
+    this.message.set(errorMessage);
+    setTimeout(() => this.message.set(''), 3000);
+  }
+
   getRoleBadgeColor(): string {
     const role = this.profile()?.role;
-    if (role === 'Admin')  return '#ef4444';
+    if (role === 'Admin') return '#ef4444';
     if (role === 'Seller') return '#f59e0b';
     return '#6366f1';
   }

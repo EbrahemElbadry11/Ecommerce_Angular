@@ -7,6 +7,8 @@ export interface AdminUser {
   role?: string | null;
   isDeleted: boolean;
   createdAt: string;
+  isBlocked: boolean;
+  isSellerApproved: boolean;
 }
 
 export interface AdminDashboardStats {
@@ -25,7 +27,7 @@ export interface RecentOrder {
   date: string;
 }
 
-export type ManagedRole = 'Admin' | 'Seller' | 'Customer';
+export type ManagedRole = 'Admin' | 'Seller' | 'User';
 
 export interface ApiResponse<T> {
   isSuccess: boolean;

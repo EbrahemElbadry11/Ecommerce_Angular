@@ -1,26 +1,33 @@
 <div class="category-list-container">
   <!-- Header -->
-  <div class="header">
-    <h1>Shop by Category</h1>
-    <p class="subtitle">Browse our carefully selected product categories</p>
+  <div class="list-header">
+    <div class="header-top">
+      <div class="title-block">
+        <span class="title-eyebrow">Browse</span>
+        <h1 class="page-title">Shop by Category</h1>
+      </div>
+    </div>
+    <p class="header-subtitle">Explore our curated product categories to find exactly what you need.</p>
   </div>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading">
-    <div class="spinner"></div>
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
     <p>Loading categories...</p>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="errorMessage && !isLoading" class="error-banner">
+  <div *ngIf="errorMessage && !isLoading" class="error-state">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <p>{{ errorMessage }}</p>
-    <button (click)="retry()">Retry</button>
+    <button (click)="retry()" class="retry-btn">Retry</button>
   </div>
 
   <!-- Categories Grid -->
   <div class="categories-grid" *ngIf="!isLoading && !errorMessage">
-    <div *ngIf="categories.length === 0" class="no-categories">
-      <p>No categories available</p>
+    <div *ngIf="categories.length === 0" class="empty-state">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+      <p>No categories available yet.</p>
     </div>
 
     <button
@@ -28,19 +35,24 @@
       class="category-card"
       (click)="viewCategory(category.categoryId)"
     >
-      <div class="card-icon">
+      <div class="card-visual">
         <img
           *ngIf="getImageUrl(category.icon)"
           [src]="getImageUrl(category.icon)"
           [alt]="category.name"
-          class="icon-image"
+          class="card-icon-img"
         />
-        <div *ngIf="!getImageUrl(category.icon)" class="icon-placeholder">
-          📦
+        <div *ngIf="!getImageUrl(category.icon)" class="card-icon-placeholder">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
         </div>
       </div>
-      <h3 class="category-name">{{ category.name }}</h3>
-      <span class="view-link">View Products →</span>
+      <div class="card-content">
+        <h3 class="card-name">{{ category.name }}</h3>
+        <span class="card-link">
+          Browse Products
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
+      </div>
     </button>
   </div>
 </div>

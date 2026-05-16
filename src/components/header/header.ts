@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, Router, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { AuthService } from '../../app/modules/auth/services/auth.service';
 import { ThemeService } from '../../app/shared/services/ThemeService';
+import { CartService } from '../../app/modules/cart/services/cart.service';
 import { Subject, filter, takeUntil } from 'rxjs';
 
 @Component({
@@ -22,6 +23,7 @@ export class Header implements OnInit, OnDestroy {
   userRole: string = '';
   isScrolled: boolean = false;
   isDarkMode: boolean = false;
+  cartCount: number = 0;
 
   private destroy$ = new Subject<void>();
 
@@ -29,13 +31,13 @@ export class Header implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private themeService: ThemeService,
+    private cartService: CartService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.updateAuthStatus();
 
-    // تحديث الحالة عند كل navigation (login / logout)
     this.router.events
       .pipe(
         filter(e => e instanceof NavigationEnd),
@@ -75,6 +77,22 @@ export class Header implements OnInit, OnDestroy {
 
     this.userFullName = session?.fullName || session?.email || 'User';
     this.userInitial  = this.userFullName.charAt(0).toUpperCase();
+
+    if (this.isLogged && !this.isAdmin) {
+      this.loadCartCount();
+    }
+  }
+
+  private loadCartCount(): void {
+    this.cartService.getCart().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (res) => {
+        if (res.isSuccess && res.data) {
+          this.cartCount = res.data.items?.length ?? 0;
+          this.cdr.markForCheck();
+        }
+      },
+      error: () => { this.cartCount = 0; },
+    });
   }
 
   logout(): void {
