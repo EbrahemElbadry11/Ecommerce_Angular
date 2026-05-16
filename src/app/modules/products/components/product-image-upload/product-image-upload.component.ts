@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
@@ -17,6 +19,8 @@ import { ProductService } from '../../services/product.service';
   styleUrls: [
     './product-image-upload.component.css',
   ],
+  changeDetection:
+    ChangeDetectionStrategy.OnPush,
 })
 export class ProductImageUploadComponent {
   @Input() productId!: number;
@@ -50,7 +54,7 @@ export class ProductImageUploadComponent {
   ];
 
   constructor(
-    private productService: ProductService
+    private productService: ProductService, private cdr: ChangeDetectorRef
   ) { }
 
   /**
@@ -108,9 +112,12 @@ export class ProductImageUploadComponent {
     const reader = new FileReader();
 
     reader.onload = () => {
+
       this.previewUrl = String(
         reader.result || ''
       );
+
+      this.cdr.detectChanges();
     };
 
     reader.readAsDataURL(file);
@@ -174,7 +181,7 @@ export class ProductImageUploadComponent {
             );
 
             this.clearSelection();
-
+            this.cdr.detectChanges();
             return;
           }
 

@@ -277,7 +277,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
                   imageUrl:
                     product.imagesNames?.length
-                      ? product.imagesNames[0]
+                      ? this.productService.getImageUrl(
+                        product.imagesNames[0]
+                      )
                       : 'assets/images/no-image.png',
 
                   shortDescription:

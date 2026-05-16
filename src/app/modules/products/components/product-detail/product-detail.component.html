@@ -142,9 +142,9 @@
           >
 
             <img
-              [src]="image"
-              [alt]="'Image ' + (i + 1)"
-              loading="lazy"
+                [src]="productService.getImageUrl(image)"
+                [alt]="'Image ' + (i + 1)"
+                loading="lazy"
             />
 
           </button>

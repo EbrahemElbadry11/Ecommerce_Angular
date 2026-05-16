@@ -1,44 +1,85 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component
+} from '@angular/core';
+
 import { RouterLink } from '@angular/router';
+
 import { SellerResponseDto } from '../../models/seller.model';
+
 import { SellerFormComponent } from '../seller-form/seller-form.component';
+import { SellerService } from '../../services/seller.service';
 
 @Component({
   selector: 'app-seller-register-page',
+
   standalone: true,
-  imports: [CommonModule, RouterLink, SellerFormComponent],
-  templateUrl: './seller-register-page.component.html',
-  styleUrls: ['./seller-register-page.component.css'],
+
+  imports: [
+    CommonModule,
+    RouterLink,
+    SellerFormComponent
+  ],
+
+  templateUrl:
+    './seller-register-page.component.html',
+
+  styleUrls: [
+    './seller-register-page.component.css'
+  ],
+
+  changeDetection:
+    ChangeDetectionStrategy.OnPush,
 })
+
 export class SellerRegisterPageComponent {
-  successMessage: string = '';
-  errorMessage: string = '';
-  createdSeller: SellerResponseDto | null = null;
 
-  onSaved(seller: SellerResponseDto): void {
+  successMessage = '';
+
+  errorMessage = '';
+
+  createdSeller:
+    SellerResponseDto | null =
+    null;
+
+  constructor(private cdr: ChangeDetectorRef, public sellerService: SellerService) { }
+
+
+  onSaved(
+    seller: SellerResponseDto
+  ): void {
+
     this.createdSeller = seller;
+
+    this.cdr.detectChanges();
   }
 
-  onSuccess(message: string): void {
+  onSuccess(
+    message: string
+  ): void {
+
     this.successMessage = message;
+
     this.errorMessage = '';
+
+    this.cdr.detectChanges();
   }
 
-  onError(message: string): void {
+  onError(
+    message: string
+  ): void {
+
     this.errorMessage = message;
+
     if (message) {
+
       this.successMessage = '';
     }
+
+    this.cdr.detectChanges();
   }
 
-  getLogoUrl(logoBase64?: string): string {
-    if (!logoBase64) {
-      return '';
-    }
-
-    return logoBase64.startsWith('data:image')
-      ? logoBase64
-      : `data:image/png;base64,${logoBase64}`;
-  }
 }
