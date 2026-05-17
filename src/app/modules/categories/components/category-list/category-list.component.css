@@ -152,11 +152,12 @@
 
 /* ─── Grid ────────────────────────────── */
 .categories-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 22px;
   max-width: 1200px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 .empty-state {
@@ -174,6 +175,7 @@
 
 /* ─── Category Card ───────────────────── */
 .category-card {
+  width: 220px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);

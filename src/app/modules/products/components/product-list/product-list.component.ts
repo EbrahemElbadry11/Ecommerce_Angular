@@ -129,6 +129,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
     this.setupSearchDebounce();
 
+    this.loadPriceRange();
+
     this.loadProducts();
   }
 
@@ -148,6 +150,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.currentPage = 1;
+
+        this.loadPriceRange();
 
         this.loadProducts();
       });
@@ -230,29 +234,62 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   // Products
 
+  // Load price range from ALL products matching current search/category (without price filters)
+  private loadPriceRange(): void {
+    const priceRangeFilter: ProductFilterDto = {
+      search:
+        this.searchText.trim() ||
+        undefined,
+      categoryId:
+        this.selectedCategory,
+      // NO minPrice/maxPrice filters - we want the full range
+      sortBy: 'price',
+      order: 'asc',
+      page: 1,
+      pageSize: 99999, // Get all products to calculate accurate range
+    };
+
+    this.productService
+      .getAllProducts(priceRangeFilter)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (
+            response.isSuccess &&
+            response.data
+          ) {
+            const data = normalizeProductListResponse(response.data);
+            if (data.products.length > 0) {
+              const prices = data.products.map(p => p.price);
+              this.globalMinPrice = Math.min(...prices);
+              this.globalMaxPrice = Math.max(...prices);
+            } else {
+              this.globalMinPrice = 0;
+              this.globalMaxPrice = 999999;
+            }
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          console.error('Failed to load price range:', err);
+        },
+      });
+  }
+
   loadProducts(): void {
     this.isLoading = true;
     this.errorMessage = '';
     console.log('🔍 A — loadProducts called, isLoading=true');
 
     const filter: ProductFilterDto = {
-      search:
-        this.searchText.trim() ||
-        undefined,
-      categoryId:
-        this.selectedCategory,
-      minPrice:
-        this.minPrice,
-      maxPrice:
-        this.maxPrice,
-      sortBy:
-        this.sortBy,
-      order:
-        this.sortOrder,
-      page:
-        this.currentPage,
-      pageSize:
-        this.pageSize,
+      search: this.searchText.trim() || undefined,
+      categoryId: this.selectedCategory,
+      minPrice: (this.minPrice !== null && this.minPrice !== undefined && !isNaN(this.minPrice)) ? this.minPrice : undefined,
+      maxPrice: (this.maxPrice !== null && this.maxPrice !== undefined && !isNaN(this.maxPrice)) ? this.maxPrice : undefined,
+      sortBy: this.sortBy,
+      order: this.sortOrder,
+      page: this.currentPage,
+      pageSize: this.pageSize,
     };
 
     this.productService
@@ -310,19 +347,9 @@ export class ProductListComponent implements OnInit, OnDestroy {
               const prices = this.products.map(p => p.price);
               this.minPlaceholderPrice = Math.min(...prices);
               this.maxPlaceholderPrice = Math.max(...prices);
-              
-              // Set global min/max from current page on first load of filter results
-              if (this.currentPage === 1) {
-                this.globalMinPrice = Math.min(...prices);
-                this.globalMaxPrice = Math.max(...prices);
-              }
             } else {
               this.minPlaceholderPrice = 'Min';
               this.maxPlaceholderPrice = 'Max';
-              if (this.currentPage === 1) {
-                this.globalMinPrice = 0;
-                this.globalMaxPrice = 999999;
-              }
             }
 
             this.totalProducts = data.totalCount;
@@ -371,35 +398,96 @@ export class ProductListComponent implements OnInit, OnDestroy {
   onCategoryChange(): void {
     this.currentPage = 1;
 
+    this.loadPriceRange();
+
     this.loadProducts();
   }
 
   onPriceChange(): void {
-    const minLimit = this.getMinPriceInputLimit();
-    const maxLimit = this.getMaxPriceInputLimit();
-
-    if (this.minPrice !== undefined && this.minPrice !== null) {
-      if (this.minPrice < minLimit) {
-        this.minPrice = minLimit;
-      }
-      const maxForMin = this.getMaxPriceInputLimitForMin();
-      if (this.minPrice > maxForMin) {
-        this.minPrice = maxForMin;
-      }
-    }
-
-    if (this.maxPrice !== undefined && this.maxPrice !== null) {
-      const minForMax = this.getMinPriceInputLimitForMax();
-      if (this.maxPrice < minForMax) {
-        this.maxPrice = minForMax;
-      }
-      if (this.maxPrice > maxLimit) {
-        this.maxPrice = maxLimit;
-      }
-    }
+    // Validate and clamp price inputs to allowed ranges
+    this.validateAndClampPrices();
 
     this.currentPage = 1;
     this.loadProducts();
+  }
+
+  /**
+   * Validate and clamp price inputs to ensure they're within valid ranges
+   */
+  private validateAndClampPrices(): void {
+    const globalMin = this.globalMinPrice;
+    const globalMax = this.globalMaxPrice;
+
+    let hasChanged = false;
+
+    // Ensure global limits are valid
+    if (globalMin > globalMax) {
+      console.warn('Invalid global price range:', { globalMin, globalMax });
+      return;
+    }
+
+    // Validate and clamp min price
+    if (this.minPrice !== undefined && this.minPrice !== null && !isNaN(this.minPrice)) {
+      let newMinPrice = this.minPrice;
+
+      // Clamp to global minimum
+      if (newMinPrice < globalMin) {
+        newMinPrice = globalMin;
+        hasChanged = true;
+      }
+
+      // Clamp to global maximum
+      if (newMinPrice > globalMax) {
+        newMinPrice = globalMax;
+        hasChanged = true;
+      }
+
+      // Ensure min doesn't exceed max (if max is set)
+      if (this.maxPrice !== undefined && this.maxPrice !== null && !isNaN(this.maxPrice)) {
+        if (newMinPrice > this.maxPrice) {
+          newMinPrice = this.maxPrice;
+          hasChanged = true;
+        }
+      }
+
+      if (hasChanged) {
+        this.minPrice = newMinPrice;
+      }
+    }
+
+    // Validate and clamp max price
+    if (this.maxPrice !== undefined && this.maxPrice !== null && !isNaN(this.maxPrice)) {
+      let newMaxPrice = this.maxPrice;
+
+      // Clamp to global minimum
+      if (newMaxPrice < globalMin) {
+        newMaxPrice = globalMin;
+        hasChanged = true;
+      }
+
+      // Clamp to global maximum
+      if (newMaxPrice > globalMax) {
+        newMaxPrice = globalMax;
+        hasChanged = true;
+      }
+
+      // Ensure max doesn't go below min (if min is set)
+      if (this.minPrice !== undefined && this.minPrice !== null && !isNaN(this.minPrice)) {
+        if (newMaxPrice < this.minPrice) {
+          newMaxPrice = this.minPrice;
+          hasChanged = true;
+        }
+      }
+
+      if (hasChanged) {
+        this.maxPrice = newMaxPrice;
+      }
+    }
+
+    // Trigger UI update if any corrections were made
+    if (hasChanged) {
+      this.cdr.detectChanges();
+    }
   }
 
   getMinPriceInputLimit(): number {
@@ -407,20 +495,25 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   getMaxPriceInputLimitForMin(): number {
+    // If user has set a max price, min cannot exceed it
     if (this.maxPrice !== undefined && this.maxPrice !== null) {
       return this.maxPrice;
     }
+    // Otherwise, max allowed is the global maximum
     return this.globalMaxPrice;
   }
 
   getMinPriceInputLimitForMax(): number {
+    // If user has set a min price, max cannot go below it
     if (this.minPrice !== undefined && this.minPrice !== null) {
       return this.minPrice;
     }
+    // Otherwise, min allowed is the global minimum
     return this.globalMinPrice;
   }
 
   getMaxPriceInputLimit(): number {
+    // Return globalMaxPrice (max of ALL filtered products, not just current page)
     return this.globalMaxPrice;
   }
 
@@ -501,6 +594,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.globalMinPrice = 0;
 
     this.globalMaxPrice = 999999;
+
+    this.loadPriceRange();
 
     this.loadProducts();
   }
