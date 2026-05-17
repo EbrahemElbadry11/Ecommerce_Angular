@@ -1,25 +1,67 @@
 <div class="home-container">
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <span class="hero-eyebrow">Premium Marketplace</span>
-      <h1 class="hero-title">Discover Products <br/>You'll Love</h1>
-      <p class="hero-subtitle">Curated selections from top sellers, delivered to your door.</p>
-      <div class="hero-actions">
-        <a routerLink="/products" class="btn-hero-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-          Shop Now
-        </a>
-        <a routerLink="/categories" class="btn-hero-secondary">Browse Categories</a>
+  <!-- Hero Section / Dynamic Banner Carousel -->
+  <section class="hero-carousel" *ngIf="banners.length > 0; else staticHero">
+    <div class="carousel-track">
+      <div *ngFor="let banner of banners; let i = index" 
+           class="carousel-slide"
+           [class.active]="i === currentBannerIndex"
+           [style.backgroundImage]="'linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)), url(' + getImageUrl(banner.image) + ')'">
+        <div class="hero-content">
+          <span class="hero-eyebrow">{{ banner.categoryName || 'Featured Collection' }}</span>
+          <h1 class="hero-title">{{ banner.title }}</h1>
+          <p class="hero-subtitle">Premium curated selection. Direct from verified sellers.</p>
+          <div class="hero-actions">
+            <a [routerLink]="['/categories', banner.categoryId]" class="btn-hero-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              Explore Now
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="hero-decoration">
-      <div class="hero-circle hero-circle-1"></div>
-      <div class="hero-circle hero-circle-2"></div>
-      <div class="hero-circle hero-circle-3"></div>
+    
+    <!-- Carousel Dots -->
+    <div class="carousel-dots" *ngIf="banners.length > 1">
+      <button *ngFor="let banner of banners; let i = index"
+              class="carousel-dot"
+              [class.active]="i === currentBannerIndex"
+              (click)="setBannerIndex(i)"
+              [attr.aria-label]="'Go to slide ' + (i + 1)">
+      </button>
     </div>
+    
+    <!-- Carousel Navigation Arrows -->
+    <button class="carousel-nav prev" (click)="prevBanner()" *ngIf="banners.length > 1" aria-label="Previous Slide">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <button class="carousel-nav next" (click)="nextBanner()" *ngIf="banners.length > 1" aria-label="Next Slide">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
   </section>
+
+  <!-- Static Hero Fallback -->
+  <ng-template #staticHero>
+    <section class="hero">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Premium Marketplace</span>
+        <h1 class="hero-title">Discover Products <br/>You'll Love</h1>
+        <p class="hero-subtitle">Curated selections from top sellers, delivered to your door.</p>
+        <div class="hero-actions">
+          <a routerLink="/products" class="btn-hero-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            Shop Now
+          </a>
+          <a routerLink="/categories" class="btn-hero-secondary">Browse Categories</a>
+        </div>
+      </div>
+      <div class="hero-decoration">
+        <div class="hero-circle hero-circle-1"></div>
+        <div class="hero-circle hero-circle-2"></div>
+        <div class="hero-circle hero-circle-3"></div>
+      </div>
+    </section>
+  </ng-template>
 
   <!-- Categories Section -->
  <section class="section categories-section" *ngIf="categories.length > 0">

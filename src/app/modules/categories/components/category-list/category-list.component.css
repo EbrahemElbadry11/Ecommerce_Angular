@@ -308,3 +308,55 @@
 @media (prefers-reduced-motion: reduce) {
   .category-card, .list-header { animation: none; transition: none; }
 }
+
+/* =========================
+   PAGINATION (Cart Navigation Style)
+========================= */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  margin: 2.5rem auto 0;
+  max-width: fit-content;
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-btn {
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white !important;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: var(--ff-body);
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 96, 42, .2);
+}
+
+.pagination-btn:disabled {
+  background: var(--line);
+  color: var(--muted) !important;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-info {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 14px;
+}

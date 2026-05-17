@@ -293,6 +293,8 @@ export class CheckoutPageComponent
       this.elements =
         this.stripe.elements();
 
+      const isDarkMode = document.body.classList.contains('dark-mode') || document.documentElement.classList.contains('dark-mode');
+
       this.cardElement =
         this.elements.create(
           'card',
@@ -303,13 +305,13 @@ export class CheckoutPageComponent
 
                 fontSize: '16px',
 
-                color: '#1f2937',
+                color: isDarkMode ? '#f5f2ec' : '#1f2937',
 
                 fontFamily:
                   '"DM Sans", sans-serif',
 
                 '::placeholder': {
-                  color: '#9ca3af',
+                  color: isDarkMode ? '#8a8175' : '#9ca3af',
                 },
               },
 
@@ -323,6 +325,28 @@ export class CheckoutPageComponent
       this.cardElement.mount(
         '#card-element'
       );
+
+      // Listen for dark mode toggles to update Stripe styles in real-time
+      if (typeof MutationObserver !== 'undefined') {
+        const observer = new MutationObserver(() => {
+          const isDark = document.body.classList.contains('dark-mode') || document.documentElement.classList.contains('dark-mode');
+          if (this.cardElement) {
+            this.cardElement.update({
+              style: {
+                base: {
+                  color: isDark ? '#f5f2ec' : '#1f2937',
+                  '::placeholder': {
+                    color: isDark ? '#8a8175' : '#9ca3af',
+                  }
+                }
+              }
+            });
+          }
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        this.destroy$.subscribe(() => observer.disconnect());
+      }
 
       this.cardElement.on(
         'change',

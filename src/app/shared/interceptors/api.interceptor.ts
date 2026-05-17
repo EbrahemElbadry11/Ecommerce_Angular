@@ -19,7 +19,7 @@ import { ToastService } from '../../../services/toast';
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
   // Update this to match your API server URL
-  private readonly API_BASE_URL = 'https://ecommerceiti.runasp.net/api';
+  private readonly API_BASE_URL = 'https://localhost:7017/api';
   private readonly toastService = inject(ToastService);
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {

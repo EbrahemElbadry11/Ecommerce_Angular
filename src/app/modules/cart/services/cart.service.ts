@@ -10,7 +10,7 @@ import { GeneralResponse } from '../../../shared/models/api-response.model';
 })
 export class CartService {
 
-  baseUrl = 'https://ecommerceiti.runasp.net/api/cart';
+  baseUrl = '/cart';
 
   currentCart: CartResponse | null = null;
 
@@ -98,6 +98,6 @@ export class CartService {
       return image;
     }
 
-    return `https://ecommerceiti.runasp.net/images/products/${image}`;
+    return `https://localhost:7017/images/products/${image}`;
   }
 }

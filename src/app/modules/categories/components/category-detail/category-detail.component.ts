@@ -29,6 +29,9 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   searchText: string = '';
   minPrice?: number;
   maxPrice?: number;
+  // Global min/max prices from ALL filtered products (persists across pages)
+  globalMinPrice: number = 0;
+  globalMaxPrice: number = 999999;
   minPlaceholderPrice: number | string = 'Min';
   maxPlaceholderPrice: number | string = 'Max';
   sortBy: 'name' | 'price' | 'createdAt' = 'createdAt';
@@ -189,9 +192,18 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
               const prices = this.products.map(p => p.price);
               this.minPlaceholderPrice = Math.min(...prices);
               this.maxPlaceholderPrice = Math.max(...prices);
+              // Set global min/max from current page on first load of filter results
+              if (this.currentPage === 1) {
+                this.globalMinPrice = Math.min(...prices);
+                this.globalMaxPrice = Math.max(...prices);
+              }
             } else {
               this.minPlaceholderPrice = 'Min';
               this.maxPlaceholderPrice = 'Max';
+              if (this.currentPage === 1) {
+                this.globalMinPrice = 0;
+                this.globalMaxPrice = 999999;
+              }
             }
           } else {
             this.products = [];
@@ -234,20 +246,55 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
    * Handle filter changes
    */
   onFilterChange(): void {
-    if (this.minPrice !== undefined && this.minPrice !== null && typeof this.minPlaceholderPrice === 'number') {
-      if (this.minPrice < this.minPlaceholderPrice) {
-        this.minPrice = this.minPlaceholderPrice;
+    const minLimit = this.getMinPriceInputLimit();
+    const maxLimit = this.getMaxPriceInputLimit();
+
+    if (this.minPrice !== undefined && this.minPrice !== null) {
+      if (this.minPrice < minLimit) {
+        this.minPrice = minLimit;
+      }
+      const maxForMin = this.getMaxPriceInputLimitForMin();
+      if (this.minPrice > maxForMin) {
+        this.minPrice = maxForMin;
       }
     }
-    if (this.maxPrice !== undefined && this.maxPrice !== null && typeof this.maxPlaceholderPrice === 'number') {
-      if (this.maxPrice > this.maxPlaceholderPrice) {
-        this.maxPrice = this.maxPlaceholderPrice;
+
+    if (this.maxPrice !== undefined && this.maxPrice !== null) {
+      const minForMax = this.getMinPriceInputLimitForMax();
+      if (this.maxPrice < minForMax) {
+        this.maxPrice = minForMax;
+      }
+      if (this.maxPrice > maxLimit) {
+        this.maxPrice = maxLimit;
       }
     }
+
     this.currentPage = 1;
     if (this.categoryId) {
       this.loadProductsByCategory(this.categoryId);
     }
+  }
+
+  getMinPriceInputLimit(): number {
+    return this.globalMinPrice;
+  }
+
+  getMaxPriceInputLimitForMin(): number {
+    if (this.maxPrice !== undefined && this.maxPrice !== null) {
+      return this.maxPrice;
+    }
+    return this.globalMaxPrice;
+  }
+
+  getMinPriceInputLimitForMax(): number {
+    if (this.minPrice !== undefined && this.minPrice !== null) {
+      return this.minPrice;
+    }
+    return this.globalMinPrice;
+  }
+
+  getMaxPriceInputLimit(): number {
+    return this.globalMaxPrice;
   }
 
   /**
@@ -324,6 +371,8 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     this.sortBy = 'createdAt';
     this.sortOrder = 'desc';
     this.currentPage = 1;
+    this.globalMinPrice = 0;
+    this.globalMaxPrice = 999999;
     if (this.categoryId) {
       this.loadProductsByCategory(this.categoryId);
     }

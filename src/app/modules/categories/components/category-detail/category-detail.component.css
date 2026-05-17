@@ -724,72 +724,51 @@
 /* ─── Pagination ─────────────────────────────────────────── */
 .pagination {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 14px 20px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  margin: 2.5rem auto 0;
   max-width: fit-content;
-  margin: 0 auto;
+  box-shadow: var(--shadow-sm);
 }
 
 .pagination-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1.5px solid var(--line-strong);
-  padding: 9px 18px;
+  padding: 10px 20px;
+  background: var(--accent);
+  color: white !important;
+  border: none;
   border-radius: 999px;
-  background: transparent;
-  color: var(--ink-secondary);
-  font-family: var(--ff-body);
-  font-size: 13px;
-  font-weight: 600;
   cursor: pointer;
-  transition: all .2s ease;
-}
-
-.pagination-btn svg {
-  width: 14px;
-  height: 14px;
+  font-family: var(--ff-body);
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
+  background: var(--accent-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 96, 42, .2);
 }
 
 .pagination-btn:disabled {
-  opacity: .35;
+  background: var(--line);
+  color: var(--muted) !important;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .page-info {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
+  color: var(--muted);
+  font-weight: 600;
   font-size: 14px;
-  font-weight: 500;
-}
-
-.current-page {
-  font-family: var(--ff-display);
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.page-sep {
-  color: var(--muted);
-}
-
-.total-pages {
-  color: var(--muted);
-  font-size: 13px;
 }
 
 /* ─── Animations ─────────────────── */
