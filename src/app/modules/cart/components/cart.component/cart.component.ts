@@ -159,7 +159,24 @@ export class CartComponent implements OnInit {
             );
 
           if (item) {
+
             item.quantity = newQuantity;
+
+            if (this.cart) {
+
+              this.cart = {
+                ...this.cart,
+
+                totalItems:
+                  this.cart.items.reduce(
+
+                    (sum, x) =>
+                      sum + x.quantity,
+
+                    0
+                  )
+              };
+            }
           }
 
           this.updateSubtotal();
