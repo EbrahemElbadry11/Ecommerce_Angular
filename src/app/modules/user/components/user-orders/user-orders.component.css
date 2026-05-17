@@ -443,3 +443,85 @@
     grid-column: span 1;
   }
 }
+
+/* ─── Dark Mode ──────────────────────────────────────────── */
+
+:host-context(.dark-mode) {
+  --bg: #0e0d0b;
+  --surface: rgba(23, 21, 16, .92);
+  --ink: #f5f2ec;
+  --muted: #8a8175;
+  --stroke: rgba(245, 242, 236, .09);
+  --accent: #e07840;
+  --green: #4ade80;
+  --yellow: #fbbf24;
+  --red: #f87171;
+  --shadow-lg: 0 24px 70px rgba(0, 0, 0, .45);
+}
+
+/* Page background */
+:host-context(.dark-mode) .orders-page {
+  background:
+    radial-gradient(circle at top left,
+      rgba(224, 120, 64, .08),
+      transparent 28%),
+
+    radial-gradient(circle at bottom right,
+      rgba(74, 222, 128, .05),
+      transparent 30%),
+
+    var(--bg);
+}
+
+/* Dot grid overlay */
+:host-context(.dark-mode) .orders-background {
+  background-image:
+    radial-gradient(rgba(245, 242, 236, .025) 1px,
+      transparent 1px);
+}
+
+/* Header & cards — replace hardcoded white glass */
+:host-context(.dark-mode) .orders-header {
+  background: rgba(23, 21, 16, .92);
+  border-color: rgba(245, 242, 236, .10);
+}
+
+:host-context(.dark-mode) .order-card {
+  background: rgba(23, 21, 16, .92);
+  border-color: rgba(245, 242, 236, .10);
+}
+
+/* Inner info boxes — replace rgba(255,255,255,.72) */
+:host-context(.dark-mode) .order-info {
+  background: rgba(255, 255, 255, .04);
+  border-color: var(--stroke);
+}
+
+/* State panels */
+:host-context(.dark-mode) .orders-loading,
+:host-context(.dark-mode) .orders-error,
+:host-context(.dark-mode) .empty-orders {
+  background: rgba(23, 21, 16, .92);
+  border-color: rgba(245, 242, 236, .10);
+}
+
+/* Status badge adjustments for dark bg */
+:host-context(.dark-mode) .confirmed {
+  background: rgba(74, 222, 128, .12);
+  color: var(--green);
+}
+
+:host-context(.dark-mode) .pending {
+  background: rgba(251, 191, 36, .13);
+  color: var(--yellow);
+}
+
+:host-context(.dark-mode) .cancelled {
+  background: rgba(248, 113, 113, .13);
+  color: var(--red);
+}
+
+:host-context(.dark-mode) .default {
+  background: rgba(245, 242, 236, .08);
+  color: var(--ink);
+}

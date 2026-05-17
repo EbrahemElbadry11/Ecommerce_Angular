@@ -455,23 +455,32 @@
 
   border-radius: 16px;
 
-  border: 1px solid var(--line);
+  border: 1.5px solid var(--accent);
 
-  background: var(--surface-alt);
+  background: transparent;
 
-  color: var(--ink);
+  color: var(--accent);
 
-  font-weight: 600;
+  font-weight: 700;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-family: var(--ff-body);
+
+  /* Force centering — works on both <a> and <button> */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center;
+  text-decoration: none;
+
+  transition: background .25s ease, color .25s ease, transform .2s ease;
 }
 
 .continue-btn:hover {
-  background: var(--ink);
+  background: var(--accent);
 
-  color: white;
+  color: #fff;
+
+  transform: translateY(-2px);
 }
 
 /* =========================
@@ -537,6 +546,27 @@
   border-radius: 999px;
 
   font-weight: 700;
+
+  /* Override Bootstrap btn-primary blue with accent palette */
+  background: var(--accent) !important;
+
+  border-color: var(--accent) !important;
+
+  color: #fff !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  transition: background .25s ease, transform .2s ease;
+}
+
+.empty-btn:hover {
+  background: var(--accent-deep) !important;
+
+  border-color: var(--accent-deep) !important;
+
+  transform: translateY(-2px);
 }
 
 /* =========================
@@ -594,9 +624,17 @@
 }
 
 :host-context(.dark-mode) .continue-btn {
-  background: var(--surface-alt);
+  background: transparent;
 
-  color: var(--ink);
+  border-color: var(--accent);
+
+  color: var(--accent);
+}
+
+:host-context(.dark-mode) .continue-btn:hover {
+  background: var(--accent);
+
+  color: #fff;
 }
 
 /* =========================

@@ -413,9 +413,9 @@
 
 .product-price {
   font-family: var(--ff-display);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
+  color: var(--green);
   letter-spacing: -0.3px;
 }
 
