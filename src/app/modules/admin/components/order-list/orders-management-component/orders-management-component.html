@@ -1,0 +1,222 @@
+<!-- orders-management.component.html -->
+<section class="admin-page">
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div>
+      <span class="eyebrow">Admin Panel</span>
+      <h1>Orders Management</h1>
+      <p class="header-desc">Track, manage, and update all customer orders in one place.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/admin/dashboard" class="action-btn action-btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Dashboard
+      </a>
+      <button class="action-btn action-btn-primary" (click)="loadOrders()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- Alert -->
+  @if (alertMessage()) {
+    <div class="alert" [ngClass]="'alert-' + alertType()">
+      <strong>{{ alertType() === 'success' ? '✓' : '⚠' }}</strong> {{ alertMessage() }}
+      <button class="alert-close" (click)="alertMessage.set(null)">×</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="loader-ring"><div></div><div></div><div></div><div></div></div>
+      <p>Loading orders...</p>
+    </div>
+  } @else {
+
+    <!-- Stats Strip -->
+    <div class="stats-grid">
+      <article class="stat-card stat-orders">
+        <div class="stat-content">
+          <span class="stat-label">Total Orders</span>
+          <strong class="stat-value">{{ allOrders().length | number }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+        </div>
+      </article>
+
+      <article class="stat-card stat-revenue">
+        <div class="stat-content">
+          <span class="stat-label">Total Revenue</span>
+          <strong class="stat-value">{{ totalRevenue | currency:'USD':'symbol':'1.0-0' }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+      </article>
+
+      <article class="stat-card stat-users">
+        <div class="stat-content">
+          <span class="stat-label">Pending</span>
+          <strong class="stat-value">{{ statusCounts['Pending'] ?? 0 }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </article>
+
+      <article class="stat-card stat-products">
+        <div class="stat-content">
+          <span class="stat-label">Delivered</span>
+          <strong class="stat-value">{{ statusCounts['Delivered'] ?? 0 }}</strong>
+        </div>
+        <div class="stat-icon-wrap">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+
+    <!-- Filters -->
+    <div class="table-panel">
+      <div class="panel-header">
+        <h2>All Orders</h2>
+        <span class="panel-count">{{ filteredOrders().length }} orders</span>
+      </div>
+
+      <div class="filters-section">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="applyFilters()"
+          placeholder="Search by order ID or address..."
+          class="search-input"
+        >
+        <select [(ngModel)]="statusFilter" (change)="applyFilters()" class="admin-select">
+          <option value="all">All Statuses</option>
+          @for (s of orderStatuses; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+        <select [(ngModel)]="sortBy" (change)="applyFilters()" class="admin-select">
+          <option value="date-desc">Newest First</option>
+          <option value="date-asc">Oldest First</option>
+          <option value="amount-desc">Highest Amount</option>
+          <option value="amount-asc">Lowest Amount</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      @if (filteredOrders().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+          </svg>
+          <p>No orders found.</p>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Subtotal</th>
+                <th>Shipping</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Change Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of filteredOrders(); track order.orderId) {
+                <!-- Main Row -->
+                <tr [class.expanded-row]="expandedOrder() === order.orderId">
+                  <td>
+                    <button class="expand-btn" (click)="toggleExpand(order.orderId)">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        [style.transform]="expandedOrder() === order.orderId ? 'rotate(90deg)' : 'rotate(0deg)'">
+                        <polyline points="9 18 15 12 9 6"/>
+                      </svg>
+                    </button>
+                  </td>
+                  <td><span class="order-id">#{{ order.orderId }}</span></td>
+                  <td><span class="date-text">{{ order.orderDate | date:'mediumDate' }}</span></td>
+                  <td>
+                    <div class="customer-info">
+                    <td>{{ order.customerName }}</td>
+                    </div>
+                  </td>
+                  <td><span class="items-count">{{ order.totalItems }} items</span></td>
+                  <td><span class="amount">{{ order.subTotal | currency:'USD' }}</span></td>
+                  <td><span class="shipping-fee">{{ order.shippingFees | currency:'USD' }}</span></td>
+                  <td><strong class="amount total-amount">{{ order.totalAmount | currency:'USD' }}</strong></td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <select
+                      class="role-select"
+                      [value]="order.status"
+                      (change)="updateStatus(order.orderId, $event)"
+                      [disabled]="actionLoading() === order.orderId"
+                    >
+                      @for (s of orderStatuses; track s) {
+                        <option [value]="s">{{ s }}</option>
+                      }
+                    </select>
+                    @if (actionLoading() === order.orderId) {
+                      <span class="spinner" style="margin-left:6px;"></span>
+                    }
+                  </td>
+                </tr>
+
+                <!-- Expanded Row — Order Items -->
+                @if (expandedOrder() === order.orderId) {
+  <tr class="detail-row">
+    <td colspan="10">
+      <div class="order-detail">
+        <div class="detail-meta">
+          <span><strong>Customer:</strong> {{ order.customerName }}</span>
+        </div>
+       
+        <div class="order-summary">
+          <div class="summary-row"><span>Total</span><strong>{{ order.totalAmount | currency:'USD' }}</strong></div>
+        </div>
+      </div>
+    </td>
+  </tr>
+}
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</section>

@@ -18,7 +18,7 @@ export class ErrorInterceptor implements HttpInterceptor {
           localStorage.removeItem('userToken');
           this.router.navigate(['/login']);
         }
-        const errorMessage = error.error.message || 'An unexpected error occurred';
+        const errorMessage = error.error?.message || error.message || 'An unexpected error occurred';
         this.message.set(errorMessage);
         console.error(errorMessage);
         return throwError(() => error);

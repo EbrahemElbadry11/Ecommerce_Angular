@@ -9,9 +9,21 @@ export const authGuard: CanActivateFn = (route, state) => {
   const auth   = inject(AuthService);
   const router = inject(Router);
 
-  if (auth.isLoggedIn()) return true;
+   if (!auth.isLoggedIn()) {
+    return router.createUrlTree(['/auth/login'], {
+      queryParams: { returnUrl: state.url },
+    });
+  }
 
-  return router.createUrlTree(['/auth/login'], {
-    queryParams: { returnUrl: state.url },
-  });
+  // ✅ جلب المستخدم الحالي
+  const currentUser = auth.session();
+
+  // ✅ فحص الحظر أو الحذف
+  if (currentUser?.isBlocked === true || currentUser?.isDeleted === true) {
+    auth.logout();
+    return router.createUrlTree(['/auth/login']);
+  }
+
+  return true;
 };
+
