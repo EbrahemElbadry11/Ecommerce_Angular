@@ -21,14 +21,37 @@ export class AuthService {
     return this.http.post<ApiResponse<string>>('/auth/register', payload, { headers });
   }
 
-  login(payload: LoginDto): Observable<ApiResponse<AuthResponse>> {
-    const headers = new HttpHeaders({ 'X-Success-Message': 'Login successful! Welcome back.' });
-    return this.http.post<ApiResponse<AuthResponse>>('/auth/login', payload, { headers, withCredentials: true }).pipe(
-      tap((response) => {
-        if (response.data?.token) this.saveSession(response.data);
-      })
-    );
-  }
+ login(payload: LoginDto): Observable<ApiResponse<AuthResponse>> {
+  return this.http.post<ApiResponse<AuthResponse>>('/auth/login', payload, {
+    withCredentials: true
+  }).pipe(
+    tap((response) => {
+      if (response.data?.isBlocked === true || response.data?.isDeleted === true) {
+        this.clearSession();
+        return;
+      }
+      if (response.data?.token) {
+        this.saveSession(response.data);
+      }
+    })
+  );
+}
+
+// ✅ أضف دالة clearSession
+private clearSession(): void {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  localStorage.removeItem(SESSION_KEY);
+  this.session.set(null);
+}
+getUserById(userId: string): Observable<ApiResponse<AuthResponse>> {
+  return this.http.get<ApiResponse<AuthResponse>>(`/User/${userId}`);
+}
+
+// أو جلب المستخدم الحالي
+getCurrentUserFromApi(): Observable<ApiResponse<AuthResponse>> {
+  return this.http.get<ApiResponse<AuthResponse>>('/User/current');
+}
 
   confirmEmail(payload: VerifyCodeDto): Observable<ApiResponse<string>> {
     const headers = new HttpHeaders({ 'X-Success-Message': 'Email confirmed successfully! You can now log in.' });
@@ -68,13 +91,13 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post('/auth/logout', {}).subscribe({ error: () => undefined });
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(SESSION_KEY);
-    this.session.set(null);
-    this.router.navigate(['/auth/login']);
-  }
+  this.http.post('/auth/logout', {}).subscribe({ 
+    next: () => {},
+    error: () => {}
+  });
+  this.clearSession();
+  this.router.navigate(['/auth/login']);
+}
 
   get token(): string | null { return localStorage.getItem(TOKEN_KEY); }
   get refreshTokenValue(): string | null { return localStorage.getItem(REFRESH_TOKEN_KEY); }

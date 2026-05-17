@@ -137,7 +137,7 @@ public orderStatusData: OrderStatusItem[] = [];
           this.recentOrders.set(
             (res.data.recentOrders ?? []).map((o: any) => ({
               id:           o.id ?? o.orderId ?? o.OrderId ?? 0,
-              customerName: o.customerName ?? o.CustomerName ?? 'Unknown',
+              customerName: o.customerName ?? o.CustomerName ?? 'Guest',
               totalAmount:  o.totalAmount ?? o.TotalAmount ?? 0,
               status:       o.status ?? o.Status ?? 'Pending',
               date:         o.date ?? o.orderDate ?? o.OrderDate ?? new Date().toISOString(),

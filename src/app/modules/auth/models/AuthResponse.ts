@@ -4,6 +4,8 @@ export interface AuthResponse {
   fullName?: string;
   email?: string;
   role?: string;
+  isBlocked?: boolean;
+  isDeleted?: boolean;
 }
 
 export interface ApiResponse<T> {

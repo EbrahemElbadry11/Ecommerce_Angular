@@ -74,19 +74,19 @@ export class ApiInterceptor implements HttpInterceptor {
     }
 
     return next.handle(request).pipe(
-      tap((event) => {
-        // console.log('🔍 B-response — got HttpResponse for:', request.url);
-        if (
-          event instanceof HttpResponse &&
-          ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
-          &&
-          !request.url.includes('/order') // Skip showing success toast for order creation/update
-        ) {
-          const customMessage = request.headers.get('X-Success-Message');
-          const message = customMessage || 'Action completed successfully.';
-          this.toastService.show(message, 'success');
-        }
-      }),
+     tap((event) => {
+          if (
+            event instanceof HttpResponse &&
+            ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)
+          ) {
+            if (event.body?.isSuccess === false) return;
+
+            const customMessage = request.headers.get('X-Success-Message');
+            if (!customMessage) return; // ← مش هيعرض toast لو مفيش message
+
+            this.toastService.show(customMessage, 'success');
+          }
+        }),
       catchError((error: HttpErrorResponse) => {
         // console.error('🔍 B-error — interceptor caught error:', error.status, error.message);
 

@@ -241,3 +241,29 @@ input.ng-touched.ng-valid {
   .auth-panel { padding: 2rem 1.25rem; border-radius: 20px; }
   h1 { font-size: 1.75rem; }
 }
+.back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted, #94a3b8);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.back-home svg {
+  width: 14px;
+  height: 14px;
+}
+
+.back-home:hover {
+  color: var(--accent, #c8602a);
+  border-color: var(--accent, #c8602a);
+  background: rgba(200, 96, 42, 0.06);
+}

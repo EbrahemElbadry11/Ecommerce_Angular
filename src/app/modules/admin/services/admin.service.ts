@@ -35,10 +35,21 @@ export class AdminService {
   }
 
   changeRole(id: string, role: string): Observable<ApiResponse<string>> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    const body = { role };
-    return this.http.put<ApiResponse<string>>(`/Admin/change-role/${id}`, body, { headers });
-  }
+  const headers = new HttpHeaders({ 
+    'Content-Type': 'application/json'
+  });
+  
+  const body = { role: role };
+  console.log('Sending request:', {
+    url: `/Admin/change-role/${id}`,
+    body: body
+  });
+  return this.http.put<ApiResponse<string>>(
+    `/Admin/change-role/${id}`, 
+    body, 
+    { headers }
+  );
+}
 
   getPendingSellers(): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`/admin/pending-sellers`);
@@ -69,13 +80,16 @@ export class AdminService {
     return this.http.put<ApiResponse<string>>(`/orders/bulk-status`, { orderIds, status });
   }
 
-  getOrders(page: number = 1, pageSize: number = 10, status?: string): Observable<ApiResponse<any>> {
-    let url = `/orders?page=${page}&pageSize=${pageSize}`;
-    if (status) { url += `&status=${status}`; }
-    return this.http.get<ApiResponse<any>>(url);
-  }
+  getOrders(page: number = 1, pageSize: number = 5, status?: string): Observable<ApiResponse<any>> {
+  let url = `/orders?page=${page}&pageSize=${pageSize}`;
+  if (status) { url += `&status=${status}`; }
+  return this.http.get<ApiResponse<any>>(url);
+}
 
-  getAllOrders(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`/orders/all`);
-  }
+getAllOrders(): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`/orders?page=1&pageSize=1000`);
+}
+getOrderById(id: number): Observable<ApiResponse<any>> {
+  return this.http.get<ApiResponse<any>>(`/Order/${id}`);
+}
 }
