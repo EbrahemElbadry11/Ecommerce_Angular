@@ -772,7 +772,7 @@
   font-family: var(--ff-display);
   font-size: 16px;
   font-weight: 700;
-  color: var(--green);
+  color: var(--ink);
 }
 
 .stock { font-size: 11px; color: var(--muted); }

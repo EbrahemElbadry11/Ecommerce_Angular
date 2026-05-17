@@ -511,7 +511,7 @@
 }
 
 .item-price {
-  color: var(--green);
+  color: var(--ink);
 
   font-size: 15px;
   font-weight: 700;
