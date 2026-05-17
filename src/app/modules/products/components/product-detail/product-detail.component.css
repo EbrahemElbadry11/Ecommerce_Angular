@@ -503,7 +503,7 @@
   font-size: 34px;
   font-weight: 700;
 
-  color: var(--accent-2);
+  color: var(--ink);
 }
 
 .stock .value {
@@ -1052,7 +1052,7 @@
   font-size: 18px;
   font-weight: 700;
 
-  color: var(--accent-2);
+  color: var(--ink);
 }
 
 .card-stock {

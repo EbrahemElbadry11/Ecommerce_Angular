@@ -29,6 +29,9 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   searchText: string = '';
   minPrice?: number;
   maxPrice?: number;
+  // Global min/max prices from ALL filtered products (persists across pages)
+  globalMinPrice: number = 0;
+  globalMaxPrice: number = 999999;
   minPlaceholderPrice: number | string = 'Min';
   maxPlaceholderPrice: number | string = 'Max';
   sortBy: 'name' | 'price' | 'createdAt' = 'createdAt';
@@ -47,7 +50,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   showFilters: boolean = false;
 
   // Image API URL
-  private apiUrl: string = 'https://localhost:7017'; // غير البورت حسب اللي عندك
+  private apiUrl: string = 'http://localhost:5053'; // غير البورت حسب اللي عندك
 
   addingToCartIds = new Set<number>();
 
@@ -74,7 +77,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
         this.currentPage = 1;
         this.totalProducts = 0;
         this.totalPages = 0;
+        this.globalMinPrice = 0;
+        this.globalMaxPrice = 999999;
         this.loadCategoryDetails(this.categoryId);
+        this.loadPriceRange();
         this.loadProductsByCategory(this.categoryId);
         this.cd.markForCheck();
       }
@@ -99,6 +105,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.currentPage = 1;
         if (this.categoryId) {
+          this.loadPriceRange();
           this.loadProductsByCategory(this.categoryId);
           this.cd.markForCheck();
         }
@@ -154,6 +161,46 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Load price range from ALL products matching current search/category (without price filters)
+   */
+  private loadPriceRange(): void {
+    if (!this.categoryId) return;
+
+    const priceRangeFilter: ProductFilterDto = {
+      categoryId: this.categoryId,
+      search: this.searchText.trim() || undefined,
+      // NO minPrice/maxPrice filters - we want the full range
+      sortBy: 'price',
+      order: 'asc',
+      page: 1,
+      pageSize: 99999, // Get all products to calculate accurate range
+    };
+
+    this.productService
+      .getAllProducts(priceRangeFilter)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          if (response.isSuccess && response.data) {
+            const data = normalizeProductListResponse(response.data);
+            if (data.products.length > 0) {
+              const prices = data.products.map(p => p.price);
+              this.globalMinPrice = Math.min(...prices);
+              this.globalMaxPrice = Math.max(...prices);
+            } else {
+              this.globalMinPrice = 0;
+              this.globalMaxPrice = 999999;
+            }
+            this.cd.markForCheck();
+          }
+        },
+        error: (err: any) => {
+          console.error('Failed to load price range:', err);
+        },
+      });
+  }
+
+  /**
    * Load products by category
    */
   private loadProductsByCategory(id: number): void {
@@ -163,8 +210,8 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     const filter: ProductFilterDto = {
       categoryId: id,
       search: this.searchText.trim() || undefined,
-      minPrice: this.minPrice,
-      maxPrice: this.maxPrice,
+      minPrice: (this.minPrice !== null && !isNaN(this.minPrice as number)) ? this.minPrice : undefined,
+      maxPrice: (this.maxPrice !== null && !isNaN(this.maxPrice as number)) ? this.maxPrice : undefined,
       sortBy: this.sortBy,
       order: this.sortOrder,
       page: this.currentPage,
@@ -231,23 +278,133 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle filter changes
+   * Handle filter changes with price validation
    */
   onFilterChange(): void {
-    if (this.minPrice !== undefined && this.minPrice !== null && typeof this.minPlaceholderPrice === 'number') {
-      if (this.minPrice < this.minPlaceholderPrice) {
-        this.minPrice = this.minPlaceholderPrice;
-      }
-    }
-    if (this.maxPrice !== undefined && this.maxPrice !== null && typeof this.maxPlaceholderPrice === 'number') {
-      if (this.maxPrice > this.maxPlaceholderPrice) {
-        this.maxPrice = this.maxPlaceholderPrice;
-      }
-    }
+    // Validate and clamp price inputs to allowed ranges
+    this.validateAndClampPrices();
+
     this.currentPage = 1;
     if (this.categoryId) {
       this.loadProductsByCategory(this.categoryId);
     }
+  }
+
+  /**
+   * Validate and clamp price inputs to ensure they're within valid ranges
+   */
+  private validateAndClampPrices(): void {
+    const globalMin = this.globalMinPrice;
+    const globalMax = this.globalMaxPrice;
+
+    let hasChanged = false;
+
+    // Ensure global limits are valid
+    if (globalMin > globalMax) {
+      console.warn('Invalid global price range:', { globalMin, globalMax });
+      return;
+    }
+
+    // Validate and clamp min price
+    if (this.minPrice !== undefined && this.minPrice !== null && !isNaN(this.minPrice)) {
+      let newMinPrice = this.minPrice;
+
+      // Clamp to global minimum
+      if (newMinPrice < globalMin) {
+        newMinPrice = globalMin;
+        hasChanged = true;
+      }
+
+      // Clamp to global maximum
+      if (newMinPrice > globalMax) {
+        newMinPrice = globalMax;
+        hasChanged = true;
+      }
+
+      // Ensure min doesn't exceed max (if max is set)
+      if (this.maxPrice !== undefined && this.maxPrice !== null && !isNaN(this.maxPrice)) {
+        if (newMinPrice > this.maxPrice) {
+          newMinPrice = this.maxPrice;
+          hasChanged = true;
+        }
+      }
+
+      if (hasChanged) {
+        this.minPrice = newMinPrice;
+      }
+    }
+
+    // Validate and clamp max price
+    if (this.maxPrice !== undefined && this.maxPrice !== null && !isNaN(this.maxPrice)) {
+      let newMaxPrice = this.maxPrice;
+
+      // Clamp to global minimum
+      if (newMaxPrice < globalMin) {
+        newMaxPrice = globalMin;
+        hasChanged = true;
+      }
+
+      // Clamp to global maximum
+      if (newMaxPrice > globalMax) {
+        newMaxPrice = globalMax;
+        hasChanged = true;
+      }
+
+      // Ensure max doesn't go below min (if min is set)
+      if (this.minPrice !== undefined && this.minPrice !== null && !isNaN(this.minPrice)) {
+        if (newMaxPrice < this.minPrice) {
+          newMaxPrice = this.minPrice;
+          hasChanged = true;
+        }
+      }
+
+      if (hasChanged) {
+        this.maxPrice = newMaxPrice;
+      }
+    }
+
+    // Trigger UI update if any corrections were made
+    if (hasChanged) {
+      this.cd.markForCheck();
+    }
+  }
+
+  /**
+   * Get minimum allowed price for price inputs (global minimum of all filtered products)
+   */
+  getMinPriceInputLimit(): number {
+    return this.globalMinPrice;
+  }
+
+  /**
+   * Get maximum allowed price for min input field (either max price if set, else global maximum)
+   */
+  getMaxPriceInputLimitForMin(): number {
+    // If user has set a max price, min cannot exceed it
+    if (this.maxPrice !== undefined && this.maxPrice !== null) {
+      return this.maxPrice;
+    }
+    // Otherwise, max allowed is the global maximum
+    return this.globalMaxPrice;
+  }
+
+  /**
+   * Get minimum allowed price for max input field (either min price if set, else global minimum)
+   */
+  getMinPriceInputLimitForMax(): number {
+    // If user has set a min price, max cannot go below it
+    if (this.minPrice !== undefined && this.minPrice !== null) {
+      return this.minPrice;
+    }
+    // Otherwise, min allowed is the global minimum
+    return this.globalMinPrice;
+  }
+
+  /**
+   * Get maximum allowed price for price inputs (global maximum of all filtered products)
+   */
+  getMaxPriceInputLimit(): number {
+    return this.globalMaxPrice;
   }
 
   /**
@@ -271,6 +428,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     if (this.categoryId) {
       this.loadProductsByCategory(this.categoryId);
     }
+  }
+
+  hasPreviousPage(): boolean {
+    return this.currentPage > 1;
   }
 
   /**
@@ -320,7 +481,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     this.sortBy = 'createdAt';
     this.sortOrder = 'desc';
     this.currentPage = 1;
+    this.globalMinPrice = 0;
+    this.globalMaxPrice = 999999;
     if (this.categoryId) {
+      this.loadPriceRange();
       this.loadProductsByCategory(this.categoryId);
     }
   }

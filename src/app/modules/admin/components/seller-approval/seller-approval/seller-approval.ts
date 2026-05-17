@@ -8,6 +8,7 @@ import { AdminUser } from '../../../models/user-admin.model';
 import { SlicePipe } from '@angular/common';
 import { ToastService } from '../../...../../../../../../services/toast';
 import { ChangeDetectorRef } from '@angular/core';
+import { retry, delay, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-seller-approval',
@@ -30,7 +31,6 @@ export class SellerApprovalComponent implements OnInit {
   readonly activeTab = signal<'pending' | 'approved'>('pending');
   readonly alertMessage = signal<string | null>(null);
   readonly alertType = signal<'success' | 'danger' | 'warning' | 'info'>('info');
-
   readonly searchTerm = signal('');
 
   readonly filteredPendingSellers = computed(() => {
@@ -47,22 +47,46 @@ export class SellerApprovalComponent implements OnInit {
     return filtered;
   });
 
- ngOnInit(): void {
+  ngOnInit(): void {
     this.loadPendingSellers();
-    this.loadApprovedSellers(); 
-      this.cd.markForCheck(); 
+    this.loadApprovedSellers();
   }
 
   loadApprovedSellers(): void {
-    this.adminService.getApprovedSellers() 
-      .subscribe({
-        next: (response: any) => {
-          let sellersArray = this.extractDataArray(response);
-          this.approvedSellers.set(this.mapToAdminUsers(sellersArray));
-        },
-        error: (error) => console.error('Error loading approved sellers:', error)
-      });
-  }
+  console.log('🔄 Loading approved sellers...');
+  
+  this.adminService.getApprovedSellers()
+    .pipe(
+      retry(2), // حاول 3 مرات لو فشل
+      delay(500), // انتظر نص ثانية
+      catchError(error => {
+        console.error('Error loading approved sellers:', error);
+        return of([]); // رجع array فاضي بدل ما تخلي الـ component يموت
+      })
+    )
+    .subscribe({
+      next: (response: any) => {
+        let sellersArray = this.extractDataArray(response);
+        const mappedSellers = this.mapToAdminUsers(sellersArray);
+        
+        console.log('✅ Approved sellers loaded:', mappedSellers.length);
+        
+        // تأكد إن البيانات وصلت بشكل صحيح
+        if (mappedSellers.length === 0) {
+          console.warn('⚠️ No approved sellers found - this might be normal if none exist');
+        }
+        
+        this.approvedSellers.set(mappedSellers);
+        
+        // Force change detection (في حالة إن signals مش شغالة كويس)
+        this.cd.detectChanges();
+      },
+      error: (error) => {
+        console.error('❌ Error loading approved sellers:', error);
+        this.approvedSellers.set([]); // Set empty array on error
+      }
+    });
+}
 
   private extractDataArray(response: any): any[] {
     if (response.isSuccess && response.data) return response.data;
@@ -78,7 +102,6 @@ export class SellerApprovalComponent implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response: any) => {
-          
           let sellersArray = [];
           
           if (response.isSuccess && response.data) {
@@ -90,7 +113,7 @@ export class SellerApprovalComponent implements OnInit {
           } else {
             sellersArray = response;
           }
-          this.cd.markForCheck();
+          
           
           // Filter pending vs approved sellers
           const pending = sellersArray.filter((seller: any) => 
@@ -104,7 +127,6 @@ export class SellerApprovalComponent implements OnInit {
           // Map to AdminUser model
           this.pendingSellers.set(this.mapToAdminUsers(pending));
           this.approvedSellers.set(this.mapToAdminUsers(approved));
-          
         },
         error: (error: any) => {
           console.error('❌ Error loading sellers:', error);
@@ -137,7 +159,6 @@ export class SellerApprovalComponent implements OnInit {
     return mappedUsers;
   }
 
-  // Approve seller via Custom Toast Confirm
   approveSeller(seller: AdminUser): void {
     this.toastService.show({
       message: `Approve ${seller.fullName} as a seller? They will be able to sell products on the platform.`,
@@ -174,7 +195,6 @@ export class SellerApprovalComponent implements OnInit {
     });
   }
 
-  // Reject seller via Custom Toast Confirm
   rejectSeller(seller: AdminUser): void {
     this.toastService.show({
       message: `Reject ${seller.fullName}? They will need to reapply.`,
@@ -194,7 +214,6 @@ export class SellerApprovalComponent implements OnInit {
             },
             error: (error: any) => {
               console.error('Error rejecting seller:', error);
-              // Remove locally even if API fails (for testing)
               this.pendingSellers.update(pending => 
                 pending.filter(s => s.id !== seller.id)
               );
@@ -205,7 +224,6 @@ export class SellerApprovalComponent implements OnInit {
     });
   }
 
-  // Refresh sellers list
   refreshSellers(): void {
     if (this.activeTab() === 'pending') {
       this.loadPendingSellers();
@@ -215,30 +233,25 @@ export class SellerApprovalComponent implements OnInit {
     this.toastService.show('Refreshing list...', 'info');
   }
 
-  // Change active tab
   setTab(tab: 'pending' | 'approved'): void {
     this.activeTab.set(tab);
     this.searchTerm.set('');
   }
 
-  // Get user initial for avatar
   getUserInitial(name: string): string {
     return name?.charAt(0).toUpperCase() || '?';
   }
 
-  // Show alert message
   private showAlert(message: string, type: 'success' | 'danger' | 'warning' | 'info'): void {
     this.alertMessage.set(message);
     this.alertType.set(type);
     setTimeout(() => this.alertMessage.set(null), 4000);
   }
 
-  // Clear alert
   clearAlert(): void {
     this.alertMessage.set(null);
   }
 
-  // Handle API errors
   private handleApiError(error: any): void {
     if (error.status === 0) {
       this.showAlert('Cannot connect to server. Make sure the backend is running on the correct port.', 'danger');

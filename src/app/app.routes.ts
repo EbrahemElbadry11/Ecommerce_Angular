@@ -112,6 +112,12 @@ export const routes: Routes = [
         canActivate: [authGuard, roleGuard],
         data: { roles: ['Admin'] },
       },
+      {
+        path: 'admin/orders',
+        loadComponent: () => import('./modules/admin/components/order-list/orders-management-component/orders-management-component').then(m => m.OrdersManagementComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+      },
 
       // User profile (any logged-in user)
       {

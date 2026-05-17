@@ -105,10 +105,10 @@ export class UserManagementComponent implements OnInit {
 
   changeRole(user: AdminUser, newRole: string): void {
     const roleMap: Record<string, string> = {
-      'user': 'Customer',      
-      'seller': 'Seller',  
-      'admin': 'Admin'     
-    };
+        'user':   'user',     
+        'seller': 'Seller',
+        'admin':  'Admin'
+      };
     
     const backendRole = roleMap[newRole];
     const roleDisplay = newRole.charAt(0).toUpperCase() + newRole.slice(1);

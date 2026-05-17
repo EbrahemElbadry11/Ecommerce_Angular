@@ -2,324 +2,328 @@
 
   <div class="checkout-background"></div>
 
-  <section class="checkout-main">
+  <div class="container-xl checkout-container">
 
-    <div class="checkout-header">
+    <section class="checkout-main">
 
-      <span class="checkout-eyebrow">
-        Secure Checkout
-      </span>
+      <div class="checkout-header">
 
-      <h1>
-        Complete Your Order
-      </h1>
+        <span class="checkout-eyebrow">
+          Secure Checkout
+        </span>
 
-      <p>
-        Fast, secure, and beautifully simple.
-      </p>
-
-    </div>
-
-    <div class="checkout-card">
-
-      <div class="section-title">
-
-        <div>
-
-          <h2>
-            Shipping Details
-          </h2>
-
-          <span>
-            Delivery information
-          </span>
-
-        </div>
-
-      </div>
-
-      <form
-        [formGroup]="form"
-        class="checkout-form"
-      >
-
-        <div class="input-group" *ngIf="isGuest">
-
-          <label>
-            Full Name
-          </label>
-
-          <input
-            type="text"
-            formControlName="guestName"
-            placeholder="Enter your full name"
-          />
-
-        </div>
-
-        <div class="input-group" *ngIf="isGuest">
-
-          <label>
-            Email Address
-          </label>
-
-          <input
-            type="email"
-            formControlName="guestEmail"
-            placeholder="Enter your email"
-          />
-
-          <div
-            class="field-error"
-            *ngIf="
-              guestEmail?.invalid &&
-              guestEmail?.touched
-            "
-          >
-            Please enter a valid email address
-          </div>
-
-        </div>
-
-        <div class="input-group full-width">
-
-          <label>
-            Shipping Address
-          </label>
-
-          <textarea
-            rows="4"
-            formControlName="shippingAddress"
-            placeholder="Enter your shipping address"
-          ></textarea>
-
-          <div
-            class="field-error"
-            *ngIf="
-              shippingAddress?.invalid &&
-              shippingAddress?.touched
-            "
-          >
-            Valid shipping address is required
-          </div>
-
-        </div>
-
-      </form>
-
-    </div>
-
-    <div class="checkout-card payment-card">
-
-      <div class="section-title">
-
-        <div>
-
-          <h2>
-            Payment Method
-          </h2>
-
-          <span>
-            Stripe secure payment
-          </span>
-
-        </div>
-
-      </div>
-
-      <div class="payment-box">
-
-        <div class="payment-icons">
-
-          <span>
-            Visa
-          </span>
-
-          <span>
-            Mastercard
-          </span>
-
-          <span>
-            Stripe
-          </span>
-
-        </div>
-
-        <div
-          id="card-element"
-          class="card-element"
-        ></div>
-
-      </div>
-
-      <button
-        type="button"
-        class="checkout-btn"
-        (click)="placeOrder()"
-        [disabled]="
-          loading ||
-          paymentLoading ||
-          form.invalid
-        "
-      >
-
-        {{
-          loading || paymentLoading
-            ? 'Processing Payment...'
-            : 'Place Order'
-        }}
-
-      </button>
-
-      <div
-        *ngIf="errorMessage"
-        class="message error"
-      >
-        {{ errorMessage }}
-      </div>
-
-      <div
-        *ngIf="successMessage"
-        class="message success"
-      >
-        {{ successMessage }}
-      </div>
-
-    </div>
-
-  </section>
-
-  <aside class="summary-card">
-
-    <div class="summary-header">
-
-      <span>
-        Order Summary
-      </span>
-
-      <h2>
-        Your Cart
-      </h2>
-
-    </div>
-
-    <ng-container
-      *ngIf="
-        cart?.items?.length;
-        else emptyCart
-      "
-    >
-
-      <div class="summary-items">
-
-        <div
-          *ngFor="
-            let item of cart.items
-          "
-          class="summary-item"
-        >
-
-          <div class="item-image">
-
-            <img
-              [src]="item.imageUrl"
-              [alt]="item.productName"
-            />
-
-          </div>
-
-          <div class="item-info">
-
-            <h4>
-              {{ item.productName }}
-            </h4>
-
-            <span>
-              Qty: {{ item.quantity }}
-            </span>
-
-          </div>
-
-          <div class="item-price">
-
-            {{
-              item.price
-                | currency
-            }}
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="summary-totals">
-
-        <div class="total-row">
-
-          <span>
-            Subtotal
-          </span>
-
-          <span>
-            {{
-              subtotal
-                | currency
-            }}
-          </span>
-
-        </div>
-
-        <div class="total-row">
-
-          <span>
-            Shipping
-          </span>
-
-          <span>
-            {{
-              shippingFees
-                | currency
-            }}
-          </span>
-
-        </div>
-
-        <div class="total-row grand-total">
-
-          <span>
-            Total
-          </span>
-
-          <span>
-            {{
-              total
-                | currency
-            }}
-          </span>
-
-        </div>
-
-      </div>
-
-    </ng-container>
-
-    <ng-template #emptyCart>
-
-      <div class="empty-cart">
-
-        <h3>
-          Your cart is empty
-        </h3>
+        <h1>
+          Complete Your Order
+        </h1>
 
         <p>
-          Add products before checkout.
+          Fast, secure, and beautifully simple.
         </p>
 
       </div>
 
-    </ng-template>
+      <div class="checkout-card">
 
-  </aside>
+        <div class="section-title">
+
+          <div>
+
+            <h2>
+              Shipping Details
+            </h2>
+
+            <span>
+              Delivery information
+            </span>
+
+          </div>
+
+        </div>
+
+        <form
+          [formGroup]="form"
+          class="checkout-form"
+        >
+
+          <div class="input-group" *ngIf="isGuest">
+
+            <label>
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              formControlName="guestName"
+              placeholder="Enter your full name"
+            />
+
+          </div>
+
+          <div class="input-group" *ngIf="isGuest">
+
+            <label>
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              formControlName="guestEmail"
+              placeholder="Enter your email"
+            />
+
+            <div
+              class="field-error"
+              *ngIf="
+                guestEmail?.invalid &&
+                guestEmail?.touched
+              "
+            >
+              Please enter a valid email address
+            </div>
+
+          </div>
+
+          <div class="input-group full-width">
+
+            <label>
+              Shipping Address
+            </label>
+
+            <textarea
+              rows="4"
+              formControlName="shippingAddress"
+              placeholder="Enter your shipping address"
+            ></textarea>
+
+            <div
+              class="field-error"
+              *ngIf="
+                shippingAddress?.invalid &&
+                shippingAddress?.touched
+              "
+            >
+              Valid shipping address is required
+            </div>
+
+          </div>
+
+        </form>
+
+      </div>
+
+      <div class="checkout-card payment-card">
+
+        <div class="section-title">
+
+          <div>
+
+            <h2>
+              Payment Method
+            </h2>
+
+            <span>
+              Stripe secure payment
+            </span>
+
+          </div>
+
+        </div>
+
+        <div class="payment-box">
+
+          <div class="payment-icons">
+
+            <span>
+              Visa
+            </span>
+
+            <span>
+              Mastercard
+            </span>
+
+            <span>
+              Stripe
+            </span>
+
+          </div>
+
+          <div
+            id="card-element"
+            class="card-element"
+          ></div>
+
+        </div>
+
+        <button
+          type="button"
+          class="checkout-btn"
+          (click)="placeOrder()"
+          [disabled]="
+            loading ||
+            paymentLoading ||
+            form.invalid
+          "
+        >
+
+          {{
+            loading || paymentLoading
+              ? 'Processing Payment...'
+              : 'Place Order'
+          }}
+
+        </button>
+
+        <div
+          *ngIf="errorMessage"
+          class="message error"
+        >
+          {{ errorMessage }}
+        </div>
+
+        <div
+          *ngIf="successMessage"
+          class="message success"
+        >
+          {{ successMessage }}
+        </div>
+
+      </div>
+
+    </section>
+
+    <aside class="summary-card">
+
+      <div class="summary-header">
+
+        <span>
+          Order Summary
+        </span>
+
+        <h2>
+          Your Cart
+        </h2>
+
+      </div>
+
+      <ng-container
+        *ngIf="
+          cart?.items?.length;
+          else emptyCart
+        "
+      >
+
+        <div class="summary-items">
+
+          <div
+            *ngFor="
+              let item of cart.items
+            "
+            class="summary-item"
+          >
+
+            <div class="item-image">
+
+              <img
+                [src]="item.imageUrl"
+                [alt]="item.productName"
+              />
+
+            </div>
+
+            <div class="item-info">
+
+              <h4>
+                {{ item.productName }}
+              </h4>
+
+              <span>
+                Qty: {{ item.quantity }}
+              </span>
+
+            </div>
+
+            <div class="item-price">
+
+              {{
+                item.price
+                  | currency
+              }}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="summary-totals">
+
+          <div class="total-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <span>
+              {{
+                subtotal
+                  | currency
+              }}
+            </span>
+
+          </div>
+
+          <div class="total-row">
+
+            <span>
+              Shipping
+            </span>
+
+            <span>
+              {{
+                shippingFees
+                  | currency
+              }}
+            </span>
+
+          </div>
+
+          <div class="total-row grand-total">
+
+            <span>
+              Total
+            </span>
+
+            <span>
+              {{
+                total
+                  | currency
+              }}
+            </span>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+      <ng-template #emptyCart>
+
+        <div class="empty-cart">
+
+          <h3>
+            Your cart is empty
+          </h3>
+
+          <p>
+            Add products before checkout.
+          </p>
+
+        </div>
+
+      </ng-template>
+
+    </aside>
+
+  </div>
 
 </div>

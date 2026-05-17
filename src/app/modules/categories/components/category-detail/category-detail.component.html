@@ -82,8 +82,9 @@
               type="number"
               [placeholder]="minPlaceholderPrice"
               [(ngModel)]="minPrice"
-              (ngModelChange)="onFilterChange()"
-              min="0"
+              (change)="onFilterChange()"
+              [min]="getMinPriceInputLimit()"
+              [max]="getMaxPriceInputLimitForMin()"
               class="price-input"
             />
             <span>-</span>
@@ -91,8 +92,9 @@
               type="number"
               [placeholder]="maxPlaceholderPrice"
               [(ngModel)]="maxPrice"
-              (ngModelChange)="onFilterChange()"
-              min="0"
+              (change)="onFilterChange()"
+              [min]="getMinPriceInputLimitForMax()"
+              [max]="getMaxPriceInputLimit()"
               class="price-input"
             />
           </div>
@@ -153,7 +155,7 @@
           <div class="product-image-container" (click)="viewProduct(product.productId)" style="cursor: pointer;">
             <img
               *ngIf="product.imagesNames && product.imagesNames.length > 0"
-              [src]="productService.getImageUrl(product.imagesNames[0])"
+              [src]="getProductImageUrl(product.imagesNames[0])"
               [alt]="product.name"
               class="product-image"
               (error)="onImageError($event)"
@@ -231,14 +233,27 @@
       </div>
 
       <!-- Pagination -->
-      <div class="pagination" *ngIf="products.length > 0 && !isLoadingProducts">
-        <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagination-btn">
+      <div
+        class="pagination"
+        *ngIf="products.length > 0 && !isLoadingProducts"
+      >
+        <button
+          type="button"
+          class="pagination-btn"
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage()"
+        >
           ← Previous
         </button>
 
-        <span class="page-info">Page {{ currentPage }}</span>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
 
-        <button (click)="nextPage()" [disabled]="!hasNextPage()" class="pagination-btn">
+        <button
+          type="button"
+          class="pagination-btn"
+          (click)="nextPage()"
+          [disabled]="!hasNextPage()"
+        >
           Next →
         </button>
       </div>

@@ -440,7 +440,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 28px;
 }
 
 .no-products {
@@ -603,7 +603,7 @@
   font-family: var(--ff-display);
   font-size: 16px;
   font-weight: 700;
-  color: var(--green);
+  color: var(--ink);
 }
 
 .stock { font-size: 11px; color: var(--muted); }
@@ -721,7 +721,7 @@
   user-select: none;
 }
 
-/* ─── Pagination ─────────────────── */
+/* ─── Pagination ─────────────────────────────────────────── */
 .pagination {
   display: flex;
   justify-content: center;
@@ -729,15 +729,17 @@
   gap: 1rem;
   padding: 1.25rem;
   background: var(--surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  margin-top: 1.25rem;
+  margin: 2.5rem auto 0;
+  max-width: fit-content;
+  box-shadow: var(--shadow-sm);
 }
 
 .pagination-btn {
   padding: 10px 20px;
   background: var(--accent);
-  color: white;
+  color: white !important;
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -745,12 +747,29 @@
   font-weight: 600;
   font-size: 13px;
   transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pagination-btn:hover:not(:disabled) { background: var(--accent-deep); transform: translateY(-1px); }
-.pagination-btn:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+.pagination-btn:hover:not(:disabled) {
+  background: var(--accent-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(200, 96, 42, .2);
+}
 
-.page-info { color: var(--muted); font-weight: 600; font-size: 14px; }
+.pagination-btn:disabled {
+  background: var(--line);
+  color: var(--muted) !important;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-info {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 14px;
+}
 
 /* ─── Animations ─────────────────── */
 @keyframes riseIn {
@@ -801,6 +820,10 @@
   border-color: var(--ink) !important;
 }
 
+:host-context(.dark-mode) .pagination-btn:hover:not(:disabled) {
+  color: var(--bg);
+}
+
 /* ─── Responsive ─────────────────── */
 @media (max-width: 768px) {
   .category-detail-container { padding: 1rem; }
@@ -841,8 +864,13 @@
   .category-info h1 { font-size: 1.2rem; }
   .filters-panel { grid-template-columns: 1fr; }
   .products-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .pagination {
+    gap: 12px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .product-card { animation: none; transition: none; }
+  .pagination-btn { transition: none; }
 }

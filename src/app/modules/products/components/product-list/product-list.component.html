@@ -99,8 +99,9 @@
             type="number"
             [placeholder]="minPlaceholderPrice"
             [(ngModel)]="minPrice"
-            (ngModelChange)="onPriceChange()"
-            min="0"
+            (change)="onPriceChange()"
+            [min]="getMinPriceInputLimit()"
+            [max]="getMaxPriceInputLimitForMin()"
             class="price-input"
           />
           <span class="price-sep">—</span>
@@ -108,8 +109,9 @@
             type="number"
             [placeholder]="maxPlaceholderPrice"
             [(ngModel)]="maxPrice"
-            (ngModelChange)="onPriceChange()"
-            min="0"
+            (change)="onPriceChange()"
+            [min]="getMinPriceInputLimitForMax()"
+            [max]="getMaxPriceInputLimit()"
             class="price-input"
           />
         </div>
@@ -318,28 +320,22 @@
 
         <button
           type="button"
-          class="pagination-btn prev"
+          class="pagination-btn"
           (click)="previousPage()"
           [disabled]="!hasPreviousPage()"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-          Prev
+          ← Previous
         </button>
 
-        <div class="page-info">
-          <span class="current-page">{{ currentPage }}</span>
-          <span class="page-sep">/</span>
-          <span class="total-pages">{{ totalPages }}</span>
-        </div>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
 
         <button
           type="button"
-          class="pagination-btn next"
+          class="pagination-btn"
           (click)="nextPage()"
           [disabled]="!hasNextPage()"
         >
-          Next
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          Next →
         </button>
 
       </div>
