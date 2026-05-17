@@ -1,2 +1,55 @@
-<h1 class="alert alert-danger">404 page</h1>
-<button class="btn btn-dark w-100" (click)="Back()">Back to Home</button>
+<!-- error.html - نسخة معدلة -->
+<div class="error-container">
+  <div class="error-content">
+    <!-- Error Code -->
+    <div class="error-code">
+      <span class="digit">4</span>
+      <span class="digit">0</span>
+      <span class="digit">4</span>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-message">
+      <h2 class="error-title">Oops! Page Not Found</h2>
+      <p class="error-description">
+        The page you are looking for might have been removed or is temporarily unavailable.
+      </p>
+    </div>
+
+    <!-- Search Box -->
+    <div class="search-box">
+      <input 
+        type="text" 
+        #searchInput
+        placeholder="Search for products or pages..." 
+        class="search-input"
+        (keyup.enter)="search($event)"
+      />
+      <button class="search-btn" (click)="searchFromInput()">
+        🔍 Search
+      </button>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn-primary" (click)="goBack()">
+        ← Go Back
+      </button>
+      
+      <button class="btn-secondary" (click)="goHome()">
+        🏠 Home Page
+      </button>
+    </div>
+
+    <!-- Helpful Links -->
+    <div class="helpful-links">
+      <p class="help-title">You might find these helpful:</p>
+      <div class="links-grid">
+        <a routerLink="/products" class="help-link">📦 Browse Products</a>
+        <a routerLink="/categories" class="help-link">📂 Shop by Category</a>
+        <a routerLink="/contact" class="help-link">📞 Contact Support</a>
+        <a routerLink="/faq" class="help-link">❓ FAQs</a>
+      </div>
+    </div>
+  </div>
+</div>

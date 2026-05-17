@@ -8,43 +8,36 @@
       <h1>Dashboard Overview</h1>
       <p class="header-desc">Monitor your store performance and manage operations at a glance.</p>
     </div>
-   <div class="header-actions">
-    <!-- View Products -->
-    <a routerLink="/products" class="action-btn action-btn-outline">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="9" cy="21" r="1"/>
-        <circle cx="20" cy="21" r="1"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-      </svg>
-      View Products
-    </a>
-
-    <!-- View Users -->
-    <a routerLink="/admin/users" class="action-btn action-btn-outline">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      Manage Users
-    </a>
-
-    <!-- Approve Sellers -->
-    <a routerLink="/admin/seller-approval" class="action-btn action-btn-primary">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-      Approve Sellers
-    </a>
-  </div>
+    <div class="header-actions">
+      <a routerLink="/products" class="action-btn action-btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        View Products
+      </a>
+      <a routerLink="/admin/users" class="action-btn action-btn-outline">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Manage Users
+      </a>
+      <a routerLink="/admin/seller-approval" class="action-btn action-btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Approve Sellers
+      </a>
+    </div>
   </header>
 
-  <!-- Alert Messages -->
+  <!-- Alert -->
   @if (alertMessage()) {
     <div class="alert" [ngClass]="'alert-' + alertType()">
       <strong>{{ alertType() === 'success' ? '✓' : '⚠' }}</strong> {{ alertMessage() }}
-      <button class="alert-close" (click)="clearAlert()">×</button>
+      <button class="alert-close" (click)="showAlert('', 'info')">×</button>
     </div>
   }
 
@@ -66,11 +59,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
         </div>
       </article>
+
       <article class="stat-card stat-orders">
         <div class="stat-content">
           <span class="stat-label">Total Orders</span>
@@ -80,11 +73,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="1" y="3" width="15" height="13"/>
             <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
-            <circle cx="5.5" cy="18.5" r="2.5"/>
-            <circle cx="18.5" cy="18.5" r="2.5"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
           </svg>
         </div>
       </article>
+
       <article class="stat-card stat-products">
         <div class="stat-content">
           <span class="stat-label">Total Products</span>
@@ -92,16 +85,17 @@
         </div>
         <div class="stat-icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="9" cy="21" r="1"/>
-            <circle cx="20" cy="21" r="1"/>
+            <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
           </svg>
         </div>
       </article>
+
       <article class="stat-card stat-revenue">
         <div class="stat-content">
           <span class="stat-label">Total Revenue</span>
-          <strong class="stat-value">{{ stats()?.totalRevenue ?? 0 | currency:'USD':'symbol':'1.0-0' }}</strong>
+          <!-- يتحسب من الـ Delivered orders فعلاً -->
+          <strong class="stat-value">{{ computedTotalRevenue | currency:'USD':'symbol':'1.0-0' }}</strong>
         </div>
         <div class="stat-icon-wrap">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -112,7 +106,7 @@
       </article>
     </div>
 
-    <!-- Charts Row -->
+    <!-- Charts -->
     <div class="charts-grid">
       <div class="chart-panel">
         <div class="panel-header">
@@ -132,7 +126,7 @@
         <div class="chart-container pie-chart-container">
           <canvas #ordersPieChart></canvas>
         </div>
-        <div class="pie-legend">
+       <div class="pie-legend">
           @for (item of orderStatusData; track item.status) {
             <div class="legend-item">
               <span class="legend-color" [style.background]="item.color"></span>
@@ -144,24 +138,24 @@
       </div>
     </div>
 
-    <!-- Users Management Section (Toggle) -->
+    <!-- Users Management -->
     @if (showUsersManagement) {
       <div class="users-panel">
         <div class="panel-header">
           <h2>User Management</h2>
           <div class="filters-section">
-            <input 
-              type="text" 
-              [(ngModel)]="userSearchTerm" 
+            <input
+              type="text"
+              [(ngModel)]="userSearchTerm"
               (input)="filterUsers()"
-              placeholder="Search users..." 
+              placeholder="Search users..."
               class="search-input"
             >
             <select [(ngModel)]="userRoleFilter" (change)="filterUsers()" class="admin-select">
               <option value="all">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="seller">Seller</option>
-              <option value="user">User</option>
+              <option value="Admin">Admin</option>
+              <option value="Seller">Seller</option>
+              <option value="User">User</option>
             </select>
             <select [(ngModel)]="userStatusFilter" (change)="filterUsers()" class="admin-select">
               <option value="all">All Status</option>
@@ -170,7 +164,7 @@
             </select>
           </div>
         </div>
-        
+
         @if (usersLoading()) {
           <div class="loading-spinner"><div class="spinner"></div> Loading users...</div>
         } @else {
@@ -184,7 +178,7 @@
                   <th>Status</th>
                   <th>Joined</th>
                   <th>Actions</th>
-                 </tr>
+                </tr>
               </thead>
               <tbody>
                 @for (user of filteredUsers(); track user.id) {
@@ -197,10 +191,15 @@
                     </td>
                     <td>{{ user.email }}</td>
                     <td>
-                      <select [value]="user.role" (change)="onRoleChange(user.id, $event)" class="role-select" [disabled]="actionLoading() === user.id">
-                        <option value="user">User</option>
-                        <option value="seller">Seller</option>
-                        <option value="admin">Admin</option>
+                      <select
+                        [value]="user.role"
+                        (change)="onRoleChange(user.id, $event)"
+                        class="role-select"
+                        [disabled]="actionLoading() === user.id"
+                      >
+                        <option value="User">User</option>
+                        <option value="Seller">Seller</option>
+                        <option value="Admin">Admin</option>
                       </select>
                     </td>
                     <td>
@@ -210,7 +209,7 @@
                     </td>
                     <td>{{ user.createdAt | date:'mediumDate' }}</td>
                     <td class="action-buttons">
-                      @if (!user.isBlocked ) {
+                      @if (!user.isBlocked) {
                         <button (click)="blockUser(user.id)" class="btn-sm btn-warning-sm" [disabled]="actionLoading() === user.id">
                           Block
                         </button>
@@ -222,7 +221,7 @@
                       <button (click)="deleteUser(user.id)" class="btn-sm btn-danger-sm" [disabled]="actionLoading() === user.id">
                         Delete
                       </button>
-                      @if (user.role === 'seller' && !user.isSellerApproved) {
+                      @if (user.role === 'Seller' && !user.isSellerApproved) {
                         <button (click)="approveSeller(user.id)" class="btn-sm btn-primary-sm" [disabled]="actionLoading() === user.id">
                           Approve
                         </button>
@@ -250,49 +249,65 @@
     }
 
     <!-- Recent Orders -->
-   <!-- Recent Orders Section -->
-<div class="recent-orders-section mt-4">
-  <div class="section-header">
-    <h3>Recent Orders</h3>
-    <a routerLink="/admin/orders" class="view-all-link">View All</a>
-  </div>
-  
-  <div *ngIf="loading()" class="loading-state">
-    <div class="spinner"></div>
-  </div>
-  
-  <div *ngIf="!loading() && recentOrders().length === 0" class="empty-state">
-    <p>No orders found</p>
-  </div>
-  
-  <div class="orders-table-wrapper" *ngIf="!loading() && recentOrders().length > 0">
-    <table class="orders-table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Customer</th>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let order of recentOrders()">
-          <td>{{ order.orderNumber }}</td>
-          <td>{{ order.customerName }}</td>
-          <td>{{ order.createdAt | date:'mediumDate' }}</td>
-          <td>{{ formatCurrency(order.totalAmount) }}</td>
-          <td>
-            <span [class]="'badge ' + getOrderStatusClass(order.status)">
-              {{ order.status }}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+    <div class="recent-orders-section">
+      <div class="section-header">
+        <h3>Recent Orders</h3>
+        <a routerLink="/admin/orders" class="view-all-link">View All</a>
+      </div>
+
+      @if (recentOrders().length === 0) {
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="3" width="15" height="13"/>
+            <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+          </svg>
+          <p>No recent orders found.</p>
+        </div>
+      } @else {
+        <div class="orders-table-wrapper">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Change Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of recentOrders(); track order.id) {
+                <tr>
+                  <td>#{{ order.id }}</td>
+                  <td>{{ order.customerName }}</td>
+                  <td>{{ order.date | date:'mediumDate' }}</td>
+                  <td>{{ formatCurrency(order.totalAmount) }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(order.status)">
+                      {{ order.status }}
+                    </span>
+                  </td>
+                <td>
+                  <select
+                    class="role-select"
+                    (change)="updateOrderStatus(order.id, $event)"
+                    [disabled]="actionLoading() === (order.id ?? 0).toString()"
+                  >
+                    <option value="" selected disabled>Select Status</option>
+
+                    @for (status of orderStatuses; track status) {
+                      <option [value]="status">{{ status }}</option>
+                    }
+                  </select>
+                </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
 
   }
-
 </section>

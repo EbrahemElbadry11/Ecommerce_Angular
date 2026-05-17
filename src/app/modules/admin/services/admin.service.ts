@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AdminDashboardStats, AdminUser, ApiResponse, ManagedRole } from '../models/user-admin.model';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
@@ -34,27 +34,14 @@ export class AdminService {
     return this.http.delete<ApiResponse<string>>(`/admin/delete-user/${id}`, { headers });
   }
 
+  changeRole(id: string, role: string): Observable<ApiResponse<string>> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    const body = { role };
+    return this.http.put<ApiResponse<string>>(`/Admin/change-role/${id}`, body, { headers });
+  }
 
-
-changeRole(id: string, role: string): Observable<ApiResponse<string>> {
-  const headers = new HttpHeaders({ 
-    'Content-Type': 'application/json'
-  });
-  
-  const body = { role: role };
-  console.log('Sending request:', {
-    url: `/Admin/change-role/${id}`,
-    body: body
-  });
-  return this.http.put<ApiResponse<string>>(
-    `/Admin/change-role/${id}`, 
-    body, 
-    { headers }
-  );
-}
-
-  getPendingSellers(): Observable<ApiResponse<string>> {
-    return this.http.get<ApiResponse<string>>(`/admin/pending-sellers`);
+  getPendingSellers(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`/admin/pending-sellers`);
   }
 
   approveSeller(sellerId: number): Observable<ApiResponse<string>> {
@@ -62,14 +49,33 @@ changeRole(id: string, role: string): Observable<ApiResponse<string>> {
     return this.http.put<ApiResponse<string>>(`/admin/approve-seller/${sellerId}`, {}, { headers });
   }
 
-  // داخل ملف admin.service.ts
-getApprovedSellers(): Observable<ApiResponse<string>> {
-  return this.http.get<ApiResponse<string>>(`/admin/approved-sellers`); 
+  getApprovedSellers(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`/admin/approved-sellers`); 
+  }
+
+  rejectSeller(sellerId: number): Observable<ApiResponse<string>> {
+    return this.http.delete<ApiResponse<string>>(`/admin/reject-seller/${sellerId}`);
+  }
+
+  getOrderStatus(orderId: number): Observable<ApiResponse<{ status: string }>> {
+    return this.http.get<ApiResponse<{ status: string }>>(`/orders/${orderId}/status`);
+  }
+
+ updateOrderStatus(orderId: number, status: string): Observable<ApiResponse<string>> {
+  return this.http.put<ApiResponse<string>>(`/Order/${orderId}/status`, { status });
 }
 
-   rejectSeller(sellerId: number): Observable<ApiResponse<string>> {
-  console.log('Calling reject API for seller ID:', sellerId);
-  return this.http.delete<ApiResponse<string>>(`/admin/reject-seller/${sellerId}`);
-}
-}
+  bulkUpdateOrderStatus(orderIds: number[], status: string): Observable<ApiResponse<string>> {
+    return this.http.put<ApiResponse<string>>(`/orders/bulk-status`, { orderIds, status });
+  }
 
+  getOrders(page: number = 1, pageSize: number = 10, status?: string): Observable<ApiResponse<any>> {
+    let url = `/orders?page=${page}&pageSize=${pageSize}`;
+    if (status) { url += `&status=${status}`; }
+    return this.http.get<ApiResponse<any>>(url);
+  }
+
+  getAllOrders(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`/orders/all`);
+  }
+}
