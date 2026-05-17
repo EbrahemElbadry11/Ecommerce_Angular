@@ -58,7 +58,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private productService: ProductService,
+    public productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
     private cd: ChangeDetectorRef
@@ -115,8 +115,8 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess && response.data) {
-            this.allCategories = Array.isArray(response.data) 
-              ? response.data 
+            this.allCategories = Array.isArray(response.data)
+              ? response.data
               : (response.data.categories || response.data.Categories || []);
             this.cd.markForCheck();
           }
