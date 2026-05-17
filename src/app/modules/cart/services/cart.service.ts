@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 
 import { CartResponse } from '../models/cartresponse';
 import { GeneralResponse } from '../../../shared/models/api-response.model';
@@ -14,6 +14,12 @@ export class CartService {
 
   currentCart: CartResponse | null = null;
 
+  private readonly cartCountSubject =
+    new BehaviorSubject<number>(0);
+
+  readonly cartCount$ =
+    this.cartCountSubject.asObservable();
+
   constructor(private http: HttpClient) { }
 
   loadCart(): Observable<GeneralResponse<CartResponse>> {
@@ -25,13 +31,32 @@ export class CartService {
       )
       .pipe(
         tap((res) => {
-          this.currentCart = res.data ?? null;
+          this.setCart(res.data ?? null);
         })
       );
   }
 
   getCart(): Observable<GeneralResponse<CartResponse>> {
     return this.loadCart();
+  }
+
+  setCart(cart: CartResponse | null): void {
+
+    this.currentCart = cart;
+
+    this.cartCountSubject.next(
+      cart?.totalItems ??
+      cart?.items?.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      ) ??
+      0
+    );
+  }
+
+  clearCartState(): void {
+
+    this.setCart(null);
   }
 
   addToCart(productId: number, quantity: number) {

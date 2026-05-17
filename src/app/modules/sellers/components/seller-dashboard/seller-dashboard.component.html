@@ -58,17 +58,12 @@
     </div>
 
     <div class="product-grid" *ngIf="!isLoadingProducts && products.length > 0">
-      <article class="product-card" *ngFor="let product of products">
+      <article class="product-card" *ngFor="let product of products; trackBy: trackByProductId">
         <div class="image-wrap">
-          <img *ngIf="product.imagesNames.length;else noImage"
-            [src]="
-              productService.getImageUrl(
-                product.imagesNames[0]
-              )
-            "
+          <img *ngIf="getPrimaryImageName(product); else noImage"
+            [src]="getPrimaryImageUrl(product)"
             [alt]="product.name"
             loading="lazy"
-            style="object-fit: cover; width: 100%; height: 100%;"
           />
           <ng-template #noImage>
             <div class="image-placeholder">{{ product.name.charAt(0) }}</div>
@@ -100,7 +95,7 @@
           <app-product-image-upload
             [productId]="product.productId"
             [productName]="product.name"
-            [currentImageUrl]="productService.getImageUrl(product.imagesNames[0])"
+            [currentImageUrl]="getPrimaryImageUrl(product)"
             (uploaded)="onImageUploaded($event)"
             (error)="onImageError($event)"
           ></app-product-image-upload>

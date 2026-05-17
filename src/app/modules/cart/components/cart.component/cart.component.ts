@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 import { CartService } from '../../services/cart.service';
 import { CartResponse } from '../../models/cartresponse';
+import { ToastService } from '../../../../../services/toast';
 
 @Component({
   selector: 'app-cart.component',
@@ -27,6 +28,7 @@ export class CartComponent implements OnInit {
 
   constructor(
     public cartService: CartService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -91,7 +93,24 @@ export class CartComponent implements OnInit {
       });
   }
 
-  removeItem(productId: number): void {
+  confirmRemoveItem(
+    productId: number,
+    productName?: string
+  ): void {
+
+    this.toastService.show({
+      message:
+        `Remove ${productName || 'this item'} from your cart?`,
+      type: 'danger',
+      isConfirm: true,
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      onConfirm: () =>
+        this.removeItem(productId),
+    });
+  }
+
+  private removeItem(productId: number): void {
 
     this.cartService
       .removeItem(productId)
@@ -107,12 +126,22 @@ export class CartComponent implements OnInit {
             return;
           }
 
+          this.toastService.show(
+            'Item removed from cart.',
+            'success'
+          );
+
           this.loadCart();
         },
 
         error: (err) => {
 
           console.error(err);
+
+          this.toastService.show(
+            'Failed to remove item from cart.',
+            'danger'
+          );
         }
 
       });
@@ -128,16 +157,17 @@ export class CartComponent implements OnInit {
     const newQuantity =
       currentQuantity + change;
 
-    // remove confirm
     if (newQuantity < 1) {
 
-      const confirmed = confirm(
-        'Are you sure you want to remove this item from cart?'
-      );
+      const item =
+        this.cart?.items.find(
+          x => x.productId === productId
+        );
 
-      if (confirmed) {
-        this.removeItem(productId);
-      }
+      this.confirmRemoveItem(
+        productId,
+        item?.productName
+      );
 
       return;
     }
@@ -187,6 +217,8 @@ export class CartComponent implements OnInit {
                     0
                   )
               };
+
+              this.cartService.setCart(this.cart);
             }
           }
 

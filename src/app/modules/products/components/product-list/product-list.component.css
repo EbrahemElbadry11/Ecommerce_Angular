@@ -1153,6 +1153,11 @@
   border-color: var(--line);
 }
 
+:host-context(.dark-mode) .search-input {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
 :host-context(.dark-mode) .filter-select option {
   background: var(--surface-alt);
   color: var(--ink);

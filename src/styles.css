@@ -39,6 +39,10 @@ body.dark-mode {
 /* ── Base ── */
 *, *::before, *::after { box-sizing: border-box; }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-primary);
@@ -59,7 +63,7 @@ body {
 /* ── Navbar / Header ── */
 body.dark-mode .dropdown-menu,
 body.dark-mode .modal-content {
-  background-color: #1a1a2e !important;
+  background-color: var(--bg-card) !important;
   color: var(--text-primary) !important;
   border-color: var(--border-color) !important;
 }
@@ -124,18 +128,20 @@ body.dark-mode textarea {
   border-color: var(--border-color) !important;
 }
 
-body.dark-mode input.search-input,
-body.dark-mode input.newsletter-input {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
   color: var(--text-muted) !important;
 }
 
+/* ── High-Visibility Feedback (Confirmation Messages) ── */
+.alert-success, .toast-success {
+  background-color: var(--success) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  border: none !important;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.25) !important;
+  z-index: 9999;
+}
 
 /* ── Admin select ── */
 body.dark-mode .admin-select {
@@ -144,11 +150,22 @@ body.dark-mode .admin-select {
   border-color: var(--border-color) !important;
 }
 
-/* ── User management table ── */
+/* ── Admin Table Panel Globals ── */
 body.dark-mode .user-table-container,
-body.dark-mode .filters-section {
-  background: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
+body.dark-mode .user-management-panel,
+body.dark-mode .filters-section,
+body.dark-mode .table-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+
+body.dark-mode .table-panel .table,
+body.dark-mode .table-panel .table td,
+body.dark-mode .table-panel .table th {
+  background-color: transparent;
+  color: var(--text-primary);
+  border-color: var(--border-color);
 }
 
 /* ── Product list / filter panel / Category Detail overrides removed to honor local component themes ── */

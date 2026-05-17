@@ -21,14 +21,12 @@
             <img
               [src]="userImageUrl()"
               alt="Profile Picture"
-              class="rounded-circle img-thumbnail shadow"
-              style="width: 140px; height: 140px; object-fit: cover;"
+              class="profile-avatar"
             />
 
             <label
               for="fileInput"
-              class="btn btn-sm btn-dark rounded-circle position-absolute bottom-0 end-0 p-2 shadow"
-              style="cursor: pointer;"
+              class="avatar-upload-btn"
             >
 
               <i class="bi bi-camera-fill"></i>
@@ -45,7 +43,7 @@
 
           </div>
 
-          <small class="text-muted d-block mt-2">
+          <small class="avatar-help">
             Click the camera icon to change avatar
           </small>
 
@@ -61,11 +59,11 @@
             {{ profile()?.role }}
           </span>
 
-          <p class="sidebar-email text-muted">
+          <p class="sidebar-email">
             {{ profile()?.email }}
           </p>
 
-          <p class="sidebar-date text-secondary small">
+          <p class="sidebar-date">
             Member since
             {{ profile()?.createdAt | date:'longDate' }}
           </p>
@@ -149,21 +147,10 @@
                 type="email"
                 [value]="profile()?.email || ''"
                 readonly
-                style="
-                  opacity:.6;
-                  cursor:not-allowed;
-                  background-color:#f1f5f9;
-                "
+                class="readonly-input"
               />
 
-              <span
-                style="
-                  font-size:.78rem;
-                  color:#94a3b8;
-                  margin-top:.3rem;
-                  display:block;
-                "
-              >
+              <span class="field-hint">
                 Email cannot be changed
               </span>
 
