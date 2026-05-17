@@ -1188,3 +1188,7 @@
 :host-context(.dark-mode) .low-stock-badge {
   background: rgba(14, 13, 11, .85);
 }
+
+:host-context(.dark-mode) .pagination-btn:hover:not(:disabled) {
+  color: var(--bg);
+}

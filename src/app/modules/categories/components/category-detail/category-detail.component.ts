@@ -273,6 +273,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  hasPreviousPage(): boolean {
+    return this.currentPage > 1;
+  }
+
   /**
    * Previous page
    */

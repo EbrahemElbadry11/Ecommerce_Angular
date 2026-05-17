@@ -153,7 +153,7 @@
           <div class="product-image-container" (click)="viewProduct(product.productId)" style="cursor: pointer;">
             <img
               *ngIf="product.imagesNames && product.imagesNames.length > 0"
-              [src]="productService.getImageUrl(product.imagesNames[0])"
+              [src]="getProductImageUrl(product.imagesNames[0])"
               [alt]="product.name"
               class="product-image"
               (error)="onImageError($event)"
@@ -231,15 +231,34 @@
       </div>
 
       <!-- Pagination -->
-      <div class="pagination" *ngIf="products.length > 0 && !isLoadingProducts">
-        <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagination-btn">
-          ← Previous
+      <div
+        class="pagination"
+        *ngIf="products.length > 0 && !isLoadingProducts"
+      >
+        <button
+          type="button"
+          class="pagination-btn prev"
+          (click)="previousPage()"
+          [disabled]="!hasPreviousPage()"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Prev
         </button>
 
-        <span class="page-info">Page {{ currentPage }}</span>
+        <div class="page-info">
+          <span class="current-page">{{ currentPage }}</span>
+          <span class="page-sep">/</span>
+          <span class="total-pages">{{ totalPages }}</span>
+        </div>
 
-        <button (click)="nextPage()" [disabled]="!hasNextPage()" class="pagination-btn">
-          Next →
+        <button
+          type="button"
+          class="pagination-btn next"
+          (click)="nextPage()"
+          [disabled]="!hasNextPage()"
+        >
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
       </div>
     </div>
