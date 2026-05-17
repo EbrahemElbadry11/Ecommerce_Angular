@@ -14,8 +14,8 @@
   <div *ngIf="category && !isLoadingCategory" class="category-header">
     <!-- ✅ صورة الكاتيجوري معدلة -->
     <div class="category-icon" *ngIf="getCategoryImageUrl(category.icon)">
-      <img 
-        [src]="getCategoryImageUrl(category.icon)" 
+      <img
+        [src]="getCategoryImageUrl(category.icon)"
         [alt]="category.name"
         (error)="onCategoryImageError($event)"
       />
@@ -147,13 +147,11 @@
         <div *ngIf="products.length === 0" class="no-products">
           <p>No products found in this category</p>
         </div>
-
-        <!-- ✅ منتج واحد معدل -->
         <div *ngFor="let product of products" class="product-card">
           <div class="product-image-container">
             <img
               *ngIf="product.imagesNames && product.imagesNames.length > 0"
-              [src]="getProductImageUrl(product.imagesNames[0])"
+              [src]="productService.getImageUrl(product.imagesNames[0])"
               [alt]="product.name"
               class="product-image"
               (error)="onImageError($event)"

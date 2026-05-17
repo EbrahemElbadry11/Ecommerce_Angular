@@ -19,7 +19,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
   errorMessage: string = '';
 
   private destroy$ = new Subject<void>();
-  
+
   private categoryService = inject(CategoryService);
   private router = inject(Router);
   private cd = inject(ChangeDetectorRef);
@@ -42,8 +42,8 @@ export class CategoryListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response: any) => {
           if (response.isSuccess && response.data) {
-            this.categories = Array.isArray(response.data) 
-              ? response.data 
+            this.categories = Array.isArray(response.data)
+              ? response.data
               : (response.data.categories || response.data.Categories || []);
           } else if (Array.isArray(response)) {
             this.categories = response;
@@ -51,16 +51,14 @@ export class CategoryListComponent implements OnInit, OnDestroy {
             this.categories = [];
           }
           this.isLoading = false;
-          
-          // ✅ markForCheck أسرع من detectChanges
+
           this.cd.markForCheck();
         },
         error: (err) => {
           console.error('Failed to load categories:', err);
           this.errorMessage = 'Failed to load categories. Please try again.';
           this.isLoading = false;
-          
-          // ✅ markForCheck أسرع من detectChanges
+
           this.cd.markForCheck();
         },
       });
@@ -102,7 +100,7 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     const img = event.target as HTMLImageElement;
     img.src = 'assets/images/default-category.png';
     img.onerror = null;
-    
+
     // ✅ markForCheck
     this.cd.markForCheck();
   }

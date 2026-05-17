@@ -43,12 +43,12 @@
       (click)="viewCategory(category.categoryId)"
     >
       <div class="card-visual">
-        <!-- ✅ استخدم الدالة getImageUrl -->
         <img
           [src]="getImageUrl(category.icon)"
           [alt]="category.name"
           class="card-icon-img"
           (error)="onImageError($event)"
+          style="object-fit: contain; width: 100%; height: 100%;"
         />
       </div>
       <div class="card-content">

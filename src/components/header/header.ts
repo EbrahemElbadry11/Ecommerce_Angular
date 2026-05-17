@@ -33,7 +33,7 @@ export class Header implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private cartService: CartService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.updateAuthStatus();
@@ -68,15 +68,15 @@ export class Header implements OnInit, OnDestroy {
   }
 
   private updateAuthStatus(): void {
-    this.isLogged   = this.authService.isLoggedIn();
-    const session   = this.authService.session();
-    this.userRole   = session?.role ?? '';
-    this.isAdmin    = this.userRole === 'Admin';
-    this.isSeller   = this.userRole === 'Seller';
+    this.isLogged = this.authService.isLoggedIn();
+    const session = this.authService.session();
+    this.userRole = session?.role ?? '';
+    this.isAdmin = this.userRole === 'Admin';
+    this.isSeller = this.userRole === 'Seller';
     this.isCustomer = this.isLogged && !this.isAdmin && !this.isSeller;
 
     this.userFullName = session?.fullName || session?.email || 'User';
-    this.userInitial  = this.userFullName.charAt(0).toUpperCase();
+    this.userInitial = this.userFullName.charAt(0).toUpperCase();
 
     if (this.isLogged && !this.isAdmin) {
       this.loadCartCount();
@@ -84,15 +84,32 @@ export class Header implements OnInit, OnDestroy {
   }
 
   private loadCartCount(): void {
-    this.cartService.getCart().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (res) => {
-        if (res.isSuccess && res.data) {
-          this.cartCount = res.data.items?.length ?? 0;
-          this.cdr.markForCheck();
-        }
-      },
-      error: () => { this.cartCount = 0; },
-    });
+
+    this.cartService
+      .getCart()
+      .pipe(takeUntil(this.destroy$))
+
+      .subscribe({
+
+        next: (res) => {
+
+          if (
+            res.isSuccess &&
+            res.data
+          ) {
+
+            this.cartCount =
+              res.data.totalItems ?? 0;
+
+            this.cdr.markForCheck();
+          }
+        },
+
+        error: () => {
+
+          this.cartCount = 0;
+        },
+      });
   }
 
   logout(): void {
