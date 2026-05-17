@@ -22,10 +22,10 @@ export class Home implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private productService: ProductService,
+    public productService: ProductService,
     private categoryService: CategoryService,
     private cd: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     forkJoin({
@@ -38,7 +38,9 @@ export class Home implements OnInit, OnDestroy {
           if (products.isSuccess && products.data) {
             this.featuredProducts = products.data.products.map((p) => ({
               ...p,
-              imageUrl: p.imagesNames?.length ? p.imagesNames[0] : 'assets/images/no-image.png',
+              imageUrl: p.imagesNames?.length
+                ? this.productService.getImageUrl(p.imagesNames[0])
+                : 'assets/images/no-image.png',
               shortDescription: p.description ? p.description.slice(0, 80) : '',
               formattedPrice: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(p.price),
             }));
@@ -52,39 +54,33 @@ export class Home implements OnInit, OnDestroy {
         error: () => (this.isLoading = false),
       });
   }
-  
+
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-   getImageUrl(icon: string | null | undefined): string {
-    // لو مفيش صورة
+  getImageUrl(icon: string | null | undefined): string {
     if (!icon) {
       return '';
     }
 
-    // لو كان رابط خارجي
     if (icon.startsWith('http://') || icon.startsWith('https://')) {
       return icon;
     }
 
-    // لو كان Base64
     if (icon.startsWith('data:image')) {
       return icon;
     }
 
-    // لو كان مسار من API
     if (icon.startsWith('/')) {
       return `https://localhost:7017${icon}`;
     }
 
-    // مسار نسبي
     return `https://localhost:7017/${icon}`;
   }
 
-  // ✅ دالة لو الصورة فشلت
   onImageError(event: Event): void {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';

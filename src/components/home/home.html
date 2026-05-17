@@ -35,15 +35,15 @@
         </svg>
       </a>
     </div>
-    <div class="categories-scroll">
+    <div class="categories-scroll pt-3">
       <button *ngFor="let cat of categories"
               class="category-chip"
               [routerLink]="['/products']"
               [queryParams]="{ category: cat.name }">
         <div class="chip-icon">
-          <img *ngIf="getImageUrl(cat.icon)" 
-               [src]="getImageUrl(cat.icon)" 
-               [alt]="cat.name" 
+          <img *ngIf="getImageUrl(cat.icon)"
+               [src]="getImageUrl(cat.icon)"
+               [alt]="cat.name"
                class="chip-icon-img"
                (error)="onImageError($event)"/>
           <span *ngIf="!getImageUrl(cat.icon)" class="chip-icon-placeholder">📦</span>

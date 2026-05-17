@@ -5,20 +5,20 @@ import { ApiResponse, UpdateProfileRequest, UserProfile } from '../models/user-p
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProfile(): Observable<ApiResponse<UserProfile>> {
     return this.http.get<ApiResponse<UserProfile>>('/user/profile');
   }
 
   updateProfile(payload: UpdateProfileRequest): Observable<ApiResponse<string>> {
-  const form = new FormData();
-  
-  if (payload.fullName)    form.append('FullName',    payload.fullName);
-  if (payload.phoneNumber) form.append('PhoneNumber', payload.phoneNumber);
-  if (payload.address)     form.append('Address',     payload.address);
-  
-  if (payload.image) {
+    const form = new FormData();
+
+    if (payload.fullName) form.append('FullName', payload.fullName);
+    if (payload.phoneNumber) form.append('PhoneNumber', payload.phoneNumber);
+    if (payload.address) form.append('Address', payload.address);
+
+    if (payload.image) {
       form.append('Image', payload.image, payload.image.name);
     }
 
@@ -26,12 +26,28 @@ export class UserService {
     return this.http.put<ApiResponse<string>>('/user/update-profile', form, { headers });
   }
 
-   uploadProfileImage(file: File): Observable<ApiResponse<string>> {
+  uploadProfileImage(file: File): Observable<ApiResponse<string>> {
     const form = new FormData();
     form.append('Image', file, file.name);
-    
+
     const headers = new HttpHeaders({ 'X-Success-Message': 'Profile image uploaded successfully!' });
     return this.http.post<ApiResponse<string>>(`${this.http}/user/upload-profile-image`, form, { headers });
+  }
+
+  getUserImageUrl(image: string): string {
+
+    if (!image) {
+      return 'assets/images/default-user.png';
+    }
+
+    if (
+      image.startsWith('http://') ||
+      image.startsWith('https://')
+    ) {
+      return image;
+    }
+
+    return `https://ecommerceiti.runasp.net/${image}`;
   }
 }
 

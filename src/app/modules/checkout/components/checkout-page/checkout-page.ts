@@ -41,7 +41,7 @@ import { OrderService }
 import { PaymentService }
   from '../../services/payment.service';
 import { AuthService } from '../../../auth/services/auth.service';
-
+import { ProductService } from '../../../products/services/product.service';
 @Component({
   selector: 'app-checkout-page',
 
@@ -105,7 +105,8 @@ export class CheckoutPageComponent
     private paymentService: PaymentService,
 
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private productService: ProductService
   ) {
     const isGuest = !this.authService.isLoggedIn();
 
@@ -222,8 +223,17 @@ export class CheckoutPageComponent
 
         next: (response: any) => {
 
-          this.cart =
-            response.data;
+          this.cart = {
+            ...response.data,
+
+            items: response.data.items.map((item: any) => ({
+              ...item,
+
+              imageUrl: item.imageUrl
+                ? this.productService.getImageUrl(item.imageUrl)
+                : 'assets/images/no-image.png'
+            }))
+          };
 
           this.calculateSubtotal();
 
