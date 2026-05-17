@@ -1,0 +1,197 @@
+<section class="seller-orders-section">
+
+  <div class="orders-header">
+
+    <div>
+
+      <p class="eyebrow">
+        Store Orders
+      </p>
+
+      <h2>
+        Customer Orders
+      </h2>
+
+      <span>
+        {{ orders.length }} orders found
+      </span>
+
+    </div>
+
+    <div class="orders-badge">
+      Live Tracking
+    </div>
+
+  </div>
+
+  <div
+    *ngIf="isLoading"
+    class="orders-loading"
+  >
+
+    <div class="spinner"></div>
+
+    <p>
+      Loading orders...
+    </p>
+
+  </div>
+
+  <div
+    *ngIf="!isLoading && !orders.length"
+    class="empty-orders"
+  >
+
+    <h3>
+      No orders yet
+    </h3>
+
+    <p>
+      Your products haven’t received orders yet.
+    </p>
+
+  </div>
+
+  <div
+    *ngIf="!isLoading && paginatedOrders.length"
+    class="orders-grid"
+  >
+
+    <article
+      class="order-card"
+      *ngFor="let order of paginatedOrders"
+    >
+
+      <div class="order-top">
+
+        <div>
+
+          <span class="order-label">
+            Order
+          </span>
+
+          <h3>
+            #{{ order.orderId }}
+          </h3>
+
+        </div>
+
+        <span
+          class="status"
+          [ngClass]="order.status?.toLowerCase()"
+        >
+          {{ order.status }}
+        </span>
+
+      </div>
+
+      <div class="order-meta">
+
+        <div class="meta-box">
+
+          <span>
+            Customer
+          </span>
+
+          <strong>
+            {{ order.customerName }}
+          </strong>
+
+        </div>
+
+        <div class="meta-box">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            {{ formatCurrency(order.totalAmount) }}
+          </strong>
+
+        </div>
+
+        <div class="meta-box wide">
+
+          <span>
+            Address
+          </span>
+
+          <strong>
+            {{ order.shippingAddress }}
+          </strong>
+
+        </div>
+
+      </div>
+
+      <div class="items-list">
+
+        <div
+          class="item"
+          *ngFor="let item of order.items"
+        >
+
+          <img
+            [src]="item.imageUrl"
+            [alt]="item.productName"
+          />
+
+          <div class="item-content">
+
+            <h4>
+              {{ item.productName }}
+            </h4>
+
+            <div class="item-row">
+
+              <span>
+                Qty: {{ item.quantity }}
+              </span>
+
+              <strong>
+                {{ formatCurrency(item.total) }}
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </article>
+
+  </div>
+
+  <div
+    class="pagination"
+    *ngIf="totalPages > 1"
+  >
+
+    <button
+      type="button"
+      class="page-btn"
+      (click)="previousPage()"
+      [disabled]="!hasPreviousPage()"
+    >
+      Prev
+    </button>
+
+    <div class="page-indicator">
+      {{ currentPage }} / {{ totalPages }}
+    </div>
+
+    <button
+      type="button"
+      class="page-btn"
+      (click)="nextPage()"
+      [disabled]="!hasNextPage()"
+    >
+      Next
+    </button>
+
+  </div>
+
+</section>

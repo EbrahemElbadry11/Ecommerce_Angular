@@ -129,4 +129,10 @@ export class SellerService {
     // relative path
     return `https://ecommerceiti.runasp.net/${logo}`;
   }
+
+  getSellerOrders(): Observable<GeneralResponse<any[]>> {
+    return this.http.get<GeneralResponse<any[]>>(
+      `/order/seller/orders`
+    );
+  }
 }
