@@ -33,7 +33,7 @@
             class="btn btn-sm btn-light text-dark fw-bold px-3 rounded-3"
             (click)="handleToastConfirm(toast)"
           >
-            Yes
+            {{ toast.confirmText || 'Confirm' }}
           </button>
 
           <button
@@ -41,7 +41,7 @@
             class="btn btn-sm btn-outline-light px-3 rounded-3"
             (click)="toastService.remove(toast)"
           >
-            Cancel
+            {{ toast.cancelText || 'Cancel' }}
           </button>
         </div>
       }

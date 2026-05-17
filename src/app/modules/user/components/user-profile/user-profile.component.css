@@ -7,10 +7,14 @@
   --ink-secondary: #3d3a35;
   --muted: #8a867e;
   --line: rgba(26, 23, 20, 0.09);
+  --line-strong: rgba(26, 23, 20, 0.18);
   --accent: #c8602a;
   --accent-deep: #a34d1f;
   --accent-glow: rgba(200, 96, 42, 0.18);
   --green: #2d6a4f;
+  --green-pale: rgba(45, 106, 79, 0.1);
+  --danger: #b91c1c;
+  --danger-pale: rgba(185, 28, 28, 0.1);
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 22px;
@@ -68,34 +72,51 @@
   text-align: center;
 }
 
-.avatar-section { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-
-.avatar-wrapper { position: relative; width: 100px; height: 100px; }
-
-.avatar-img {
-  width: 100px; height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(200,96,42,0.2);
-  box-shadow: 0 4px 12px rgba(200,96,42,0.15);
+.profile-img-wrapper {
+  width: 140px;
+  height: 140px;
 }
 
-.avatar-edit-btn {
-  position: absolute;
-  bottom: 2px; right: 2px;
-  width: 30px; height: 30px;
-  background: var(--accent);
-  color: white;
+.profile-avatar {
+  width: 140px;
+  height: 140px;
+  display: block;
   border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-alt);
+  border: 3px solid var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  background: var(--accent);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: .85rem;
-  box-shadow: 0 2px 8px rgba(200,96,42,0.4);
-  transition: transform 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: background .2s ease, transform .2s ease;
 }
-.avatar-edit-btn:hover { transform: scale(1.1); }
+
+.avatar-upload-btn:hover {
+  background: var(--accent-deep);
+  transform: translateY(-1px);
+}
+
+.avatar-help {
+  display: block;
+  margin-top: .75rem;
+  color: var(--muted);
+  font-size: .8rem;
+}
 
 .sidebar-name {
   font-family: var(--ff-display);
@@ -168,9 +189,11 @@
 .span-2 { grid-column: span 2; }
 
 label {
-  font-size: .875rem;
+  font-size: 10.5px;
   font-weight: 600;
-  color: var(--ink-secondary);
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 input {
@@ -191,13 +214,33 @@ input:focus {
   box-shadow: 0 0 0 4px var(--accent-glow);
 }
 
+.readonly-input {
+  opacity: 1;
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--surface-alt) 82%, var(--line-strong));
+  color: var(--muted);
+}
+
+.readonly-input:focus {
+  border-color: var(--line);
+  box-shadow: none;
+  background: color-mix(in srgb, var(--surface-alt) 82%, var(--line-strong));
+}
+
+.field-hint {
+  display: block;
+  margin-top: .1rem;
+  color: var(--muted);
+  font-size: .78rem;
+}
+
 input.ng-touched.ng-invalid {
-  border-color: #b91c1c;
-  box-shadow: 0 0 0 3px rgba(185,28,28,.1);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px var(--danger-pale);
 }
 
 .field-error {
-  color: #b91c1c;
+  color: var(--danger);
   font-size: .78rem;
   display: flex;
   align-items: center;
@@ -249,8 +292,8 @@ input.ng-touched.ng-invalid {
   grid-column: span 2;
 }
 
-.alert-success { background: rgba(45,106,79,0.08); color: var(--green); border-color: var(--green); }
-.alert-danger  { background: rgba(185,28,28,0.06); color: #b91c1c; border-color: #b91c1c; }
+.alert-success { background: var(--green-pale); color: var(--green); border-color: var(--green); }
+.alert-danger  { background: var(--danger-pale); color: var(--danger); border-color: var(--danger); }
 
 @media (max-width: 768px) {
   .profile-container { grid-template-columns: 1fr; }
@@ -269,11 +312,26 @@ input.ng-touched.ng-invalid {
   --ink-secondary: #c9c4b8;
   --muted: #776f63;
   --line: rgba(245,242,236,.09);
+  --line-strong: rgba(245,242,236,.18);
   --accent: #e07840;
   --accent-deep: #c8602a;
   --accent-glow: rgba(224,120,64,.2);
   --green: #4ade80;
+  --green-pale: rgba(74,222,128,.1);
+  --danger: #f87171;
+  --danger-pale: rgba(239,68,68,.12);
   --shadow-xs: 0 1px 3px rgba(0,0,0,.3);
   --shadow-sm: 0 4px 16px rgba(0,0,0,.4);
   --shadow-md: 0 12px 36px rgba(0,0,0,.5);
+}
+
+:host-context(.dark-mode) .profile-shell input {
+  background-color: var(--surface-alt) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+
+:host-context(.dark-mode) .profile-shell .readonly-input {
+  background-color: #222019 !important;
+  color: var(--muted) !important;
 }

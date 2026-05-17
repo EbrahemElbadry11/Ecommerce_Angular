@@ -639,7 +639,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.cartService.loadCart().subscribe((res) => {
-            this.cartService.currentCart = res.data ?? null;
             this.cdr.markForCheck();
           });
         },
@@ -675,7 +674,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.cartService.loadCart().subscribe((res) => {
-              this.cartService.currentCart = res.data ?? null;
               this.cdr.markForCheck();
             });
           },
@@ -696,7 +694,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.cartService.loadCart().subscribe((res) => {
-              this.cartService.currentCart = res.data ?? null;
               this.cdr.markForCheck();
             });
           },
@@ -745,9 +742,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
         // refresh cart cache
         this.cartService.loadCart()
           .subscribe((res) => {
-
-            this.cartService.currentCart =
-              res.data ?? null;
             this.cdr.markForCheck();
           });
         console.log(

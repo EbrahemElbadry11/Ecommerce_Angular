@@ -121,10 +121,12 @@
           <div class="radio-group">
             <label class="radio-label">
               <input type="radio" [(ngModel)]="sortOrder" value="asc" (change)="onFilterChange()" />
+              <span class="radio-custom"></span>
               Ascending
             </label>
             <label class="radio-label">
               <input type="radio" [(ngModel)]="sortOrder" value="desc" (change)="onFilterChange()" />
+              <span class="radio-custom"></span>
               Descending
             </label>
           </div>

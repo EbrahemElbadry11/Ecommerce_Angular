@@ -113,21 +113,40 @@ export class SellerService {
   // Helper method to get the full logo URL from the logo path or URL
   getLogoUrl(logo?: string | null): string {
 
-    if (!logo) {
+    const value =
+      logo?.trim();
+
+    if (!value) {
 
       return 'assets/images/default-store.png';
     }
 
     if (
-      logo.startsWith('http://') ||
-      logo.startsWith('https://')
+      value.startsWith('http://') ||
+      value.startsWith('https://') ||
+      value.startsWith('data:image') ||
+      value.startsWith('blob:') ||
+      value.startsWith('assets/')
     ) {
 
-      return logo;
+      return value;
     }
 
-    // relative path
-    return `https://ecommerceiti.runasp.net/${logo}`;
+    const looksLikeBase64 =
+      /^[A-Za-z0-9+/]+={0,2}$/.test(value) &&
+      value.length > 100;
+
+    if (looksLikeBase64) {
+
+      return `data:image/png;base64,${value}`;
+    }
+
+    const normalizedPath =
+      value.startsWith('/')
+        ? value
+        : `/${value}`;
+
+    return `https://ecommerceiti.runasp.net${normalizedPath}`;
   }
 
   getSellerOrders(): Observable<GeneralResponse<any[]>> {

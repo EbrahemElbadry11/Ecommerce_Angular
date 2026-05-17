@@ -25,6 +25,8 @@ import { SellerService } from '../../services/seller.service';
 
 import { SellerFormComponent } from '../seller-form/seller-form.component';
 
+import { ToastService } from '../../../../../services/toast';
+
 @Component({
   selector: 'app-seller-profile-page',
 
@@ -66,6 +68,7 @@ export class SellerProfilePageComponent
 
   constructor(
     public sellerService: SellerService,
+    private toastService: ToastService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -152,9 +155,6 @@ export class SellerProfilePageComponent
 
     this.seller = updatedSeller;
 
-    this.successMessage =
-      'Seller profile saved successfully.';
-
     this.errorMessage = '';
 
     this.cdr.detectChanges();
@@ -162,9 +162,17 @@ export class SellerProfilePageComponent
 
   onSuccess(message: string): void {
 
-    this.successMessage = message;
+    this.successMessage = '';
 
     this.errorMessage = '';
+
+    if (message) {
+
+      this.toastService.show(
+        message,
+        'success'
+      );
+    }
 
     this.cdr.detectChanges();
   }
@@ -176,6 +184,11 @@ export class SellerProfilePageComponent
     if (message) {
 
       this.successMessage = '';
+
+      this.toastService.show(
+        message,
+        'danger'
+      );
     }
 
     this.cdr.detectChanges();
@@ -188,14 +201,19 @@ export class SellerProfilePageComponent
 
   deleteProfile(): void {
 
-    const confirmed = window.confirm(
+    this.toastService.show({
+      message:
+        'Delete your seller profile? This action cannot be undone.',
+      type: 'danger',
+      isConfirm: true,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () =>
+        this.confirmDeleteProfile(),
+    });
+  }
 
-      'Delete your seller profile? This action cannot be undone.'
-    );
-
-    if (!confirmed) {
-      return;
-    }
+  private confirmDeleteProfile(): void {
 
     this.isDeleting = true;
 
@@ -229,11 +247,21 @@ export class SellerProfilePageComponent
 
             this.successMessage =
               'Seller profile deleted successfully.';
+
+            this.toastService.show(
+              'Seller profile deleted successfully.',
+              'success'
+            );
           }
           else {
 
             this.errorMessage =
               'Unable to delete seller profile.';
+
+            this.toastService.show(
+              'Unable to delete seller profile.',
+              'danger'
+            );
           }
 
           this.cdr.detectChanges();
@@ -259,6 +287,11 @@ export class SellerProfilePageComponent
 
           this.errorMessage =
             'Failed to delete seller profile. Please try again.';
+
+          this.toastService.show(
+            'Failed to delete seller profile. Please try again.',
+            'danger'
+          );
 
           this.cdr.detectChanges();
         },

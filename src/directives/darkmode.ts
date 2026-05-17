@@ -10,18 +10,18 @@ export class Darkmode implements OnInit {
     const theme = localStorage.getItem('theme');
 
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark-mode');
     }
   }
 
   @HostListener('click')
   toggleDarkMode() {
 
-    const html = document.documentElement;
+    const body = document.body;
 
-    html.classList.toggle('dark');
+    body.classList.toggle('dark-mode');
 
-    if (html.classList.contains('dark')) {
+    if (body.classList.contains('dark-mode')) {
       localStorage.setItem('theme', 'dark');
     } else {
       localStorage.setItem('theme', 'light');

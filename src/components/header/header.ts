@@ -48,6 +48,13 @@ export class Header implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       });
 
+    this.cartService.cartCount$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((count) => {
+        this.cartCount = count;
+        this.cdr.markForCheck();
+      });
+
     this.isDarkMode = this.themeService.isDarkMode();
 
     if (typeof window !== 'undefined') {
@@ -80,6 +87,8 @@ export class Header implements OnInit, OnDestroy {
 
     if (this.isLogged && !this.isAdmin) {
       this.loadCartCount();
+    } else {
+      this.cartService.clearCartState();
     }
   }
 
@@ -97,9 +106,6 @@ export class Header implements OnInit, OnDestroy {
             res.isSuccess &&
             res.data
           ) {
-
-            this.cartCount =
-              res.data.totalItems ?? 0;
 
             this.cdr.markForCheck();
           }

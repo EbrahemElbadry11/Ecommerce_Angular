@@ -352,9 +352,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
           // update local cart cache
           this.cartService.loadCart()
             .subscribe((res) => {
-
-              this.cartService.currentCart =
-                res.data ?? null;
+              this.cdr.markForCheck();
             });
 
           this.quantity = 1;
@@ -611,6 +609,11 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.cartService.loadCart()
+            .subscribe(() => {
+              this.cdr.markForCheck();
+            });
+
           console.log(`${product.name} added to cart`);
         },
         error: (err) => {

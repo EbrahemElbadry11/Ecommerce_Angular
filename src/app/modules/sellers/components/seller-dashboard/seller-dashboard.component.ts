@@ -30,6 +30,8 @@ import { SellerService } from '../../services/seller.service';
 import { ProductImageUploadComponent } from '../../../products/components/product-image-upload/product-image-upload.component';
 import { SellerOrdersComponent } from "../seller-orders/seller-orders";
 
+import { ToastService } from '../../../../../services/toast';
+
 @Component({
   selector: 'app-seller-dashboard',
 
@@ -78,6 +80,7 @@ export class SellerDashboardComponent
   constructor(
     private sellerService: SellerService,
     public productService: ProductService,
+    private toastService: ToastService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -250,14 +253,19 @@ export class SellerDashboardComponent
 
   deleteProduct(product: ProductDto): void {
 
-    const confirmed =
-      window.confirm(
-        `Delete ${product.name}? This cannot be undone.`
-      );
+    this.toastService.show({
+      message:
+        `Delete ${product.name}? This cannot be undone.`,
+      type: 'danger',
+      isConfirm: true,
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      onConfirm: () =>
+        this.confirmDeleteProduct(product),
+    });
+  }
 
-    if (!confirmed) {
-      return;
-    }
+  private confirmDeleteProduct(product: ProductDto): void {
 
     this.isDeletingProductId =
       product.productId;
@@ -304,6 +312,11 @@ export class SellerDashboardComponent
 
             this.errorMessage =
               'Unable to delete this product.';
+
+            this.toastService.show(
+              'Unable to delete this product.',
+              'danger'
+            );
           }
 
           this.cdr.detectChanges();
@@ -318,6 +331,11 @@ export class SellerDashboardComponent
 
           this.errorMessage =
             'Failed to delete product. Please try again.';
+
+          this.toastService.show(
+            'Failed to delete product. Please try again.',
+            'danger'
+          );
 
           this.cdr.detectChanges();
         },
@@ -362,6 +380,29 @@ export class SellerDashboardComponent
       this.isDeletingProductId ===
       productId
     );
+  }
+
+  trackByProductId(
+    _index: number,
+    product: ProductDto
+  ): number {
+
+    return product.productId;
+  }
+
+  getPrimaryImageName(product: ProductDto): string {
+
+    return product.imagesNames?.[0] ?? '';
+  }
+
+  getPrimaryImageUrl(product: ProductDto): string {
+
+    const imageName =
+      this.getPrimaryImageName(product);
+
+    return imageName
+      ? this.productService.getImageUrl(imageName)
+      : 'assets/images/no-image.png';
   }
 
   formatCurrency(value: number): string {

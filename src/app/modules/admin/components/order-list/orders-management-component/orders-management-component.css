@@ -45,6 +45,7 @@
   background-image:
     radial-gradient(ellipse 60% 40% at 0% 0%, rgba(200,96,42,.05) 0%, transparent 70%),
     radial-gradient(ellipse 50% 60% at 100% 100%, rgba(45,106,79,.04) 0%, transparent 65%);
+  transition: background-color 0.35s ease, color 0.35s ease, background-image 0.35s ease;
 }
 
 .admin-header {
@@ -204,7 +205,8 @@
 }
 .panel-count {
   font-size: 12px; font-weight: 600; color: var(--muted);
-  background: var(--surface-alt); padding: 4px 12px;
+  background: var(--line-strong); color: var(--ink-secondary);
+  padding: 4px 12px;
   border-radius: 999px; border: 1px solid var(--line);
 }
 
@@ -232,29 +234,57 @@
 
 /* ─── Table ──────────────────────────────────────────── */
 .table-responsive { overflow-x: auto; }
-.table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .9rem; }
+.table { 
+  width: 100%; 
+  border-collapse: collapse !important; 
+  border-spacing: 0 !important;
+  font-size: .9rem; 
+}
 
 .table th {
   padding: .875rem 1rem; text-align: left; font-weight: 600;
   color: var(--muted); font-size: 10.5px; text-transform: uppercase;
-  letter-spacing: 1.5px; border-bottom: 1px solid var(--line); white-space: nowrap;
+  letter-spacing: 1.5px; border-bottom: 1px solid var(--line-strong); white-space: nowrap;
 }
 .table td {
   padding: .875rem 1rem; color: var(--ink);
-  border-bottom: 1px solid var(--line); vertical-align: middle;
+  border-bottom: 1px solid var(--line); 
+  vertical-align: middle;
+  background-clip: padding-box;
+  height: 60px; /* Fixed height ensures horizontal alignment across all cells */
 }
 .table tbody tr { transition: background .15s ease; }
 .table tbody tr:hover { background: var(--surface-alt); }
-.table tbody tr:last-child td { border-bottom: none; }
+
+/* Fix cracked lines: Remove border from expanded parent to join detail row seamlessly */
+.table tr.expanded-row td {
+  border-bottom: none !important;
+}
+
+/* Ensure action buttons in table don't crack the alignment */
+.table .action-btn {
+  padding: 0 14px;
+  font-size: 12px;
+  height: 32px;
+  margin: 0; /* Remove margin to prevent row stretching */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.table td:last-child {
+  white-space: nowrap;
+}
 
 /* Expanded row highlight */
-.expanded-row > td { background: var(--accent-pale) !important; }
+.expanded-row > td { background: var(--surface) !important; }
 
 /* Detail row */
 .detail-row > td {
   padding: 0;
   background: var(--surface-alt);
-  border-bottom: 2px solid var(--accent);
+  border-bottom: 1px solid var(--line);
 }
 
 .order-detail {
@@ -403,16 +433,125 @@
 
 /* ─── Dark Mode ──────────────────────────────────────── */
 :host-context(body.dark-mode) {
-  --bg: #0e0d0b; --surface: #17150f; --surface-alt: #1d1b14;
-  --ink: #f5f2ec; --ink-secondary: #c9c4b8; --muted: #776f63;
-  --line: rgba(245,242,236,.09); --line-strong: rgba(245,242,236,.18);
+  --bg: #0e0d0b; --surface: #17150f; --surface-alt: #2a2620;
+  --ink: #f5f2ec; --ink-secondary: #c9c4b8; --muted: #8b8680;
+  --line: rgba(245,242,236,.12); --line-strong: rgba(245,242,236,.22);
   --accent: #e07840; --accent-deep: #c8602a;
-  --accent-glow: rgba(224,120,64,.2); --accent-pale: rgba(224,120,64,.1);
-  --green: #4ade80; --green-pale: rgba(74,222,128,.1);
-  --danger: #f87171; --danger-pale: rgba(239,68,68,.12);
-  --warn: #fbbf24; --warn-pale: rgba(234,179,8,.12);
-  --info: #60a5fa; --info-pale: rgba(59,130,246,.12);
+  --accent-glow: rgba(224,120,64,.2); --accent-pale: rgba(224,120,64,.18);
+  --green: #4ade80; --green-pale: rgba(74,222,128,.15);
+  --danger: #f87171; --danger-pale: rgba(239,68,68,.15);
+  --warn: #fbbf24; --warn-pale: rgba(234,179,8,.15);
+  --info: #60a5fa; --info-pale: rgba(59,130,246,.15);
   --shadow-xs: 0 1px 3px rgba(0,0,0,.3);
   --shadow-sm: 0 4px 16px rgba(0,0,0,.4);
   --shadow-md: 0 12px 36px rgba(0,0,0,.5);
+}
+
+:host-context(body.dark-mode) .admin-page {
+  background-image: 
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(224,120,64,.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(74,222,128,.04) 0%, transparent 65%);
+}
+
+/* Dark Mode - Table Panel Content Fixes */
+:host-context(body.dark-mode) .table-panel {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-md);
+}
+
+:host-context(body.dark-mode) .panel-count {
+  background: var(--line-strong);
+  color: var(--accent);
+  border-color: var(--line-strong);
+}
+
+:host-context(body.dark-mode) .search-input,
+:host-context(body.dark-mode) .admin-select {
+  background: var(--surface-alt);
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+
+:host-context(body.dark-mode) .table-responsive {
+  background: transparent;
+  border-radius: var(--radius-md);
+}
+
+:host-context(body.dark-mode) .table th {
+  background: rgba(245, 242, 236, 0.03);
+  color: var(--ink-secondary);
+  border-bottom-color: var(--line-strong);
+}
+
+:host-context(body.dark-mode) .table td {
+  background: transparent;
+  color: var(--ink);
+  border-bottom-color: var(--line);
+}
+
+:host-context(body.dark-mode) .table tbody tr:hover {
+  background: rgba(224,120,64,.08);
+}
+
+:host-context(body.dark-mode) .expanded-row > td {
+  background: rgba(224,120,64,.12) !important;
+  color: #f5f2ec;
+}
+
+:host-context(body.dark-mode) .detail-row > td {
+  background: #2a2620;
+  border-bottom: 2px solid #e07840;
+}
+
+:host-context(body.dark-mode) .order-detail {
+  color: #f5f2ec;
+}
+
+:host-context(body.dark-mode) .detail-meta {
+  color: #8b8680;
+  border-bottom-color: rgba(245,242,236,.15);
+}
+
+:host-context(body.dark-mode) .detail-meta strong {
+  color: #f5f2ec;
+}
+
+:host-context(body.dark-mode) .order-item-card {
+  background: #1f1d17;
+  border-color: rgba(245,242,236,.1);
+}
+
+:host-context(body.dark-mode) .order-item-card:hover {
+  box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+
+:host-context(body.dark-mode) .item-info {
+  color: #f5f2ec;
+}
+
+:host-context(body.dark-mode) .item-name {
+  color: #f5f2ec;
+}
+
+:host-context(body.dark-mode) .item-meta {
+  color: #8b8680;
+}
+
+:host-context(body.dark-mode) .order-summary {
+  background: #1f1d17;
+  border-color: rgba(245,242,236,.1);
+}
+
+:host-context(body.dark-mode) .summary-row {
+  color: #c9c4b8;
+}
+
+:host-context(body.dark-mode) .total-row {
+  color: #f5f2ec;
+  border-top-color: rgba(245,242,236,.15);
+}
+
+:host-context(body.dark-mode) .total-row strong {
+  color: #e07840;
 }
