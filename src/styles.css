@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════
    GLOBAL STYLES  – BLUE LINK E-Commerce
 ═══════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Sans:wght@400;500;600;700&display=swap');
 
 /* ── CSS Variables ── */
 :root {
@@ -24,16 +24,16 @@
 }
 
 body.dark-mode {
-  --bg-primary:   #0d0d1a;
-  --bg-secondary: #12121f;
-  --bg-card:      #1a1a2e;
-  --bg-surface:   #16213e;
-  --text-primary:   #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted:     #64748b;
-  --border-color:   rgba(255,255,255,0.08);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --bg-primary:   #0e0d0b; /* Beautiful warm charcoal background */
+  --bg-secondary: #17150f; /* Premium warm surface-alt */
+  --bg-card:      #1d1b14; /* Card background */
+  --bg-surface:   #1d1b14; /* Surface background */
+  --text-primary:   #f5f2ec; /* Soft warm white */
+  --text-secondary: #c9c4b8; /* Muted warm secondary */
+  --text-muted:     #776f63; /* Warm muted text */
+  --border-color:   rgba(245, 242, 236, 0.08); /* Warm border */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
 }
 
 /* ── Base ── */
@@ -124,10 +124,18 @@ body.dark-mode textarea {
   border-color: var(--border-color) !important;
 }
 
+body.dark-mode input.search-input,
+body.dark-mode input.newsletter-input {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
   color: var(--text-muted) !important;
 }
+
 
 /* ── Admin select ── */
 body.dark-mode .admin-select {
@@ -143,37 +151,7 @@ body.dark-mode .filters-section {
   border-color: var(--border-color) !important;
 }
 
-/* ── Product list / filter panel ── */
-body.dark-mode .filters-panel,
-body.dark-mode .product-list-container {
-  background: var(--bg-primary) !important;
-  color: var(--text-primary) !important;
-}
-
-body.dark-mode .filter-select,
-body.dark-mode .search-input,
-body.dark-mode .price-input {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
-}
-
-/* ── Product cards ── */
-body.dark-mode .product-card {
-  background: var(--bg-card) !important;
-  border-color: var(--border-color) !important;
-}
-
-body.dark-mode .product-card h3,
-body.dark-mode .product-card strong {
-  color: var(--text-primary) !important;
-}
-
-body.dark-mode .product-card p,
-body.dark-mode .product-card .category,
-body.dark-mode .product-card .date {
-  color: var(--text-secondary) !important;
-}
+/* ── Product list / filter panel / Category Detail overrides removed to honor local component themes ── */
 
 /* ── Category cards ── */
 body.dark-mode .category-card {
@@ -207,3 +185,20 @@ body.dark-mode .product-card.seller {
 body.dark-mode ::-webkit-scrollbar { width: 6px; }
 body.dark-mode ::-webkit-scrollbar-track { background: var(--bg-secondary); }
 body.dark-mode ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+/* ── Premium Router Outlet Entry Page Transitions ── */
+router-outlet + * {
+  display: block;
+  animation: pageFadeInSlide 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pageFadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

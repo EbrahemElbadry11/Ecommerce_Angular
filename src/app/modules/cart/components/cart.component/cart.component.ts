@@ -22,6 +22,9 @@ export class CartComponent implements OnInit {
 
   isEmpty = false;
 
+  currentPage = 1;
+  pageSize = 3;
+
   constructor(
     public cartService: CartService,
     private cdr: ChangeDetectorRef
@@ -58,6 +61,14 @@ export class CartComponent implements OnInit {
           }
 
           this.updateSubtotal();
+
+          // clamp currentPage after items loaded
+          const totalPages = this.totalPages;
+          if (this.currentPage > totalPages && totalPages > 0) {
+            this.currentPage = totalPages;
+          } else if (totalPages === 0) {
+            this.currentPage = 1;
+          }
 
           this.isLoading = false;
 
@@ -209,6 +220,35 @@ export class CartComponent implements OnInit {
 
         0
       );
+  }
+
+  get paginatedItems(): any[] {
+    if (!this.cart || !this.cart.items) {
+      return [];
+    }
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return this.cart.items.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  get totalPages(): number {
+    if (!this.cart || !this.cart.items) {
+      return 0;
+    }
+    return Math.ceil(this.cart.items.length / this.pageSize);
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.cdr.detectChanges();
+    }
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.cdr.detectChanges();
+    }
   }
 
 }

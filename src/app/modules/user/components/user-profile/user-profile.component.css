@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 .profile-shell {
   --bg: #ffffff;
@@ -262,7 +261,7 @@ input.ng-touched.ng-invalid {
 }
 
 /* ─── Dark Mode ───────────────────────── */
-body.dark-mode .profile-shell {
+:host-context(.dark-mode) .profile-shell {
   --bg: #0e0d0b;
   --surface: #17150f;
   --surface-alt: #1d1b14;

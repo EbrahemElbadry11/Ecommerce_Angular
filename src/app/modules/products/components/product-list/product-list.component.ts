@@ -35,7 +35,7 @@ import {
   ProductCardDto,
   ProductDto,
   ProductFilterDto,
-  ProductListResponse,
+  normalizeProductListResponse,
 } from '../../models/product.model';
 
 import { CategoryDto } from '../../../categories/models/category.model';
@@ -69,6 +69,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
   minPrice?: number;
 
   maxPrice?: number;
+
+  minPlaceholderPrice: number | string = 'Min';
+  
+  maxPlaceholderPrice: number | string = 'Max';
 
   sortBy:
     | 'name'
@@ -265,9 +269,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
             response.data
           ) {
 
-            const data:
-              ProductListResponse =
-              response.data;
+            const data = normalizeProductListResponse(response.data);
 
             this.products =
               data.products.map(
@@ -299,14 +301,21 @@ export class ProductListComponent implements OnInit, OnDestroy {
                 })
               );
 
-            this.totalProducts =
-              data.totalCount;
+            if (this.products.length > 0) {
+              const prices = this.products.map(p => p.price);
+              this.minPlaceholderPrice = Math.min(...prices);
+              this.maxPlaceholderPrice = Math.max(...prices);
+            } else {
+              this.minPlaceholderPrice = 'Min';
+              this.maxPlaceholderPrice = 'Max';
+            }
+
+            this.totalProducts = data.totalCount;
 
             this.totalPages =
-              Math.ceil(
-                data.totalCount /
-                data.pageSize
-              );
+              data.totalCount > 0
+                ? Math.max(1, Math.ceil(data.totalCount / this.pageSize))
+                : 0;
 
             return;
           }
@@ -316,6 +325,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.totalProducts = 0;
 
           this.totalPages = 0;
+          this.minPlaceholderPrice = 'Min';
+          this.maxPlaceholderPrice = 'Max';
           this.cdr.detectChanges();
         },
 
@@ -349,10 +360,21 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   onPriceChange(): void {
+    if (this.minPrice !== undefined && this.minPrice !== null && typeof this.minPlaceholderPrice === 'number') {
+      if (this.minPrice < this.minPlaceholderPrice) {
+        this.minPrice = this.minPlaceholderPrice;
+      }
+    }
+    if (this.maxPrice !== undefined && this.maxPrice !== null && typeof this.maxPlaceholderPrice === 'number') {
+      if (this.maxPrice > this.maxPlaceholderPrice) {
+        this.maxPrice = this.maxPlaceholderPrice;
+      }
+    }
     this.currentPage = 1;
 
     this.loadProducts();
   }
+
 
   onSortChange(): void {
     this.currentPage = 1;
@@ -378,14 +400,13 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   nextPage(): void {
-    if (
-      this.currentPage <
-      this.totalPages
-    ) {
-      this.currentPage++;
-
-      this.loadProducts();
+    if (!this.hasNextPage()) {
+      return;
     }
+
+    this.currentPage++;
+
+    this.loadProducts();
   }
 
   hasPreviousPage(): boolean {
@@ -393,11 +414,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
   }
 
   hasNextPage(): boolean {
-    return (
-      this.currentPage <
-      this.totalPages
-    );
+    if (this.products.length < this.pageSize) {
+      return false;
+    }
+
+    if (this.totalProducts > 0) {
+      return this.currentPage * this.pageSize < this.totalProducts;
+    }
+
+    return this.currentPage < this.totalPages;
   }
+
 
   //filter toggle
   toggleFilters(): void {
@@ -435,6 +462,103 @@ export class ProductListComponent implements OnInit, OnDestroy {
     ]);
   }
 
+  getCartQuantity(productId: number): number {
+    return this.cartService.getCartItemQuantity(productId);
+  }
+
+  incrementCart(product: ProductCardDto): void {
+    const currentQty = this.getCartQuantity(product.productId);
+    if (currentQty >= product.stockQuantity) {
+      alert(`Only ${product.stockQuantity} items available in stock.`);
+      return;
+    }
+
+    if (this.addingToCartIds.has(product.productId)) {
+      return;
+    }
+
+    this.addingToCartIds.add(product.productId);
+    this.cdr.markForCheck();
+
+    this.cartService.updateCart(product.productId, currentQty + 1)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.addingToCartIds.delete(product.productId);
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.cartService.loadCart().subscribe((res) => {
+            this.cartService.currentCart = res.data ?? null;
+            this.cdr.markForCheck();
+          });
+        },
+        error: (err) => {
+          console.error('Increment cart error:', err);
+        }
+      });
+  }
+
+  decrementCart(product: ProductCardDto): void {
+    const currentQty = this.getCartQuantity(product.productId);
+    if (currentQty <= 0) {
+      return;
+    }
+
+    if (this.addingToCartIds.has(product.productId)) {
+      return;
+    }
+
+    this.addingToCartIds.add(product.productId);
+    this.cdr.markForCheck();
+
+    if (currentQty === 1) {
+      // Remove item completely from the cart
+      this.cartService.removeItem(product.productId)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.addingToCartIds.delete(product.productId);
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cartService.loadCart().subscribe((res) => {
+              this.cartService.currentCart = res.data ?? null;
+              this.cdr.markForCheck();
+            });
+          },
+          error: (err) => {
+            console.error('Remove item error:', err);
+          }
+        });
+    } else {
+      // Decrement quantity
+      this.cartService.updateCart(product.productId, currentQty - 1)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.addingToCartIds.delete(product.productId);
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cartService.loadCart().subscribe((res) => {
+              this.cartService.currentCart = res.data ?? null;
+              this.cdr.markForCheck();
+            });
+          },
+          error: (err) => {
+            console.error('Decrement cart error:', err);
+          }
+        });
+    }
+  }
+
   /// Add to Cart
   addToCart(product: ProductCardDto): void {
 
@@ -442,23 +566,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
       !product ||
       product.stockQuantity <= 0
     ) {
-      return;
-    }
-
-    const existingQuantity =
-      this.cartService.getCartItemQuantity(
-        product.productId
-      );
-
-    if (
-      existingQuantity + 1 >
-      product.stockQuantity
-    ) {
-
-      alert(
-        `Only ${product.stockQuantity} items available in stock`
-      );
-
       return;
     }
 
@@ -493,6 +600,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
             this.cartService.currentCart =
               res.data ?? null;
+            this.cdr.markForCheck();
           });
         console.log(
           `${product.name} added to cart`

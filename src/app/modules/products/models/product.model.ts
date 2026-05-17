@@ -74,6 +74,21 @@ export interface ProductListResponse {
 
   products: ProductDto[];
 }
+
+export function normalizeProductListResponse(raw: unknown): {
+  products: ProductDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+} {
+  const data = raw as Record<string, unknown> | null | undefined;
+  const totalCount = Number(data?.['totalCount'] ?? data?.['TotalCount'] ?? 0);
+  const pageSize = Number(data?.['pageSize'] ?? data?.['PageSize'] ?? 12);
+  const page = Number(data?.['page'] ?? data?.['Page'] ?? 1);
+  const products = (data?.['products'] ?? data?.['Products'] ?? []) as ProductDto[];
+  return { products, totalCount, page, pageSize };
+}
+
 export interface ProductCardDto extends ProductDto {
   imageUrl: string;
   shortDescription: string;

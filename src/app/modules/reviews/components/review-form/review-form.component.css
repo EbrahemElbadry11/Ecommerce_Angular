@@ -174,3 +174,44 @@
     height: 24px;
   }
 }
+
+/* Dark Mode */
+:host-context(.dark-mode) .review-form {
+  background: var(--bg-card, #1a1a2e);
+  border-color: var(--border-color, rgba(255,255,255,0.08));
+}
+
+:host-context(.dark-mode) .review-form h3,
+:host-context(.dark-mode) .form-group label {
+  color: var(--text-primary, #f1f5f9);
+}
+
+:host-context(.dark-mode) .review-info {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--text-secondary, #94a3b8);
+}
+
+:host-context(.dark-mode) .rating-value {
+  color: var(--text-secondary, #94a3b8);
+}
+
+:host-context(.dark-mode) .comment-input {
+  background-color: var(--bg-secondary, #12121f) !important;
+  color: var(--text-primary, #f1f5f9) !important;
+  border-color: var(--border-color, rgba(255,255,255,0.08)) !important;
+}
+
+:host-context(.dark-mode) .comment-input::placeholder {
+  color: var(--text-muted, #64748b) !important;
+}
+
+:host-context(.dark-mode) .login-prompt {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--text-primary, #f1f5f9);
+}
+
+:host-context(.dark-mode) .login-prompt a {
+  color: var(--accent, #6366f1);
+}

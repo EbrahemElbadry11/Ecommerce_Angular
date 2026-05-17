@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 /* ═══════════════════════════════════
    HEADER / NAVBAR — Warm Earth-Tone
@@ -265,7 +264,7 @@
 }
 
 /* ── Dark mode ── */
-body.dark-mode .custom-nav {
+:host-context(.dark-mode) .custom-nav {
   background: rgba(8, 8, 12, 0.94);
   border-bottom-color: rgba(245, 242, 236, 0.04);
 }

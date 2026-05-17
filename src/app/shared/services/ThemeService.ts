@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
   private darkMode = false;
+  readonly themeChanged = new Subject<boolean>();
 
   constructor() {
     this.loadTheme();
@@ -32,6 +34,7 @@ export class ThemeService {
     } else {
       document.body.classList.remove('dark-mode');
     }
+    this.themeChanged.next(this.darkMode);
   }
 
   isDarkMode(): boolean {

@@ -1,10 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 /* ─── Design Tokens ─────────────────────────────────────── */
 .product-list-container {
   --bg: #ffffff;
   --surface: #ffffff;
-  --surface-alt: #ffffff;
+  --surface-alt: #faf9f7;
   --surface-tint: #ffffff;
   --ink: #1a1714;
   --ink-secondary: #3d3a35;
@@ -671,7 +670,7 @@
   opacity: 1;
 }
 
-.quick-view-btn {
+.quick-view-btn, .quick-view-label {
   border: 1.5px solid rgba(255, 255, 255, .85);
   background: rgba(255, 255, 255, .12);
   backdrop-filter: blur(10px);
@@ -687,11 +686,12 @@
   transition: transform .25s cubic-bezier(.22, 1, .36, 1), background .2s;
 }
 
-.product-card:hover .quick-view-btn {
+.product-card:hover .quick-view-btn,
+.product-card:hover .quick-view-label {
   transform: translateY(0);
 }
 
-.quick-view-btn:hover {
+.quick-view-btn:hover, .quick-view-label:hover {
   background: rgba(255, 255, 255, .25);
 }
 
@@ -759,27 +759,28 @@
   margin-top: auto;
   border-top: 1px solid var(--line);
   padding-top: 14px;
+}
+
+.price-stock {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .price {
   font-family: var(--ff-display);
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.3px;
+  color: var(--green);
 }
 
-.action-buttons {
-  display: flex;
-  gap: 8px;
-}
+.stock { font-size: 11px; color: var(--muted); }
+.stock.low { color: var(--warn); font-weight: 600; }
 
 /* Add to Cart */
 .add-to-cart-btn {
-  flex: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -828,36 +829,66 @@
 }
 
 .add-to-cart-btn:disabled {
-  background: var(--surface-tint);
+  background: var(--line-strong);
   color: var(--muted);
   cursor: not-allowed;
 }
 
-/* View Details */
-.view-btn {
+/* Dynamic Quantity Selector Button replacement */
+.dynamic-qty-selector {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: var(--radius-sm);
+  background: var(--accent); /* Signature orange/accent background */
+  color: #fff;
+  height: 42px; /* Exact same height as add-to-cart-btn */
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(200, 96, 42, .2);
+  transition: all 0.2s ease;
+}
+
+.dynamic-qty-selector:hover {
+  background: var(--accent-deep);
+  box-shadow: 0 8px 22px rgba(200, 96, 42, .35);
+}
+
+.qty-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border: 1.5px solid var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--ink-secondary);
-  cursor: pointer;
-  transition: all .2s ease;
-}
-
-.view-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-.view-btn:hover {
-  background: var(--ink);
+  height: 100%;
+  border: none;
+  background: rgba(255, 255, 255, 0);
   color: #fff;
-  border-color: var(--ink);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.qty-action-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.qty-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-action-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.qty-display {
+  font-family: var(--ff-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  min-width: 30px;
+  text-align: center;
+  user-select: none;
 }
 
 /* ─── Pagination ─────────────────────────────────────────── */
@@ -1106,7 +1137,7 @@
 }
 
 /* ─── Dark Mode ──────────────────────────────────────────── */
-body.dark-mode .product-list-container {
+:host-context(.dark-mode) .product-list-container {
   --bg: #0e0d0b;
   --surface: #17150f;
   --surface-alt: #1d1b14;
@@ -1129,14 +1160,31 @@ body.dark-mode .product-list-container {
   --shadow-sm: 0 4px 16px rgba(0, 0, 0, .4);
   --shadow-md: 0 12px 36px rgba(0, 0, 0, .5);
   --shadow-lg: 0 24px 60px rgba(0, 0, 0, .6);
+
+  background-image:
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(224, 120, 64, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(74, 222, 128, 0.05) 0%, transparent 65%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f5f2ec' fill-opacity='0.008'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
-body.dark-mode .filter-select,
-body.dark-mode .price-input {
+:host-context(.dark-mode) .filter-select,
+:host-context(.dark-mode) .price-input {
+  background: var(--surface-alt);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+:host-context(.dark-mode) .filter-select option {
   background: var(--surface-alt);
   color: var(--ink);
 }
 
-body.dark-mode .low-stock-badge {
+:host-context(.dark-mode) .reset-btn:hover {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+:host-context(.dark-mode) .low-stock-badge {
   background: rgba(14, 13, 11, .85);
 }

@@ -12,6 +12,7 @@ import Chart from 'chart.js/auto';
 import { AdminService } from '../../services/admin.service';
 import { AdminDashboardStats, AdminUser, ManagedRole, RecentOrder } from '../../models/user-admin.model';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
+import { ThemeService } from '../../../../shared/services/ThemeService';
 
 // ─── Order Status ────────────────────────────────────────────────────────────
 export type OrderStatus =
@@ -57,6 +58,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   // ── DI ──────────────────────────────────────────────────────────────────────
   private adminService = inject(AdminService);
   private cd           = inject(ChangeDetectorRef);
+  private themeService = inject(ThemeService);
 
   // ── Dashboard state ──────────────────────────────────────────────────────────
   stats        = signal<AdminDashboardStats | null>(null);
@@ -98,6 +100,14 @@ public orderStatusData: OrderStatusItem[] = [];
 
   ngOnInit(): void {
     this.loadDashboardData();
+
+    this.subs.push(
+      this.themeService.themeChanged.subscribe(() => {
+        if (!this.loading() && (this.revenueChart || this.ordersPieChart)) {
+          this.initCharts();
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -245,11 +255,23 @@ console.log('monthlyRevenue:', this.monthlyRevenue);
     this.initPieChart();
   }
 
+  private getChartTheme(): { tick: string; grid: string; pointBorder: string } {
+    const dark = this.themeService.isDarkMode();
+    return {
+      tick: dark ? '#c9c4b8' : '#6b7280',
+      grid: dark ? 'rgba(245, 242, 236, 0.08)' : 'rgba(138, 134, 126, 0.1)',
+      pointBorder: dark ? '#17150f' : '#ffffff',
+    };
+  }
+
   private initRevenueChart(): void {
     const canvas = this.revenueChartCanvas?.nativeElement;
     if (!canvas) return;
 
     this.revenueChart?.destroy();
+
+    const chartTheme = this.getChartTheme();
+    const accent = this.themeService.isDarkMode() ? '#e07840' : '#c8602a';
 
     this.revenueChart = new Chart(canvas, {
       type: 'line',
@@ -258,13 +280,15 @@ console.log('monthlyRevenue:', this.monthlyRevenue);
         datasets: [{
           label: 'Revenue ($)',
           data: [...this.monthlyRevenue],  
-          borderColor: '#c8602a',
-          backgroundColor: 'rgba(200, 96, 42, 0.05)',
+          borderColor: accent,
+          backgroundColor: this.themeService.isDarkMode()
+            ? 'rgba(224, 120, 64, 0.12)'
+            : 'rgba(200, 96, 42, 0.05)',
           borderWidth: 3,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#c8602a',
-          pointBorderColor: '#fff',
+          pointBackgroundColor: accent,
+          pointBorderColor: chartTheme.pointBorder,
           pointBorderWidth: 2,
           pointRadius: 5,
           pointHoverRadius: 7,
@@ -287,13 +311,16 @@ console.log('monthlyRevenue:', this.monthlyRevenue);
         scales: {
           y: {
             beginAtZero: true,
-            ticks: { callback: v => `$${Number(v).toLocaleString()}` },
-            grid: { color: 'rgba(138,134,126,0.1)' },
+            ticks: {
+              callback: v => `$${Number(v).toLocaleString()}`,
+              color: chartTheme.tick,
+            },
+            grid: { color: chartTheme.grid },
             border: { display: false },
           },
           x: {
             grid: { display: false },
-            ticks: { color: '#6b7280' },
+            ticks: { color: chartTheme.tick },
           },
         },
       },

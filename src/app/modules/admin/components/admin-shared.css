@@ -1,5 +1,4 @@
 /* admin-dashboard.component.css */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 /* ─── Design Tokens ─────────────────────── */
 :host {
@@ -843,7 +842,7 @@
 }
 
 /* ─── Dark Mode ──────────────────────── */
-:host-context(body.dark-mode) {
+:host-context(.dark-mode) {
   --bg: #0e0d0b;
   --surface: #17150f;
   --surface-alt: #1d1b14;
@@ -868,6 +867,21 @@
   --shadow-sm: 0 4px 16px rgba(0,0,0,.4);
   --shadow-md: 0 12px 36px rgba(0,0,0,.5);
   --shadow-lg: 0 24px 60px rgba(0,0,0,.6);
+}
+
+:host-context(.dark-mode) .admin-page {
+  background-image:
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(224, 120, 64, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 100% 100%, rgba(74, 222, 128, 0.08) 0%, transparent 65%);
+}
+
+:host-context(.dark-mode) .action-btn-outline:hover {
+  color: var(--bg);
+}
+
+:host-context(.dark-mode) .legend-label,
+:host-context(.dark-mode) .legend-value {
+  color: var(--ink-secondary);
 }
 
 /* Reduced Motion */

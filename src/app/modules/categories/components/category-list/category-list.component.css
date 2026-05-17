@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 .category-list-container {
   --bg: #ffffff;
@@ -285,7 +284,7 @@
 }
 
 /* ─── Dark Mode ───────────────────────── */
-body.dark-mode .category-list-container {
+:host-context(.dark-mode) .category-list-container {
   --bg: #0e0d0b;
   --surface: #17150f;
   --surface-alt: #1d1b14;

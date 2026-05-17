@@ -97,7 +97,7 @@
         <div class="price-inputs">
           <input
             type="number"
-            placeholder="Min"
+            [placeholder]="minPlaceholderPrice"
             [(ngModel)]="minPrice"
             (ngModelChange)="onPriceChange()"
             min="0"
@@ -106,7 +106,7 @@
           <span class="price-sep">—</span>
           <input
             type="number"
-            placeholder="Max"
+            [placeholder]="maxPlaceholderPrice"
             [(ngModel)]="maxPrice"
             (ngModelChange)="onPriceChange()"
             min="0"
@@ -221,23 +221,16 @@
           </div>
 
           <!-- Image -->
-          <div class="product-image-container">
+          <div class="product-image-container" (click)="viewProduct(product.productId)" style="cursor: pointer;">
             <img
               [src]="product.imageUrl"
               [alt]="product.name"
               class="product-image"
               loading="lazy"
               decoding="async"
-              width="300"
-              height="300"
-              style="object-fit: fill;"
             />
             <div class="image-overlay">
-              <button
-                type="button"
-                class="quick-view-btn"
-                (click)="viewProduct(product.productId)"
-              >Quick View</button>
+              <span class="quick-view-label">View Details</span>
             </div>
           </div>
 
@@ -257,9 +250,15 @@
             <!-- Footer -->
             <div class="product-footer">
 
-              <span class="price">{{ product.formattedPrice }}</span>
+              <div class="price-stock">
+                <span class="price">{{ product.formattedPrice }}</span>
+                <span class="stock" [class.low]="product.stockQuantity < 10">
+                  {{ product.stockQuantity }} in stock
+                </span>
+              </div>
 
-              <div class="action-buttons">
+              <!-- Dynamic Add to Cart / Inline Counter -->
+              <ng-container *ngIf="getCartQuantity(product.productId) === 0; else qtyCounter">
                 <button
                   type="button"
                   class="add-to-cart-btn"
@@ -269,28 +268,39 @@
                     isAddingToCart(product.productId)
                   "
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px; display: inline-block; vertical-align: middle;">
                     <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                     <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                   </svg>
-                  {{
-                    isAddingToCart(product.productId)
-                      ? 'Adding...'
-                      : 'Add to Cart'
-                  }}
+                  <span style="vertical-align: middle;">{{ product.stockQuantity <= 0 ? 'Out of Stock' : (isAddingToCart(product.productId) ? 'Adding...' : 'Add to Cart') }}</span>
                 </button>
+              </ng-container>
 
-                <button
-                  type="button"
-                  class="view-btn"
-                  (click)="viewProduct(product.productId)"
-                  aria-label="View product details"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </button>
-              </div>
+              <ng-template #qtyCounter>
+                <div class="dynamic-qty-selector">
+                  <button
+                    type="button"
+                    class="qty-action-btn minus"
+                    (click)="decrementCart(product)"
+                    [disabled]="isAddingToCart(product.productId)"
+                    aria-label="Decrease quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <span class="qty-display">
+                    {{ isAddingToCart(product.productId) ? '...' : getCartQuantity(product.productId) }}
+                  </span>
+                  <button
+                    type="button"
+                    class="qty-action-btn plus"
+                    (click)="incrementCart(product)"
+                    [disabled]="getCartQuantity(product.productId) >= product.stockQuantity || isAddingToCart(product.productId)"
+                    aria-label="Increase quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+              </ng-template>
 
             </div>
 

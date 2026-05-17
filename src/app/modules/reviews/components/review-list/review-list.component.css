@@ -183,3 +183,42 @@
     align-self: flex-start;
   }
 }
+
+/* Dark Mode */
+:host-context(.dark-mode) .no-reviews {
+  background: var(--bg-card, #1a1a2e);
+  border-color: var(--border-color, rgba(255,255,255,0.08));
+  color: var(--text-secondary, #94a3b8);
+}
+
+:host-context(.dark-mode) .review-card {
+  background: var(--bg-card, #1a1a2e);
+  border-color: var(--border-color, rgba(255,255,255,0.08));
+}
+
+:host-context(.dark-mode) .review-card:hover {
+  background: var(--bg-secondary, #12121f);
+}
+
+:host-context(.dark-mode) .reviewer-name {
+  color: var(--text-primary, #f1f5f9);
+}
+
+:host-context(.dark-mode) .review-date,
+:host-context(.dark-mode) .rating-number {
+  color: var(--text-muted, #64748b);
+}
+
+:host-context(.dark-mode) .review-comment {
+  color: var(--text-secondary, #94a3b8);
+}
+
+:host-context(.dark-mode) .edit-review-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+}
+
+:host-context(.dark-mode) .edit-review-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}

@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
 
 .home-container {
   --bg: #ffffff;
@@ -125,8 +124,8 @@
 
 .hero-decoration { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .hero-circle { position: absolute; border-radius: 50%; }
-.hero-circle-1 { width: 500px; height: 500px; top: -200px; right: -100px; background: radial-gradient(circle, rgba(200,96,42,0.08), transparent 70%); }
-.hero-circle-2 { width: 400px; height: 400px; bottom: -150px; left: -100px; background: radial-gradient(circle, rgba(45,106,79,0.06), transparent 70%); }
+.hero-circle-1 { max-width: 500px; width: 100%; height: 500px; top: -200px; right: -100px; background: radial-gradient(circle, rgba(200,96,42,0.08), transparent 70%); }
+.hero-circle-2 { max-width: 400px; width: 100%; height: 400px; bottom: -150px; left: -100px; background: radial-gradient(circle, rgba(45,106,79,0.06), transparent 70%); }
 .hero-circle-3 { width: 200px; height: 200px; top: 40%; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, rgba(200,96,42,0.05), transparent 70%); }
 
 /* ─── Sections ─────────────────────────── */
@@ -524,7 +523,7 @@
 }
 
 /* ─── Dark Mode ────────────────────────── */
-body.dark-mode .home-container {
+:host-context(.dark-mode) .home-container {
   --bg: #0e0d0b;
   --surface: #17150f;
   --surface-alt: #1d1b14;
@@ -545,11 +544,11 @@ body.dark-mode .home-container {
   --shadow-lg: 0 24px 60px rgba(0,0,0,.6);
 }
 
-body.dark-mode .hero {
+:host-context(.dark-mode) .hero {
   background: linear-gradient(135deg, #0e0d0b 0%, #1a1714 40%, #0e0d0b 100%);
 }
 
-body.dark-mode .low-stock-badge {
+:host-context(.dark-mode) .low-stock-badge {
   background: rgba(14,13,11,.85);
 }
 

@@ -99,7 +99,7 @@
 
           <div
             class="cart-item"
-            *ngFor="let item of cart.items">
+            *ngFor="let item of paginatedItems">
 
             <div class="cart-item-body">
 
@@ -187,6 +187,19 @@
 
           </div>
 
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button (click)="previousPage()" [disabled]="currentPage === 1" class="pagination-btn">
+            ← Previous
+          </button>
+
+          <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+
+          <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="pagination-btn">
+            Next →
+          </button>
         </div>
 
       </div>

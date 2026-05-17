@@ -343,30 +343,30 @@
 }
 
 /* Dark Mode Support */
-body.dark-mode .footer {
+:host-context(.dark-mode) .footer {
   background: linear-gradient(135deg, #0e0d0b 0%, #1a1714 100%);
 }
 
-body.dark-mode .brand-name {
+:host-context(.dark-mode) .brand-name {
   background: linear-gradient(135deg, #e07840, #c8602a);
   background-clip: text;
   -webkit-background-clip: text;
 }
 
-body.dark-mode .links-list a:hover,
-body.dark-mode .designer:hover {
+:host-context(.dark-mode) .links-list a:hover,
+:host-context(.dark-mode) .designer:hover {
   color: #e07840;
 }
 
-body.dark-mode .newsletter-btn {
+:host-context(.dark-mode) .newsletter-btn {
   background: linear-gradient(135deg, #e07840, #c8602a);
 }
 
-body.dark-mode .contact-item svg {
+:host-context(.dark-mode) .contact-item svg {
   color: #e07840;
 }
 
-body.dark-mode .copyright-brand {
+:host-context(.dark-mode) .copyright-brand {
   color: #e07840;
 }
 

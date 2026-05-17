@@ -80,7 +80,7 @@
           <div class="price-inputs">
             <input
               type="number"
-              placeholder="Min"
+              [placeholder]="minPlaceholderPrice"
               [(ngModel)]="minPrice"
               (ngModelChange)="onFilterChange()"
               min="0"
@@ -89,15 +89,17 @@
             <span>-</span>
             <input
               type="number"
-              placeholder="Max"
+              [placeholder]="maxPlaceholderPrice"
               [(ngModel)]="maxPrice"
               (ngModelChange)="onFilterChange()"
               min="0"
               class="price-input"
             />
           </div>
-          <div class="price-display">
-            {{ formatPrice(minPrice) }} - {{ formatPrice(maxPrice) }}
+          <div class="price-display" *ngIf="minPrice !== undefined || maxPrice !== undefined">
+            <span *ngIf="minPrice !== undefined">{{ formatPrice(minPrice) }}</span>
+            <span *ngIf="minPrice !== undefined && maxPrice !== undefined"> - </span>
+            <span *ngIf="maxPrice !== undefined">{{ formatPrice(maxPrice) }}</span>
           </div>
         </div>
 
@@ -148,7 +150,7 @@
           <p>No products found in this category</p>
         </div>
         <div *ngFor="let product of products" class="product-card">
-          <div class="product-image-container">
+          <div class="product-image-container" (click)="viewProduct(product.productId)" style="cursor: pointer;">
             <img
               *ngIf="product.imagesNames && product.imagesNames.length > 0"
               [src]="productService.getImageUrl(product.imagesNames[0])"
@@ -159,6 +161,9 @@
             <div *ngIf="!product.imagesNames || product.imagesNames.length === 0" class="no-image">
               No Image
             </div>
+            <div class="image-overlay">
+              <span class="quick-view-label">View Details</span>
+            </div>
           </div>
 
           <div class="product-info">
@@ -168,6 +173,7 @@
             </p>
 
             <div class="product-meta">
+              <span class="category">{{ category?.name }}</span>
               <span class="store">{{ product.storeName }}</span>
             </div>
 
@@ -178,9 +184,47 @@
                   {{ product.stockQuantity }} in stock
                 </span>
               </div>
-              <button class="view-btn" (click)="viewProduct(product.productId)">
-                View Details
-              </button>
+
+              <!-- Dynamic Add to Cart / Inline Counter -->
+              <ng-container *ngIf="getCartQuantity(product.productId) === 0; else qtyCounter">
+                <button
+                  class="add-to-cart-btn"
+                  (click)="addToCart(product)"
+                  [disabled]="product.stockQuantity <= 0 || isAddingToCart(product.productId)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; margin-right: 6px; display: inline-block; vertical-align: middle;">
+                    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                  </svg>
+                  <span style="vertical-align: middle;">{{ product.stockQuantity <= 0 ? 'Out of Stock' : (isAddingToCart(product.productId) ? 'Adding...' : 'Add to Cart') }}</span>
+                </button>
+              </ng-container>
+
+              <ng-template #qtyCounter>
+                <div class="dynamic-qty-selector">
+                  <button
+                    type="button"
+                    class="qty-action-btn minus"
+                    (click)="decrementCart(product)"
+                    [disabled]="isAddingToCart(product.productId)"
+                    aria-label="Decrease quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                  <span class="qty-display">
+                    {{ isAddingToCart(product.productId) ? '...' : getCartQuantity(product.productId) }}
+                  </span>
+                  <button
+                    type="button"
+                    class="qty-action-btn plus"
+                    (click)="incrementCart(product)"
+                    [disabled]="getCartQuantity(product.productId) >= product.stockQuantity || isAddingToCart(product.productId)"
+                    aria-label="Increase quantity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  </button>
+                </div>
+              </ng-template>
             </div>
           </div>
         </div>
