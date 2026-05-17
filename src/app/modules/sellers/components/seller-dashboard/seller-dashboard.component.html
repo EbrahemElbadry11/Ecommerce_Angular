@@ -1,111 +1,385 @@
 <section class="dashboard-page">
+
   <div class="dashboard-hero">
+
     <div class="hero-copy">
-      <p class="eyebrow">Seller dashboard</p>
-      <h1>Manage your products</h1>
-      <p>
-        Track your store performance, review your catalog, and remove products you no longer want to sell.
+
+      <p class="eyebrow">
+        Seller dashboard
       </p>
 
-      <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
-      <div class="message error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <h1>
+        Manage your products
+      </h1>
+
+      <p>
+        Track your store performance,
+        review your catalog,
+        and remove products you no longer
+        want to sell.
+      </p>
+
+      <div
+        class="message success"
+        *ngIf="successMessage"
+      >
+        {{ successMessage }}
+      </div>
+
+      <div
+        class="message error"
+        *ngIf="errorMessage"
+      >
+        {{ errorMessage }}
+      </div>
+
     </div>
 
-    <div class="quick-stats" *ngIf="seller">
+    <div
+      class="quick-stats"
+      *ngIf="seller"
+    >
+
       <div class="stat-card accent">
-        <span>Status</span>
-        <strong>{{ approvedLabel }}</strong>
+
+        <span>
+          Status
+        </span>
+
+        <strong>
+          {{ approvedLabel }}
+        </strong>
+
       </div>
+
       <div class="stat-card">
-        <span>Total products</span>
-        <strong>{{ totalProducts }}</strong>
+
+        <span>
+          Total products
+        </span>
+
+        <strong>
+          {{ totalProducts }}
+        </strong>
+
       </div>
+
       <div class="stat-card">
-        <span>Total earnings</span>
-        <strong>{{ formatCurrency(totalEarnings) }}</strong>
+
+        <span>
+          Total earnings
+        </span>
+
+        <strong>
+          {{ formatCurrency(totalRevenue) }}
+        </strong>
+
       </div>
+
       <div class="stat-card">
-        <span>Visible products</span>
-        <strong>{{ products.length }}</strong>
+
+        <span>
+          Visible products
+        </span>
+
+        <strong>
+          {{ products.length }}
+        </strong>
+
       </div>
+
     </div>
+
   </div>
 
-  <div class="loading-card" *ngIf="isLoadingSeller || isLoadingProducts">
+  <div
+    class="loading-card"
+    *ngIf="
+      isLoadingSeller ||
+      isLoadingProducts
+    "
+  >
+
     <div class="spinner"></div>
-    <p>Loading seller dashboard...</p>
+
+    <p>
+      Loading seller dashboard...
+    </p>
+
   </div>
 
-  <div class="empty-card" *ngIf="!isLoadingSeller && !seller && !errorMessage">
-    <p>You do not have a seller profile yet.</p>
-    <a routerLink="/sellers/register">Register your store</a>
+  <div
+    class="empty-card"
+    *ngIf="
+      !isLoadingSeller &&
+      !seller &&
+      !errorMessage
+    "
+  >
+
+    <p>
+      You do not have a seller profile yet.
+    </p>
+
+    <a routerLink="/sellers/register">
+      Register your store
+    </a>
+
   </div>
 
-  <div class="products-panel" *ngIf="seller">
+  <div
+    class="products-panel"
+    *ngIf="seller"
+  >
+
     <div class="panel-header">
+
       <div>
-        <h2>Your products</h2>
-        <p>{{ products.length }} items listed in your store</p>
+
+        <h2>
+          Your products
+        </h2>
+
+        <p>
+          {{ products.length }}
+          items listed in your store
+        </p>
+
       </div>
+
       <div class="panel-actions">
-        <a class="primary-link" routerLink="/products/create">Add product</a>
-        <a class="primary-link" routerLink="/sellers/profile">Edit seller profile</a>
+
+        <a
+          class="primary-link"
+          routerLink="/products/create"
+        >
+          Add product
+        </a>
+
+        <a
+          class="primary-link"
+          routerLink="/sellers/profile"
+        >
+          Edit seller profile
+        </a>
+
       </div>
+
     </div>
 
-    <div class="empty-products" *ngIf="!isLoadingProducts && products.length === 0">
-      <p>No products have been added yet.</p>
+    <div
+      class="empty-products"
+      *ngIf="
+        !isLoadingProducts &&
+        products.length === 0
+      "
+    >
+
+      <p>
+        No products have been added yet.
+      </p>
+
     </div>
 
-    <div class="product-grid" *ngIf="!isLoadingProducts && products.length > 0">
-      <article class="product-card" *ngFor="let product of products; trackBy: trackByProductId">
+    <div
+      class="product-grid"
+      *ngIf="
+        !isLoadingProducts &&
+        products.length > 0
+      "
+    >
+
+      <article
+        class="product-card"
+        *ngFor="
+          let product of paginatedProducts;
+          trackBy: trackByProductId
+        "
+      >
+
         <div class="image-wrap">
-          <img *ngIf="getPrimaryImageName(product); else noImage"
+
+          <img
+            *ngIf="
+              getPrimaryImageName(product);
+              else noImage
+            "
             [src]="getPrimaryImageUrl(product)"
             [alt]="product.name"
             loading="lazy"
           />
+
           <ng-template #noImage>
-            <div class="image-placeholder">{{ product.name.charAt(0) }}</div>
+
+            <div class="image-placeholder">
+              {{ product.name.charAt(0) }}
+            </div>
+
           </ng-template>
+
         </div>
 
         <div class="product-body">
+
           <div class="product-topline">
-            <span class="category">{{ product.categoryName }}</span>
-            <span class="date">Added {{ formatDate(product.createdAt) }}</span>
+
+            <span class="category">
+              {{ product.categoryName }}
+            </span>
+
+            <span class="date">
+              Added
+              {{ formatDate(product.createdAt) }}
+            </span>
+
           </div>
 
-          <h3>{{ product.name }}</h3>
-          <p>{{ product.description || 'No description provided.' }}</p>
+          <h3>
+            {{ product.name }}
+          </h3>
+
+          <p>
+            {{
+              product.description ||
+              'No description provided.'
+            }}
+          </p>
 
           <div class="product-meta">
-            <strong>{{ formatCurrency(product.price) }}</strong>
-            <span>Stock: {{ product.stockQuantity }}</span>
+
+            <strong>
+              {{ formatCurrency(product.price) }}
+            </strong>
+
+            <span>
+              Stock:
+              {{ product.stockQuantity }}
+            </span>
+
           </div>
 
           <div class="actions">
-            <button type="button" class="secondary-button" (click)="viewProduct(product.productId)">View</button>
-            <button type="button" class="secondary-button" (click)="editProduct(product.productId)">Edit</button>
-            <button type="button" class="danger-button" (click)="deleteProduct(product)" [disabled]="isDeleting(product.productId)">
-              {{ isDeleting(product.productId) ? 'Deleting...' : 'Delete' }}
+
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="viewProduct(product.productId)"
+            >
+              View
             </button>
+
+            <button
+              type="button"
+              class="secondary-button"
+              (click)="editProduct(product.productId)"
+            >
+              Edit
+            </button>
+
+            <button
+              type="button"
+              class="danger-button"
+              (click)="deleteProduct(product)"
+              [disabled]="
+                isDeleting(product.productId)
+              "
+            >
+              {{
+                isDeleting(product.productId)
+                  ? 'Deleting...'
+                  : 'Delete'
+              }}
+            </button>
+
           </div>
 
           <app-product-image-upload
             [productId]="product.productId"
             [productName]="product.name"
-            [currentImageUrl]="getPrimaryImageUrl(product)"
+            [currentImageUrl]="
+              getPrimaryImageUrl(product)
+            "
             (uploaded)="onImageUploaded($event)"
             (error)="onImageError($event)"
-          ></app-product-image-upload>
+          >
+          </app-product-image-upload>
+
         </div>
+
       </article>
+
     </div>
+
+    <!-- Pagination -->
+    <div
+      class="dashboard-pagination"
+      *ngIf="products.length > 0"
+    >
+
+      <button
+        type="button"
+        class="page-btn"
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+      >
+        ← Prev
+      </button>
+
+      <div class="page-numbers">
+
+        <button
+          type="button"
+          *ngFor="let page of pages"
+          class="page-number"
+          [class.active]="
+            page === currentPage
+          "
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+
+      </div>
+
+      <button
+        type="button"
+        class="page-btn"
+        (click)="nextPage()"
+        [disabled]="
+          currentPage === totalPages
+        "
+      >
+        Next →
+      </button>
+
+    </div>
+
   </div>
 
-  <div class="retry-card" *ngIf="errorMessage">
-    <button type="button" class="primary-link" (click)="retry()">Retry</button>
-    <a routerLink="/sellers/register">Register store</a>
+  <app-seller-orders
+    (revenueCalculated)="
+      totalRevenue = $event
+    "
+  >
+  </app-seller-orders>
+
+  <div
+    class="retry-card"
+    *ngIf="errorMessage"
+  >
+
+    <button
+      type="button"
+      class="primary-link"
+      (click)="retry()"
+    >
+      Retry
+    </button>
+
+    <a routerLink="/sellers/register">
+      Register store
+    </a>
+
   </div>
+
 </section>

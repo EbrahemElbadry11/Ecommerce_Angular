@@ -114,6 +114,7 @@
 }
 
 @media (max-width: 640px) {
+
   .upload-header,
   .actions {
     flex-direction: column;

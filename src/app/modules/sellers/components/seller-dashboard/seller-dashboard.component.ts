@@ -28,6 +28,7 @@ import { SellerResponseDto } from '../../models/seller.model';
 import { SellerService } from '../../services/seller.service';
 
 import { ProductImageUploadComponent } from '../../../products/components/product-image-upload/product-image-upload.component';
+import { SellerOrdersComponent } from "../seller-orders/seller-orders";
 
 import { ToastService } from '../../../../../services/toast';
 
@@ -39,7 +40,8 @@ import { ToastService } from '../../../../../services/toast';
   imports: [
     CommonModule,
     RouterLink,
-    ProductImageUploadComponent
+    ProductImageUploadComponent,
+    SellerOrdersComponent
   ],
 
   templateUrl:
@@ -70,6 +72,7 @@ export class SellerDashboardComponent
   successMessage = '';
 
   errorMessage = '';
+  totalRevenue = 0;
 
   private destroy$ =
     new Subject<void>();
@@ -426,6 +429,65 @@ export class SellerDashboardComponent
       );
   }
 
+  currentPage = 1;
+
+  pageSize = 6;
+
+  get totalPages(): number {
+
+    return Math.ceil(
+      this.products.length / this.pageSize
+    );
+
+  }
+
+  get paginatedProducts() {
+
+    const start =
+      (this.currentPage - 1) * this.pageSize;
+
+    return this.products.slice(
+      start,
+      start + this.pageSize
+    );
+
+  }
+
+  get pages(): number[] {
+
+    return Array.from(
+      { length: this.totalPages },
+      (_, i) => i + 1
+    );
+
+  }
+
+  goToPage(page: number): void {
+
+    this.currentPage = page;
+
+  }
+
+  nextPage(): void {
+
+    if (this.currentPage < this.totalPages) {
+
+      this.currentPage++;
+
+    }
+
+  }
+
+  previousPage(): void {
+
+    if (this.currentPage > 1) {
+
+      this.currentPage--;
+
+    }
+
+  }
+
   // GETTERS
 
   get totalProducts(): number {
@@ -449,4 +511,5 @@ export class SellerDashboardComponent
       ? 'Approved'
       : 'Pending approval';
   }
+
 }
