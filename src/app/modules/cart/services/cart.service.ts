@@ -98,6 +98,6 @@ export class CartService {
       return image;
     }
 
-    return `https://localhost:7017/images/products/${image}`;
+    return `http://localhost:5053/images/products/${image}`;
   }
 }

@@ -50,7 +50,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   showFilters: boolean = false;
 
   // Image API URL
-  private apiUrl: string = 'https://localhost:7017'; // غير البورت حسب اللي عندك
+  private apiUrl: string = 'http://localhost:5053'; // غير البورت حسب اللي عندك
 
   addingToCartIds = new Set<number>();
 

@@ -90,10 +90,10 @@ export class CategoryListComponent implements OnInit, OnDestroy {
     }
 
     if (icon.startsWith('/')) {
-      return `https://localhost:7017${icon}`;
+      return `http://localhost:5053${icon}`;
     }
 
-    return `https://localhost:7017/${icon}`;
+    return `http://localhost:5053/${icon}`;
   }
 
   onImageError(event: Event): void {
