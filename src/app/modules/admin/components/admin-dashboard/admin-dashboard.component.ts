@@ -131,6 +131,7 @@ public orderStatusData: OrderStatusItem[] = [];
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (res) => {
+          this.cd.detectChanges
           if (!res.data) return;
 
           this.stats.set(res.data);
@@ -150,7 +151,7 @@ console.log('monthlyRevenue:', this.monthlyRevenue);
           this.orderStatusData   = this.buildOrderStatusData(res.data.recentOrders ?? []);
 
           setTimeout(() => this.initCharts(), 200);
-          this.cd.markForCheck();
+          this.cd.detectChanges();
         },
         error: () => this.showAlert('Failed to load dashboard data', 'danger'),
       });
