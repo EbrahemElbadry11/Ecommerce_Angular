@@ -81,13 +81,13 @@ export class AdminService {
   }
 
   getOrders(page: number = 1, pageSize: number = 5, status?: string): Observable<ApiResponse<any>> {
-  let url = `/orders?page=${page}&pageSize=${pageSize}`;
+  let url = `/Order?page=${page}&pageSize=${pageSize}`;
   if (status) { url += `&status=${status}`; }
   return this.http.get<ApiResponse<any>>(url);
 }
 
 getAllOrders(): Observable<ApiResponse<any>> {
-  return this.http.get<ApiResponse<any>>(`/orders?page=1&pageSize=1000`);
+  return this.http.get<ApiResponse<any>>(`/Order/admin/all`);
 }
 getOrderById(id: number): Observable<ApiResponse<any>> {
   return this.http.get<ApiResponse<any>>(`/Order/${id}`);

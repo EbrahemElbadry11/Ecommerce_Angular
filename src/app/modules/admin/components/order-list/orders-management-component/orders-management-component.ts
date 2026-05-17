@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { finalize, Subscription } from 'rxjs';
 import { AdminService } from '../.././../services/admin.service';
 import { ApiResponse } from '../../../models/user-admin.model';
+import {  forkJoin } from 'rxjs';
 
 export type OrderStatus = 'Pending' | 'Confirmed' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 
@@ -31,7 +32,7 @@ export interface Order {
   subTotal:        number;
   shippingFees:    number;
   totalAmount:     number;
-  customerName:    string;  // ← ضيف
+  customerName:    string;  
   orderItems:      OrderItem[];
 }
 
@@ -45,6 +46,7 @@ export interface Order {
 export class OrdersManagementComponent implements OnInit, OnDestroy {
 
   private adminService = inject(AdminService);
+  private cd = inject(ChangeDetectorRef);
 
   // ── State ────────────────────────────────────────────────────────────────────
   allOrders      = signal<Order[]>([]);
@@ -52,6 +54,7 @@ export class OrdersManagementComponent implements OnInit, OnDestroy {
   loading        = signal(true);
   actionLoading  = signal<number | null>(null);
   expandedOrder  = signal<number | null>(null);
+  totalOrdersCount = signal<number>(0);
 
   // ── Alert ────────────────────────────────────────────────────────────────────
   alertMessage = signal<string | null>(null);
@@ -90,26 +93,35 @@ export class OrdersManagementComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────────────────
   loadOrders(): void {
   this.loading.set(true);
-  const sub = this.adminService.getDashboard()
+  const sub = this.adminService.getAllOrders()
     .pipe(finalize(() => this.loading.set(false)))
     .subscribe({
       next: (res: any) => {
-        const raw: any[] = res.data?.recentOrders ?? [];
+        this.cd.detectChanges
+        console.log('All orders:', res);
+        const raw: any[] = Array.isArray(res.data) ? res.data : [];
         const mapped: Order[] = raw.map((o: any) => ({
-          orderId:         o.orderId      ?? 0,
-          orderDate:       o.orderDate    ?? new Date().toISOString(),
-          status:          o.status       ?? 'Pending',
-          shippingAddress: '—',
-          userId:          null,
-          guestId:         null,
-          totalItems:      0,
-          subTotal:        o.totalAmount  ?? 0,
-          shippingFees:    0,
-          totalAmount:     o.totalAmount  ?? 0,
-          customerName:    o.customerName ?? 'Guest',
-          orderItems:      [],
+          orderId:         o.orderId         ?? o.OrderId         ?? 0,
+          orderDate:       o.orderDate       ?? o.OrderDate       ?? new Date().toISOString(),
+          status:          o.status          ?? o.Status          ?? 'Pending',
+          shippingAddress: o.shippingAddress ?? o.ShippingAddress ?? '—',
+          userId:          o.userId          ?? o.UserId          ?? null,
+          guestId:         o.guestId         ?? o.GuestId         ?? null,
+          totalItems:      o.totalItems      ?? o.TotalItems      ?? 0,
+          subTotal:        o.subTotal        ?? o.SubTotal        ?? 0,
+          shippingFees:    o.shippingFees    ?? o.ShippingFees    ?? 0,
+          totalAmount:     o.totalAmount     ?? o.TotalAmount     ?? 0,
+          customerName:    o.customerName    ?? o.CustomerName    ?? 'Guest',
+          orderItems: (o.orderItems ?? o.OrderItems ?? []).map((i: any) => ({
+            productId:   i.productId   ?? i.ProductId   ?? 0,
+            productName: i.productName ?? i.ProductName ?? 'Unknown',
+            quantity:    i.quantity    ?? i.Quantity    ?? 0,
+            price:       i.price       ?? i.Price       ?? 0,
+            imageUrl:    i.imageUrl    ?? i.ImageUrl    ?? null,
+          })),
         }));
         this.allOrders.set(mapped);
+        this.totalOrdersCount.set(mapped.length);
         this.applyFilters();
       },
       error: () => this.showAlert('Failed to load orders', 'danger'),
