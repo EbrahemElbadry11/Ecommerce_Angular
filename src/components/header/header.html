@@ -117,7 +117,11 @@
             <button class="profile-btn border-0 d-flex align-items-center gap-2"
                     type="button" data-bs-toggle="dropdown" aria-expanded="false">
               <div class="avatar" [class.avatar-admin]="isAdmin" [class.avatar-seller]="isSeller">
-                {{ userInitial }}
+                @if (userImageUrl) {
+                  <img [src]="userImageUrl" [alt]="userFullName" class="avatar-image">
+                } @else {
+                  {{ userInitial }}
+                }
               </div>
               <div class="d-none d-md-flex flex-column align-items-start">
                 <span class="user-name">{{ userFullName }}</span>
@@ -131,7 +135,11 @@
               <li class="dropdown-header">
                 <div class="d-flex align-items-center gap-2 px-2 py-1">
                   <div class="avatar avatar-sm" [class.avatar-admin]="isAdmin" [class.avatar-seller]="isSeller">
-                    {{ userInitial }}
+                    @if (userImageUrl) {
+                      <img [src]="userImageUrl" [alt]="userFullName" class="avatar-image">
+                    } @else {
+                      {{ userInitial }}
+                    }
                   </div>
                   <div>
                     <div class="fw-semibold small">{{ userFullName }}</div>

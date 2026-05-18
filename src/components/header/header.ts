@@ -4,6 +4,7 @@ import { RouterLink, Router, RouterLinkActive, NavigationEnd } from '@angular/ro
 import { AuthService } from '../../app/modules/auth/services/auth.service';
 import { ThemeService } from '../../app/shared/services/ThemeService';
 import { CartService } from '../../app/modules/cart/services/cart.service';
+import { UserService } from '../../app/modules/user/services/user.service';
 import { Subject, filter, takeUntil } from 'rxjs';
 
 @Component({
@@ -21,6 +22,7 @@ export class Header implements OnInit, OnDestroy {
   userFullName: string = '';
   userInitial: string = '';
   userRole: string = '';
+  userImageUrl: string = '';
   isScrolled: boolean = false;
   isDarkMode: boolean = false;
   cartCount: number = 0;
@@ -32,6 +34,7 @@ export class Header implements OnInit, OnDestroy {
     private router: Router,
     private themeService: ThemeService,
     private cartService: CartService,
+    private userService: UserService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -85,11 +88,33 @@ export class Header implements OnInit, OnDestroy {
     this.userFullName = session?.fullName || session?.email || 'User';
     this.userInitial = this.userFullName.charAt(0).toUpperCase();
 
-    if (this.isLogged && !this.isAdmin) {
-      this.loadCartCount();
+    if (this.isLogged) {
+      this.loadUserProfile();
+      if (!this.isAdmin) {
+        this.loadCartCount();
+      }
     } else {
       this.cartService.clearCartState();
+      this.userImageUrl = '';
     }
+  }
+
+  private loadUserProfile(): void {
+    this.userService.getProfile()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res) => {
+          if (res.isSuccess && res.data?.imagePath) {
+            this.userImageUrl = this.userService.getUserImageUrl(res.data.imagePath);
+          } else {
+            this.userImageUrl = '';
+          }
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.userImageUrl = '';
+        }
+      });
   }
 
   private loadCartCount(): void {
