@@ -1187,8 +1187,8 @@
 }
 
 :host-context(.dark-mode) .dynamic-qty-selector {
-  background: var(--surface-2) !important;
-  border-color: var(--stroke) !important;
+  background: var(--surface-alt) !important;
+  border-color: var(--line) !important;
 }
 
 :host-context(.dark-mode) .qty-action-btn {
@@ -1203,7 +1203,9 @@
   }
 
   :host-context(.dark-mode) .qty-action-btn.plus:hover:not(:disabled) {
-}
+    background: var(--accent) !important;
+    color: white !important;
+  }
 
 :host-context(.dark-mode) .pagination-btn:hover:not(:disabled) {
   color: var(--bg);

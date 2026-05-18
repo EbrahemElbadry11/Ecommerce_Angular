@@ -83,7 +83,7 @@ export class CheckoutPageComponent
 
   subtotal = 0;
 
-  shippingFees = 50;
+  shippingFees = 0;
 
   orderId = 0;
   isGuest = true;
@@ -259,6 +259,7 @@ export class CheckoutPageComponent
     if (!this.cart?.items?.length) {
 
       this.subtotal = 0;
+      this.shippingFees = 0;
 
       return;
     }
@@ -276,6 +277,9 @@ export class CheckoutPageComponent
           ),
         0
       );
+
+    // Calculate shipping: $50 if < $200, free if >= $200
+    this.shippingFees = this.subtotal >= 200 ? 0 : 50;
   }
 
   private mountCardElement(): void {
@@ -543,6 +547,7 @@ export class CheckoutPageComponent
             this.cart.items = [];
 
             this.subtotal = 0;
+            this.shippingFees = 0;
 
             this.form.reset();
 

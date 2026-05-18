@@ -18,6 +18,7 @@ export class CartComponent implements OnInit {
   cart: CartResponse | null = null;
 
   subtotal = 0;
+  shippingFees = 0;
 
   isLoading = true;
 
@@ -240,6 +241,7 @@ export class CartComponent implements OnInit {
     if (!this.cart?.items?.length) {
 
       this.subtotal = 0;
+      this.shippingFees = 0;
 
       return;
     }
@@ -252,6 +254,9 @@ export class CartComponent implements OnInit {
 
         0
       );
+
+    // Calculate shipping: $50 if < $200, free if >= $200
+    this.shippingFees = this.subtotal >= 200 ? 0 : 50;
   }
 
   get paginatedItems(): any[] {

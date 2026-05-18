@@ -452,6 +452,11 @@
   color: var(--success);
 }
 
+.free {
+  color: var(--success);
+  font-weight: 700;
+}
+
 .summary-card {
   position: sticky;
   top: 20px;

@@ -6,6 +6,7 @@ import { Subject, takeUntil, debounceTime, distinctUntilChanged, finalize } from
 import { ProductService } from '../../../products/services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../../cart/services/cart.service';
+import { ToastService } from '../../../../../services/toast';
 import { ProductDto, ProductFilterDto, normalizeProductListResponse } from '../../../products/models/product.model';
 import { CategoryDto } from '../../models/category.model';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
@@ -64,6 +65,7 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     public productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
+    private toastService: ToastService,
     private cd: ChangeDetectorRef
   ) { }
 
@@ -598,7 +600,10 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
   incrementCart(product: ProductDto): void {
     const currentQty = this.getCartQuantity(product.productId);
     if (currentQty >= product.stockQuantity) {
-      alert(`Only ${product.stockQuantity} items available in stock.`);
+      this.toastService.show({
+        message: `Only ${product.stockQuantity} items available in stock`,
+        type: 'warning'
+      });
       return;
     }
 
@@ -623,9 +628,17 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
             this.cartService.currentCart = res.data ?? null;
             this.cd.markForCheck();
           });
+          this.toastService.show({
+            message: `${product.name} quantity increased`,
+            type: 'success'
+          });
         },
         error: (err) => {
           console.error('Increment cart error:', err);
+          this.toastService.show({
+            message: 'Failed to update quantity',
+            type: 'danger'
+          });
         }
       });
   }
@@ -659,9 +672,17 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
               this.cartService.currentCart = res.data ?? null;
               this.cd.markForCheck();
             });
+            this.toastService.show({
+              message: `${product.name} removed from cart`,
+              type: 'warning'
+            });
           },
           error: (err) => {
             console.error('Remove item error:', err);
+            this.toastService.show({
+              message: 'Failed to update quantity',
+              type: 'danger'
+            });
           }
         });
     } else {
@@ -680,9 +701,17 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
               this.cartService.currentCart = res.data ?? null;
               this.cd.markForCheck();
             });
+            this.toastService.show({
+              message: `${product.name} quantity decreased`,
+              type: 'warning'
+            });
           },
           error: (err) => {
             console.error('Decrement cart error:', err);
+            this.toastService.show({
+              message: 'Failed to update quantity',
+              type: 'danger'
+            });
           }
         });
     }
@@ -717,10 +746,17 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
             this.cartService.currentCart = res.data ?? null;
             this.cd.markForCheck();
           });
-          console.log(`${product.name} added to cart`);
+          this.toastService.show({
+            message: `${product.name} added to cart`,
+            type: 'success'
+          });
         },
         error: (err) => {
           console.error('Add to cart error:', err);
+          this.toastService.show({
+            message: 'Failed to add item to cart',
+            type: 'danger'
+          });
         }
       });
   }

@@ -278,11 +278,8 @@
               Shipping
             </span>
 
-            <span>
-              {{
-                shippingFees
-                  | currency
-              }}
+            <span [class.free]="shippingFees === 0">
+              {{ shippingFees === 0 ? 'Free' : (shippingFees | currency:'USD') }}
             </span>
 
           </div>

@@ -520,7 +520,7 @@
 
 .product-image {
   width: 100%; height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform .5s cubic-bezier(.22, 1, .36, 1);
 }
 
@@ -703,59 +703,72 @@
 
 /* Dynamic Quantity Selector Button replacement */
 .dynamic-qty-selector {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: var(--radius-sm);
-  background: var(--accent); /* Signature orange/accent background */
-  color: #fff;
-  height: 42px; /* Exact same height as add-to-cart-btn */
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(200, 96, 42, .2);
-  transition: all 0.2s ease;
-}
-
-.dynamic-qty-selector:hover {
-  background: var(--accent-deep);
-  box-shadow: 0 8px 22px rgba(200, 96, 42, .35);
-}
-
-.qty-action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 100%;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 16px;
+  background: #f1f5f9;
+  border: 1px solid rgba(26, 23, 20, 0.09);
+  transition: all 0.2s ease;
+}
+
+.qty-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   border: none;
-  background: rgba(255, 255, 255, 0);
-  color: #fff;
+  background: white;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-action-btn.minus:hover:not(:disabled) {
+  background: #f59e0b;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+.qty-action-btn.plus:hover:not(:disabled) {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(200, 96, 42, 0.2);
 }
 
 .qty-action-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.qty-action-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .qty-action-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .qty-action-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
 }
 
 .qty-display {
-  font-family: var(--ff-display);
-  font-size: 14px;
-  font-weight: 700;
-  color: #fff;
   min-width: 30px;
   text-align: center;
-  user-select: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
 }
 
 /* ─── Pagination ─────────────────────────────────────────── */
@@ -865,6 +878,27 @@
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
+}
+
+:host-context(.dark-mode) .dynamic-qty-selector {
+  background: var(--surface-alt) !important;
+  border-color: var(--line) !important;
+}
+
+:host-context(.dark-mode) .qty-action-btn {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border: none !important;
+}
+
+:host-context(.dark-mode) .qty-action-btn.minus:hover:not(:disabled) {
+  background: #d97706 !important;
+  color: white !important;
+}
+
+:host-context(.dark-mode) .qty-action-btn.plus:hover:not(:disabled) {
+  background: var(--accent) !important;
+  color: white !important;
 }
 
 /* ─── Responsive ─────────────────── */
