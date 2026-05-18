@@ -796,4 +796,8 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     return this.addingToCartIds.has(productId);
   }
 
+  isCustomer(): boolean {
+    return this.authService.hasRole('Customer');
+  }
+
 }

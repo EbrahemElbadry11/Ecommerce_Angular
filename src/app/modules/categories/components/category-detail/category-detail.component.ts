@@ -7,6 +7,7 @@ import { ProductService } from '../../../products/services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../../cart/services/cart.service';
 import { ToastService } from '../../../../../services/toast';
+import { AuthService } from '../../../auth/services/auth.service';
 import { ProductDto, ProductFilterDto, normalizeProductListResponse } from '../../../products/models/product.model';
 import { CategoryDto } from '../../models/category.model';
 import { SHARED_IMPORTS } from '../../../../shared/shared-imports';
@@ -66,7 +67,8 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
     private categoryService: CategoryService,
     private cartService: CartService,
     private toastService: ToastService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -763,5 +765,9 @@ export class CategoryDetailComponent implements OnInit, OnDestroy {
 
   isAddingToCart(productId: number): boolean {
     return this.addingToCartIds.has(productId);
+  }
+
+  isCustomer(): boolean {
+    return this.authService.hasRole('Customer');
   }
 }

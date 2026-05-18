@@ -219,7 +219,7 @@
         <div class="purchase-panel">
 
           <!-- Dynamic Add to Cart / Inline Counter -->
-          <div class="action-buttons">
+          <div class="action-buttons" *ngIf="isCustomer()">
             <ng-container *ngIf="quantity === 0; else mainQtyCounter">
               <button
                 type="button"
@@ -477,7 +477,7 @@
               </a>
 
               <!-- Add To Cart / Inline Counter -->
-              <ng-container *ngIf="getCartQuantity(item.productId) === 0; else qtyCounterRelated">
+              <ng-container *ngIf="isCustomer() && getCartQuantity(item.productId) === 0; else qtyCounterRelated">
                 <button
                   type="button"
                   class="related-cart-btn"
@@ -493,7 +493,7 @@
               </ng-container>
 
               <ng-template #qtyCounterRelated>
-                <div class="dynamic-qty-selector">
+                <div class="dynamic-qty-selector" *ngIf="isCustomer()">
                   <button
                     type="button"
                     class="qty-action-btn minus"
@@ -677,7 +677,7 @@
               </a>
 
               <!-- Add To Cart / Inline Counter -->
-              <ng-container *ngIf="getCartQuantity(item.productId) === 0; else qtyCounterRecommended">
+              <ng-container *ngIf="isCustomer() && getCartQuantity(item.productId) === 0; else qtyCounterRecommended">
                 <button
                   type="button"
                   class="related-cart-btn"
@@ -693,7 +693,7 @@
               </ng-container>
 
               <ng-template #qtyCounterRecommended>
-                <div class="dynamic-qty-selector">
+                <div class="dynamic-qty-selector" *ngIf="isCustomer()">
                   <button
                     type="button"
                     class="qty-action-btn minus"

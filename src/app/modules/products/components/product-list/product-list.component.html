@@ -260,7 +260,7 @@
               </div>
 
               <!-- Dynamic Add to Cart / Inline Counter -->
-              <ng-container *ngIf="getCartQuantity(product.productId) === 0; else qtyCounter">
+              <ng-container *ngIf="isCustomer() && getCartQuantity(product.productId) === 0; else qtyCounter">
                 <button
                   type="button"
                   class="add-to-cart-btn"
@@ -279,7 +279,7 @@
               </ng-container>
 
               <ng-template #qtyCounter>
-                <div class="dynamic-qty-selector">
+                <div class="dynamic-qty-selector" *ngIf="isCustomer()">
                   <button
                     type="button"
                     class="qty-action-btn minus"

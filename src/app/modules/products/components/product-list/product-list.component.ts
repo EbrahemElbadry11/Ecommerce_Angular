@@ -30,6 +30,8 @@ import { CartService } from '../../../cart/services/cart.service';
 
 import { ToastService } from '../../../../../services/toast';
 
+import { AuthService } from '../../../auth/services/auth.service';
+
 import { finalize } from 'rxjs/operators';
 
 
@@ -122,7 +124,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -794,6 +797,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
 
   isAddingToCart(productId: number): boolean {
     return this.addingToCartIds.has(productId);
+  }
+
+  isCustomer(): boolean {
+    return this.authService.hasRole('Customer');
   }
 
   /// TrackBy for ngFor
