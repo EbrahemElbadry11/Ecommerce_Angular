@@ -726,22 +726,6 @@
         Customer Reviews
       </h2>
 
-      <!-- Success -->
-      <div
-        *ngIf="reviewSuccessMessage"
-        class="success-banner"
-      >
-        {{ reviewSuccessMessage }}
-      </div>
-
-      <!-- Error -->
-      <div
-        *ngIf="reviewErrorMessage"
-        class="error-banner"
-      >
-        {{ reviewErrorMessage }}
-      </div>
-
       <!-- Review Form -->
       <app-review-form
         *ngIf="product"

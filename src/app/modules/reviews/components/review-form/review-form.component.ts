@@ -103,7 +103,6 @@ export class ReviewFormComponent implements OnDestroy {
               this._existingReview = response.data;
               this.setFormFromReview(response.data);
               this.onReviewUpdated.emit(response.data);
-              this.onSuccess.emit('Review updated successfully!');
             }
             this.isSubmitting = false;
           },

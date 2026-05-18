@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { ReviewService } from '../../services/review.service';
 import { ReviewDto } from '../../models/review.model';
+import { ToastService } from '../../../../../services/toast';
 
 /**
  * Reusable Review List Display Component
@@ -43,7 +44,10 @@ export class ReviewListComponent implements OnInit, OnDestroy, OnChanges {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private reviewService: ReviewService) { }
+  constructor(
+    private reviewService: ReviewService,
+    private toastService: ToastService
+  ) {}
 
   ngOnInit(): void {
     if (!this.reviews.length && this.productId) {
@@ -101,13 +105,18 @@ export class ReviewListComponent implements OnInit, OnDestroy, OnChanges {
    * Delete a review
    */
   deleteReview(reviewId: number, index: number): void {
-    if (confirm('Are you sure you want to delete this review?')) {
-      this.onDeleteReview.emit({
-        productId: this.productId,
-        reviewId,
-        index,
-      });
-    }
+    this.toastService.show({
+      message: 'Are you sure you want to delete this review?',
+      type: 'danger',
+      isConfirm: true,
+      onConfirm: () => {
+        this.onDeleteReview.emit({
+          productId: this.productId,
+          reviewId,
+          index,
+        });
+      },
+    });
   }
 
   /**

@@ -18,6 +18,7 @@ import { ReviewFormComponent } from '../../../reviews/components/review-form/rev
 import { ReviewListComponent } from '../../../reviews/components/review-list/review-list.component';
 
 import { AuthService } from '../../../auth/services/auth.service';
+import { ToastService } from '../../../../../services/toast';
 
 @Component({
   selector:
@@ -68,8 +69,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private reviewService: ReviewService,
     private authService: AuthService,
+    private toastService: ToastService,
     private cdr: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
 
@@ -382,42 +384,25 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       '';
   }
 
-  onReviewAdded(
-    review: ReviewDto
-  ): void {
-
-    this.reviewErrorMessage = '';
-
+  onReviewAdded(review: ReviewDto): void {
+    this.toastService.show('Review added successfully!', 'success');
     this.reviewList?.retryLoadReviews();
-
     this.cdr.markForCheck();
   }
 
   onReviewUpdated(review: ReviewDto): void {
-    this.reviewErrorMessage = '';
-
+    this.toastService.show('Review updated successfully!', 'success');
     this.reviewList?.retryLoadReviews();
-
     this.cdr.markForCheck();
   }
 
   onReviewError(message: string): void {
-
-    this.reviewSuccessMessage = '';
-
-    this.reviewErrorMessage =
-      message;
-
+    this.toastService.show(message, 'danger');
     this.cdr.markForCheck();
   }
 
   onReviewSuccess(message: string): void {
-
-    this.reviewErrorMessage = '';
-
-    this.reviewSuccessMessage =
-      message;
-
+    this.toastService.show(message, 'success');
     this.cdr.markForCheck();
   }
 
@@ -426,39 +411,21 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     reviewId: number;
     index: number;
   }): void {
-
     this.reviewService
-      .deleteReview(
-        event.productId,
-        event.reviewId
-      )
-
+      .deleteReview(event.productId, event.reviewId)
       .pipe(takeUntil(this.destroy$))
-
       .subscribe({
-
         next: () => {
-
-          this.reviewErrorMessage = '';
-
-          this.reviewSuccessMessage =
-            'Review deleted.';
-
+          this.toastService.show('Review deleted successfully.', 'success');
           this.reviewList?.retryLoadReviews();
-
           this.cdr.markForCheck();
         },
-
         error: (err) => {
-
-          console.error(
-            'Failed to delete review:',
-            err
+          console.error('Failed to delete review:', err);
+          this.toastService.show(
+            'Failed to delete review.',
+            'danger'
           );
-
-          this.reviewErrorMessage =
-            'Failed to delete review.';
-
           this.cdr.markForCheck();
         },
       });
