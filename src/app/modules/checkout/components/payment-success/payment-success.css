@@ -424,6 +424,82 @@
   }
 }
 
+/* ==========================================================================
+   DARK MODE
+   ========================================================================== */
+
+:host-context(.dark-mode) .success-page {
+  --bg: #0e0d0b;
+  --surface: rgba(23, 21, 15, 0.92);
+  --surface-strong: #17150f;
+  --ink: #f5f2ec;
+  --muted: #c9c4b8;
+  --accent: #e07840;
+  --accent-dark: #c8602a;
+  --green: #4ade80;
+  --green-soft: rgba(74, 222, 128, 0.12);
+  --line: rgba(245, 242, 236, 0.09);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.3);
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(224, 120, 64, 0.08),
+      transparent 32%),
+    radial-gradient(circle at bottom right,
+      rgba(74, 222, 128, 0.08),
+      transparent 35%),
+    var(--bg);
+}
+
+:host-context(.dark-mode) .success-background {
+  background-image:
+    radial-gradient(rgba(245, 242, 236, 0.03) 1px,
+      transparent 1px) !important;
+}
+
+:host-context(.dark-mode) .success-card {
+  background: var(--surface) !important;
+  border-color: var(--line) !important;
+}
+
+:host-context(.dark-mode) .success-card::before {
+  background:
+    linear-gradient(135deg,
+      rgba(224, 120, 64, 0.2),
+      rgba(74, 222, 128, 0.1)) !important;
+}
+
+:host-context(.dark-mode) .detail-item {
+  background: rgba(23, 21, 15, 0.6) !important;
+  border-color: rgba(245, 242, 236, 0.08) !important;
+}
+
+:host-context(.dark-mode) .detail-label {
+  color: var(--muted) !important;
+}
+
+:host-context(.dark-mode) .detail-value {
+  color: var(--ink) !important;
+}
+
+:host-context(.dark-mode) .detail-value.success {
+  color: var(--green) !important;
+}
+
+:host-context(.dark-mode) .continue-btn,
+:host-context(.dark-mode) .orders-btn {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+
+:host-context(.dark-mode) .continue-btn:hover,
+:host-context(.dark-mode) .orders-btn:hover {
+  background: var(--accent-dark) !important;
+  border-color: var(--accent-dark) !important;
+}
+
 @media (max-width: 768px) {
 
   .success-card {
