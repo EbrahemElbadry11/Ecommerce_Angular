@@ -563,3 +563,15 @@
 :host-context(body.dark-mode) .total-row strong {
   color: #e07840;
 }
+
+:host-context(body.dark-mode) .action-btn-outline {
+  background: transparent;
+  color: #f5f2ec;
+  border-color: rgba(245,242,236,.18);
+}
+
+:host-context(body.dark-mode) .action-btn-outline:hover {
+  background: #e07840;
+  color: #fff;
+  border-color: #e07840;
+}

@@ -875,8 +875,16 @@
     radial-gradient(ellipse 50% 60% at 100% 100%, rgba(74, 222, 128, 0.08) 0%, transparent 65%);
 }
 
+:host-context(.dark-mode) .action-btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+
 :host-context(.dark-mode) .action-btn-outline:hover {
-  color: var(--bg);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
 :host-context(.dark-mode) .legend-label,

@@ -717,6 +717,18 @@
   --shadow-lg: 0 24px 60px rgba(0,0,0,.6);
 }
 
+:host-context(.dark-mode) .action-btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+:host-context(.dark-mode) .action-btn-outline:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .table-panel,
   .alert,
