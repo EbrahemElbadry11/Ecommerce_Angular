@@ -7,7 +7,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink, } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, Subject, takeUntil, } from 'rxjs';
 import { ProductCardDto, ProductDto, ProductFilterDto, ProductListResponse, } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
@@ -49,7 +49,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   formattedPrice = '';
   formattedDate = '';
   isLowStockValue = false;
-  quantity = 1;
   isAddingToCart = false;
   isLoggedIn = false;
   currentUserName = '';
@@ -60,6 +59,7 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   relatedProducts: ProductCardDto[] = [];
   recommendedProducts: ProductCardDto[] = [];
   isLoadingSuggestions = false;
+  private addingToCartIds = new Set<number>(); // To prevent multiple rapid clicks on cart buttons
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -146,8 +146,6 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
             this.product =
               response.data;
 
-            this.quantity = 1;
-
             // Image
             if (
               this.product.imagesNames
@@ -177,6 +175,9 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
             this.isLowStockValue =
               this.product.stockQuantity <=
               3;
+
+            // Load current quantity from cart
+            this.quantity = this.getCartQuantity(this.product.productId);
 
             this.loadSuggestions();
 
@@ -269,107 +270,295 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  // Quantity
-  increaseQuantity(): void {
+  // Quantity - dynamically bound to cart
+  quantity: number = 0;
 
+  increaseQuantity(): void {
     if (!this.product) {
       return;
     }
 
-    if (
-      this.quantity <
-      this.product.stockQuantity
-    ) {
+    const currentQuantity = this.getCartQuantity(this.product.productId);
+    const newQuantity = currentQuantity + 1;
 
-      this.quantity++;
-
-      this.cdr.markForCheck();
-    }
-  }
-
-  decreaseQuantity(): void {
-
-    if (this.quantity > 1) {
-
-      this.quantity--;
-
-      this.cdr.markForCheck();
-    }
-  }
-
-  // cart
-  onAddToCart(): void {
-
-    if (
-      !this.product ||
-      this.product.stockQuantity <= 0
-    ) {
-      return;
-    }
-
-    const existingQuantity =
-      this.cartService.getCartItemQuantity(
-        this.product.productId
-      );
-
-    const requestedQuantity =
-      existingQuantity + this.quantity;
-
-    if (
-      requestedQuantity >
-      this.product.stockQuantity
-    ) {
-
-      alert(
-        `Only ${this.product.stockQuantity} items available in stock`
-      );
-
+    if (newQuantity > this.product.stockQuantity) {
+      this.toastService.show({
+        message: `Only ${this.product.stockQuantity} items available in stock`,
+        type: 'warning'
+      });
       return;
     }
 
     this.isAddingToCart = true;
+    this.cdr.markForCheck();
 
-    this.cartService
-      .addToCart(
-        this.product.productId,
-        this.quantity
-      )
-
+    this.cartService.updateCart(this.product.productId, newQuantity)
       .pipe(
-
         takeUntil(this.destroy$),
-
         finalize(() => {
-
           this.isAddingToCart = false;
-
           this.cdr.markForCheck();
         })
       )
-
       .subscribe({
-
         next: () => {
-
-          // update local cart cache
-          this.cartService.loadCart()
-            .subscribe((res) => {
-              this.cdr.markForCheck();
-            });
-
-          this.quantity = 1;
-
-          this.cdr.markForCheck();
+          this.cartService.loadCart().subscribe(() => {
+            this.quantity = this.getCartQuantity(this.product!.productId);
+            this.cdr.markForCheck();
+          });
+          this.toastService.show({
+            message: `${this.product?.name} quantity increased`,
+            type: 'success'
+          });
         },
-
         error: (err) => {
-
-          console.error(
-            'Add to cart error:',
-            err
-          );
+          console.error('Failed to update quantity:', err);
+          this.toastService.show({
+            message: 'Failed to update quantity',
+            type: 'danger'
+          });
         },
       });
+  }
+
+  decreaseQuantity(): void {
+    if (!this.product) {
+      return;
+    }
+
+    const currentQuantity = this.getCartQuantity(this.product.productId);
+
+    if (currentQuantity <= 0) {
+      return;
+    }
+
+    this.isAddingToCart = true;
+    this.cdr.markForCheck();
+
+    if (currentQuantity === 1) {
+      this.cartService.removeItem(this.product.productId)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.isAddingToCart = false;
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cartService.loadCart().subscribe(() => {
+              this.quantity = 0;
+              this.cdr.markForCheck();
+            });
+            this.toastService.show({
+              message: `${this.product?.name} removed from cart`,
+              type: 'warning'
+            });
+          },
+          error: (err) => {
+            console.error('Failed to remove item:', err);
+            this.toastService.show({
+              message: 'Failed to update quantity',
+              type: 'danger'
+            });
+          },
+        });
+      return;
+    }
+
+    this.cartService.updateCart(this.product.productId, currentQuantity - 1)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isAddingToCart = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.cartService.loadCart().subscribe(() => {
+            this.quantity = this.getCartQuantity(this.product!.productId);
+            this.cdr.markForCheck();
+          });
+          this.toastService.show({
+            message: `${this.product?.name} quantity decreased`,
+            type: 'warning'
+          });
+        },
+        error: (err) => {
+          console.error('Failed to update quantity:', err);
+          this.toastService.show({
+            message: 'Failed to update quantity',
+            type: 'danger'
+          });
+        },
+      });
+  }
+
+  // Main product cart actions
+  onAddToCart(): void {
+    if (!this.product || this.product.stockQuantity <= 0) {
+      return;
+    }
+
+    const currentQuantity = this.getCartQuantity(this.product.productId);
+    const addQuantity = currentQuantity > 0 ? 1 : 1; // Default to 1 if not in cart
+    const requestedQuantity = currentQuantity + addQuantity;
+
+    if (requestedQuantity > this.product.stockQuantity) {
+      this.toastService.show({
+        message: `Only ${this.product.stockQuantity} items available in stock`,
+        type: 'warning'
+      });
+      return;
+    }
+
+    this.isAddingToCart = true;
+    this.cdr.markForCheck();
+
+    this.cartService.addToCart(this.product.productId, addQuantity)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isAddingToCart = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.cartService.loadCart().subscribe(() => {
+            this.quantity = this.getCartQuantity(this.product!.productId);
+            this.cdr.markForCheck();
+          });
+          this.toastService.show({
+            message: `${this.product?.name} added to cart`,
+            type: 'success'
+          });
+        },
+        error: (err) => {
+          console.error('Add to cart error:', err);
+          this.toastService.show({
+            message: 'Failed to add item to cart',
+            type: 'danger'
+          });
+        },
+      });
+  }
+
+  // Related/Recommended product cart actions
+  incrementRelated(product: ProductCardDto): void {
+    const currentQty = this.getCartQuantity(product.productId);
+    if (currentQty >= product.stockQuantity) {
+      this.toastService.show({
+        type: 'warning',
+        message: `Only ${product.stockQuantity} items available in stock.`
+      });
+      return;
+    }
+
+    if (this.addingToCartIds.has(product.productId)) {
+      return;
+    }
+
+    this.addingToCartIds.add(product.productId);
+    this.cdr.markForCheck();
+
+    this.cartService.updateCart(product.productId, currentQty + 1)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.addingToCartIds.delete(product.productId);
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.cartService.loadCart().subscribe(() => {
+            this.cdr.markForCheck();
+          });
+          this.toastService.show({
+            type: 'success',
+            message: `${product.name} quantity increased`
+          });
+        },
+        error: (err) => {
+          console.error('Increment cart error:', err);
+          this.toastService.show({
+            type: 'danger',
+            message: 'Failed to update cart'
+          });
+        }
+      });
+  }
+
+  decrementRelated(product: ProductCardDto): void {
+    const currentQty = this.getCartQuantity(product.productId);
+    if (currentQty <= 0) {
+      return;
+    }
+
+    if (this.addingToCartIds.has(product.productId)) {
+      return;
+    }
+
+    this.addingToCartIds.add(product.productId);
+    this.cdr.markForCheck();
+
+    if (currentQty === 1) {
+      this.cartService.removeItem(product.productId)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.addingToCartIds.delete(product.productId);
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cartService.loadCart().subscribe(() => {
+              this.cdr.markForCheck();
+            });
+            this.toastService.show({
+              type: 'warning',
+              message: `${product.name} removed from cart`
+            });
+          },
+          error: (err) => {
+            console.error('Remove item error:', err);
+            this.toastService.show({
+              type: 'danger',
+              message: 'Failed to remove item from cart'
+            });
+          }
+        });
+    } else {
+      this.cartService.updateCart(product.productId, currentQty - 1)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => {
+            this.addingToCartIds.delete(product.productId);
+            this.cdr.markForCheck();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.cartService.loadCart().subscribe(() => {
+              this.cdr.markForCheck();
+            });
+            this.toastService.show({
+              type: 'warning',
+              message: `${product.name} quantity decreased`
+            });
+          },
+          error: (err) => {
+            console.error('Decrement cart error:', err);
+            this.toastService.show({
+              type: 'danger',
+              message: 'Failed to update cart'
+            });
+          }
+        });
+    }
   }
 
   // Reviews
@@ -581,12 +770,30 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
               this.cdr.markForCheck();
             });
 
+          this.toastService.show({
+            message: `${product.name} added to cart`,
+            type: 'success'
+          });
+
           console.log(`${product.name} added to cart`);
         },
         error: (err) => {
           console.error('Add related product error:', err);
+
+          this.toastService.show({
+            message: 'Failed to add item to cart',
+            type: 'danger'
+          });
         },
       });
+  }
+
+  getCartQuantity(productId: number): number {
+    return this.cartService.getCartItemQuantity(productId);
+  }
+
+  isAddingOrUpdatingCart(productId: number): boolean {
+    return this.addingToCartIds.has(productId);
   }
 
 }

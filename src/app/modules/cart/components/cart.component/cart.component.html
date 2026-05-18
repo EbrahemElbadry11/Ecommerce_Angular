@@ -104,13 +104,17 @@
 
             <div class="cart-item-body">
 
-              <div class="cart-thumb">
+              <a
+                [routerLink]="['/products', item.productId]"
+                class="cart-thumb-link">
+                <div class="cart-thumb">
 
-                <img
-                  [src]="cartService.getImageUrl(item.imageUrl)"
-                  [alt]="item.productName">
+                  <img
+                    [src]="cartService.getImageUrl(item.imageUrl)"
+                    [alt]="item.productName">
 
-              </div>
+                </div>
+              </a>
               <div class="cart-info">
 
                 <h5 class="cart-title">

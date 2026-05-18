@@ -28,6 +28,8 @@ import { CategoryService } from '../../../categories/services/category.service';
 
 import { CartService } from '../../../cart/services/cart.service';
 
+import { ToastService } from '../../../../../services/toast';
+
 import { finalize } from 'rxjs/operators';
 
 
@@ -117,6 +119,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
     private productService: ProductService,
     private categoryService: CategoryService,
     private cartService: CartService,
+    private toastService: ToastService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
@@ -617,7 +620,10 @@ export class ProductListComponent implements OnInit, OnDestroy {
   incrementCart(product: ProductCardDto): void {
     const currentQty = this.getCartQuantity(product.productId);
     if (currentQty >= product.stockQuantity) {
-      alert(`Only ${product.stockQuantity} items available in stock.`);
+      this.toastService.show({
+        type: 'warning',
+        message: `Only ${product.stockQuantity} items available in stock.`
+      });
       return;
     }
 
@@ -641,9 +647,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
           this.cartService.loadCart().subscribe((res) => {
             this.cdr.markForCheck();
           });
+          this.toastService.show({
+            type: 'success',
+            message: `${product.name} quantity increased`
+          });
         },
         error: (err) => {
           console.error('Increment cart error:', err);
+          this.toastService.show({
+            type: 'danger',
+            message: 'Failed to update cart'
+          });
         }
       });
   }
@@ -676,9 +690,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
             this.cartService.loadCart().subscribe((res) => {
               this.cdr.markForCheck();
             });
+            this.toastService.show({
+              type: 'warning',
+              message: `${product.name} removed from cart`
+            });
           },
           error: (err) => {
             console.error('Remove item error:', err);
+            this.toastService.show({
+              type: 'danger',
+              message: 'Failed to remove item from cart'
+            });
           }
         });
     } else {
@@ -696,9 +718,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
             this.cartService.loadCart().subscribe((res) => {
               this.cdr.markForCheck();
             });
+            this.toastService.show({
+              type: 'warning',
+              message: `${product.name} quantity decreased`
+            });
           },
           error: (err) => {
             console.error('Decrement cart error:', err);
+            this.toastService.show({
+              type: 'danger',
+              message: 'Failed to update cart'
+            });
           }
         });
     }
@@ -744,15 +774,20 @@ export class ProductListComponent implements OnInit, OnDestroy {
           .subscribe((res) => {
             this.cdr.markForCheck();
           });
-        console.log(
-          `${product.name} added to cart`
-        );
+        this.toastService.show({
+          type: 'success',
+          message: `${product.name} added to cart`
+        });
       },
       error: (err) => {
         console.error(
           'Add to cart error:',
           err
         );
+        this.toastService.show({
+          type: 'danger',
+          message: 'Failed to add item to cart'
+        });
       },
     });
   }

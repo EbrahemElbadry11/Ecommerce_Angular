@@ -291,7 +291,7 @@
                   <select
                     class="role-select"
                     (change)="updateOrderStatus(order.id, $event)"
-                    [disabled]="actionLoading() === (order.id ?? 0).toString()"
+                    [disabled]="actionLoading() === order.id.toString()"
                   >
                     <option value="" selected disabled>Select Status</option>
 
